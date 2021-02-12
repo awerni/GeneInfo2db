@@ -1,0 +1,12 @@
+Package: GeneInfo2db
+Title: Imports gene and omics data into a PostgreSQL database
+Version: 0.1.2
+Authors@R: person("Andreas", "Wernitznig", email = "awernitz@broadinstitute.org",
+                  role = c("aut", "cre"))
+Description: Fills the bioinfo database with gene information and omics data from depmap.org 
+Depends: R (>= 3.6.0)
+Imports: RPostgres, RMariaDB, DBI, purrr, tibble, dplyr, tidyr, magrittr, dbplyr 
+Suggests:
+License: What license is it under?
+LazyData: true
+URL: https://github.com/broadinstitute/GeneInfo2db
