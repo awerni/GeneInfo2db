@@ -139,6 +139,35 @@ download_file_info <- tibble::tribble(
   "metmap", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-020-2969-2/MediaObjects/41586_2020_2969_MOESM7_ESM.xlsx", '41586_2020_2969_MOESM7_ESM.xlsx'
 )
 
+# -------------MSigDB --------------------
+
+gmt.files <- tibble::tribble(
+  ~file, ~collection, ~collection_name, ~gene_set_group,
+  "c1.all.v7.2.entrez.gmt", "c1", "positional", "positional",
+  "c2.cgp.v7.2.entrez.gmt", "c2", "curated", "chemical and genetic perturbations",
+  "c2.cp.biocarta.v7.2.entrez.gmt", "c2", "curated", "biocarta",
+  "c2.cp.kegg.v7.2.entrez.gmt", "c2", "curated", "KEGG",
+  "c2.cp.pid.v7.2.entrez.gmt", "c2", "curated", "PID",
+  "c2.cp.reactome.v7.2.entrez.gmt", "c2", "curated", "Reactome",
+  "c2.cp.wikipathways.v7.2.entrez.gmt", "c2", "curated", "wiki pathways",
+  "c2.cp.v7.2.entrez.gmt", "c2", "curated", "canonical pathways",
+  "c3.mir.mirdb.v7.2.entrez.gmt", "c3", "regulatory target", "MIRDB targets",
+  "c3.mir.mir_legacy.v7.2.entrez.gmt", "c3", "regulatory target", "Legacy microRNA targets",
+  #"c3.mir.v7.2.entrez.gmt", "c3", "regulatory target", "all microRNA targets",
+  "c3.tft.gtrd.v7.2.entrez.gmt", "c3", "regulatory target", "GTRD targets",
+  "c3.tft.tft_legacy.v7.2.entrez.gmt", "c3", "regulatory target", "Legacy transcription factor targets",
+  #"c3.tft.v7.2.entrez.gmt", "c3", "regulatory target", "all transcription factor targets",
+  "c4.cgn.v7.2.entrez.gmt", "c4", "computational", "cancer gene neighborhoods",
+  "c4.cm.v7.2.entrez.gmt", "c4", "computational", "cancer modules",
+  "c5.go.bp.v7.2.entrez.gmt", "c5", "gene ontology", "biological processes",
+  "c5.go.cc.v7.2.entrez.gmt", "c5", "gene ontology", "cellular components",
+  "c5.go.mf.v7.2.entrez.gmt", "c5", "gene ontology", "molecular functions",
+  "c6.all.v7.2.entrez.gmt", "c6", "oncogenic signatures", "all oncogenic signatures",
+  "c7.all.v7.2.entrez.gmt", "c7", "immunologic signatures", "all immunologic signatures ",
+  "c8.all.v7.2.entrez.gmt", "c8", "cell type signatures", "all cell type signatures",
+  "h.all.v7.2.entrez.gmt", "h", "hallmark", "hallmark"
+)
+
 
 # -----------------
-save(db_info, gene_info, refseq_info, db_compara, taiga_info, download_file_info, file = "data/source_info.rdata")
+save(db_info, gene_info, refseq_info, db_compara, taiga_info, download_file_info, gmt.files, file = "data/source_info.rdata")
