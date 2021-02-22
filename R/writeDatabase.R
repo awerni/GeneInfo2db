@@ -1,12 +1,17 @@
-writeDatabase <- function(species_data) {
+#' writes a list of data frames into a Postgresql database
+#'
+#' @param table_data a list of data frames
+#' @return nothing
+
+writeDatabase <- function(table_data) {
   con <- getPostgresqlConnection()
-  for (myT in names(species_data)) {
+  for (myT in names(table_data)) {
     myST <- strsplit(myT, split = "\\.")[[1]]
     if (length(myST) != 2) stop("tablename must contain the schema and tablename")
     RPostgres::dbWriteTable(
       con,
       RPostgres::Id(schema = myST[[1]], table = myST[[2]]),
-      species_data[[myT]],
+      table_data[[myT]],
       append = TRUE,
       overwrite = FALSE,
       row.names = FALSE
