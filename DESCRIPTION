@@ -10,3 +10,4 @@ Suggests:
 License: What license is it under?
 LazyData: true
 URL: https://github.com/broadinstitute/GeneInfo2db
+RoxygenNote: 7.1.1
