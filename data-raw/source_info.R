@@ -139,6 +139,8 @@ download_file_info <- tibble::tribble(
   "metmap", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-020-2969-2/MediaObjects/41586_2020_2969_MOESM7_ESM.xlsx", '41586_2020_2969_MOESM7_ESM.xlsx'
 )
 
+y <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/13681534/files")
+
 # -------------MSigDB --------------------
 
 gmt.files <- tibble::tribble(
