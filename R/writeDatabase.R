@@ -7,7 +7,7 @@ writeDatabase <- function(table_data) {
   con <- getPostgresqlConnection()
   for (myT in names(table_data)) {
     myST <- strsplit(myT, split = "\\.")[[1]]
-    if (length(myST) != 2) stop("tablename must contain the schema and tablename")
+    if (length(myST) != 2) stop("list element name must consist of schema and tablename")
     RPostgres::dbWriteTable(
       con,
       RPostgres::Id(schema = myST[[1]], table = myST[[2]]),
