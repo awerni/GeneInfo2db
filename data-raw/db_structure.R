@@ -5,7 +5,9 @@ recreateSchema <- readr::read_file(paste0(p, "recreateSchemas.sql"))
 geneAnnotation <- readr::read_file(paste0(p, "geneAnnotation.sql"))
 
 setSearchPath <- "set search_path = cellline,public;"
-celllineDB <- paste(setSearchPath, readr::read_file(paste0(p, "celllineDB.sql")), collapse = ";")
+celllineDB <-  readr::read_file(paste0(p, "celllineDB.sql"))
+#celllineDB <- gsub("create table ", "create table cellline\\.", celllineDB)
+#celllineDB <- gsub("alter table ", "alter table cellline\\.", celllineDB)
 
 db_glue_file <- c("storedprocedure.sql", "view.sql", "trigger.sql", 
                   "storedprocedureCellline.sql", "viewCellline.sql", 
