@@ -9,10 +9,10 @@ createDatabase <- function(db_part) {
     
     DBI::dbExecute(con, "BEGIN")
     sapply(str_split(get(db_part), ";", simplify = TRUE), function(s) {
+      print(s)
       #res <- RPostgres::dbSendQuery(con, s)
       #RPostgres::dbClearResult(res)
-      #DBI::dbExecute(con, s)
-      print(s)
+      DBI::dbExecute(con, s)
     })
     dbExecute(con, "COMMIT")
     
