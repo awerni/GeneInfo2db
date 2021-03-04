@@ -1,4 +1,5 @@
 importFrom(magrittr, "%>%")
+export(createDatabase)
 export(createSigIFN)
 export(createSigTP53)
 export(createSigRAS)
