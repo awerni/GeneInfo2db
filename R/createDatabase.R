@@ -7,14 +7,14 @@ createDatabase <- function(db_part) {
   if (db_part %in% c("recreateSchema", "geneAnnotation", "celllineDB", "db_glue")) {
     con <- getPostgresqlConnection()
     
-    DBI::dbExecute(con, "BEGIN")
     sapply(str_split(get(db_part), ";", simplify = TRUE), function(s) {
-      print(s)
       #res <- RPostgres::dbSendQuery(con, s)
       #RPostgres::dbClearResult(res)
-      DBI::dbExecute(con, s)
+      if (s != "") {
+        print(s)
+        DBI::dbExecute(con, dplyr::sql(s))
+      }
     })
-    dbExecute(con, "COMMIT")
     
     RPostgres::dbDisconnect(con)
   } else {
