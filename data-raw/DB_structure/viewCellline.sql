@@ -2,9 +2,6 @@
 ---- Views for celllineDB -----------------------
 -------------------------------------------------
 
-CREATE OR REPLACE VIEW cellline.combiDetails AS
-SELECT doseresponsematrix, drugid, drugid2, (cellline.getcombiResults(drm.doseresponsematrix)).* FROM cellline.doseresponsematrix drm;
-
 CREATE OR REPLACE VIEW cellline.hla_a_type AS
 SELECT c.celllinename, n.rnaseqrunid, allele1 AS HLA_A_allele1, allele2 as HLA_A_allele2 FROM cellline.cellline c
 JOIN cellline.rnaseqrun n ON (c.celllinename = n.celllinename AND canonical)
@@ -314,74 +311,3 @@ SELECT psv.celllinename, species, tumortype, sum((aamutation <> 'wt')::INT4)/cou
   FROM cellline.processedsequenceview psv JOIN cellline.cellline cl ON cl.celllinename = psv.celllinename 
   GROUP BY psv.celllinename, species, tumortype having count(*) > 10000;
 
--------------------------------------------------
----- Views for prolifDB -----------------------
--------------------------------------------------
-
-DROP VIEW IF EXISTS cellline.results;
-
-CREATE VIEW cellline.results AS 
-SELECT doseresponsecurve, ec50, ec50calc, ec50operator, top, bottom, slope,
-gi50, gi50calc, gi50operator, ic50, ic50calc, ic50operator, tgi, tgicalc, tgioperator, 
-tzero, tzerosd, negControlSD, amax, actarea, drc.classification, round, deviation, 
-drc.celllinename, cl.organ, cl.tissue_subtype, cl.tumortype, cl.metastatic_site, cl.histology_type, 
-cl.histology_subtype, cl.morphology, cl.growth_type, cl.gender, drc.cellsperwell, timepoint, drc.drugid, d.target, sampleid, 
-pretreatment, laboratory, proliferationtest, campaign, imagepath,
-calcimpossible, biphasiccurve, flatcurve, wrongconcrange, inactive, drc.valid, recalculate, locked, fixedtop, fixedbottom, fixedslope, fixedec50
-FROM cellline.doseresponsecurve drc
-JOIN cellline.cellline cl ON cl.celllinename = drc.celllinename
-JOIN drug d ON d.drugid = drc.drugid;
-
--------------------------------------------------------
---DROP VIEW IF EXISTS cellline.results2;
-
---CREATE VIEW cellline.results2 AS
---SELECT distinct drc.doseresponsecurve, ec50, ec50calc, ec50operator, top, bottom, slope,
---gi50, ic50, tgi, tzero, tzerosd, negControlSD, drc.classification, p.round, deviation, datafile,
---m.celllinename, organ, drc.cellsperwell, p.timepoint, m.drugid, d.target, m.sampleid, m.pretreatment, p.laboratory, p.proliferationtest, p.campaign, imagepath,
---calcimpossible, drc.valid, recalculate, locked, fixedtop, fixedbottom, fixedslope, fixedec50
---FROM cellline.doseresponsecurve drc
---JOIN cellline.curveanalysis c ON c.doseresponsecurve = drc.doseresponsecurve
---JOIN cellline.measuredvalue m ON (m.plateid = c.plateid AND m.well = c.well)
---JOIN cellline.plate p ON p.plateid = m.plateid
---JOIN cellline.cellline cl ON cl.celllinename = m.celllinename
---JOIN drug d ON d.drugid = m.drugid
---WHERE category = 'test';
-
--------------------------------------------------------
-
---DROP VIEW IF EXISTS cellline.resultsCombi;
-
---CREATE VIEW cellline.resultsCombi AS
---SELECT distinct drm.doseresponsematrix, maxcgiblissexcess, mincgiblissexcess, maxpocblissexcess, minpocblissexcess, 
---mincgihsaexcess, maxcgihsaexcess, minpochsaexcess, maxpochsaexcess, tzero, tzerosd, negControlSD, p.round, 
---m.celllinename, organ, cl.tissue_subtype, cl.tumortype, cl.metastatic_site, cl.histology_type, 
---cl.histology_subtype, cl.morphology, cl.growth_type, cl.gender, m.cellsperwell, p.timepoint, 
---m.drugid, d1.target, m.sampleid, drm.treatmenttime, 
---m.drugid2, d2.target as target2, m.sampleid2, drm.treatmenttime2, 
---drm.pretreatment, p.laboratory, p.proliferationtest, p.campaign, imagepath,
---drm.valid, recalculate, locked
---FROM cellline.doseresponsematrix drm
---JOIN cellline.matrixanalysis ma ON ma.doseresponsematrix = drm.doseresponsematrix
---JOIN cellline.measuredvalue m ON (m.plateid = ma.plateid AND m.well = ma.well AND (m.drugid <> 'DMSO' AND m.drugid2 <> 'DMSO'))
---JOIN cellline.plate p ON p.plateid = m.plateid
---JOIN cellline.cellline cl ON cl.celllinename = m.celllinename
---JOIN drug d1 ON d1.drugid = m.drugid
---JOIN drug d2 ON d2.drugid = m.drugid2
---WHERE category = 'test';
-
-DROP VIEW IF EXISTS cellline.resultsCombi;
-
-CREATE VIEW cellline.resultsCombi AS
-SELECT distinct drm.doseresponsematrix, maxcgiblissexcess, mincgiblissexcess, maxpocblissexcess, minpocblissexcess,
-mincgihsaexcess, maxcgihsaexcess, minpochsaexcess, maxpochsaexcess, min3cgiblissexcess + max3cgiblissexcess as combo6, tzero, tzerosd, negControlSD, round,
-cl.celllinename, organ, cl.tissue_subtype, cl.tumortype, cl.metastatic_site, cl.histology_type,
-cl.histology_subtype, cl.morphology, cl.growth_type, cl.gender, cellsperwell, timepoint,
-drm.drugid, d1.target, sampleid, drm.treatmenttime,
-drm.drugid2, d2.target as target2, sampleid2, drm.treatmenttime2,
-drm.pretreatment, laboratory, proliferationtest, campaign, imagepath,
-drm.valid, recalculate, locked
-FROM cellline.doseresponsematrix drm
-JOIN cellline.cellline cl ON cl.celllinename = drm.celllinename
-JOIN drug d1 ON d1.drugid = drm.drugid
-JOIN drug d2 ON d2.drugid = drm.drugid2;
