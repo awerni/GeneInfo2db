@@ -32,6 +32,3 @@ CREATE INDEX campaign_plate_index on cellline.plate (campaign);
 CREATE INDEX conc_measuredvalue_index on cellline.measuredvalue(isPositive(concentration));
 CREATE INDEX drugcat_measuredvalue_index on cellline.measuredvalue(drugid, category);
 CREATE INDEX plateid_plate_index on cellline.plate(plateid);
-CREATE INDEX drc_curveanalysis_index on cellline.curveanalysis(doseresponsecurve);
-CREATE INDEX drc_drug_campaign_pret_index ON cellline.doseresponsecurve(drugid, campaign, pretreatment);
-CREATE INDEX drm_doseresponsematrix on cellline.matrixanalysis(doseresponsematrix);
