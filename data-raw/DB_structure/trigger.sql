@@ -1,5 +1,5 @@
 DROP TRIGGER IF EXISTS checkProbeset ON probeset;
-CREATE OR REPLACE FUNCTION checkProbeset() RETURNS trigger AS ' 
+CREATE OR REPLACE FUNCTION checkProbeset() RETURNS trigger AS $$ 
 DECLARE
   num INT4;
   e TEXT;
@@ -18,7 +18,7 @@ BEGIN
 
   RETURN NEW;
 END;
-' LANGUAGE 'plpgsql';
+$$ LANGUAGE 'plpgsql';
 
 CREATE TRIGGER checkProbeset
   BEFORE INSERT OR UPDATE
