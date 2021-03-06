@@ -12,7 +12,7 @@ celllineDB <-  paste(setSearchPath, readr::read_file(paste0(p, "celllineDB.sql")
 
 db_glue_file <- c("storedprocedure.sql", "view.sql", "trigger.sql", 
                   "storedprocedureCellline.sql", "viewCellline.sql", 
-                  "triggerCellline.sql", "sequenceCellline.sql", 
+                  "sequenceCellline.sql", 
                   "indexCellline.sql", "index.sql", "permission.sql")
 
 db_glue_list <- sapply(db_glue_file, function(f) readr::read_file(paste0(p, f)))
