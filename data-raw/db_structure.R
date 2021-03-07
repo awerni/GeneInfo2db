@@ -10,8 +10,9 @@ setSearchPath <- "set search_path = cellline,public;\r\n"
 celllineDB <-  paste(setSearchPath, readr::read_file(paste0(p, "celllineDB.sql")), collapse = ";") %>%
   gsub(pattern = "(\n|\r)", replacement = "")
 
-db_glue_file <- c("storedprocedure.sql", "view.sql", "trigger.sql", 
-                  "storedprocedureCellline.sql", "viewCellline.sql", 
+db_glue_file <- c("storedprocedure.sql", "storedprocedureCellline.sql", 
+                  "viewCellline.sql",  "view.sql",
+                  "trigger.sql", 
                   "sequenceCellline.sql", 
                   "indexCellline.sql", "index.sql", "permission.sql")
 
