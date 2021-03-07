@@ -1,9 +1,9 @@
 -- from sequenceDB
-CREATE SEQUENCE cellline.dnaseqRunSequence;
+--CREATE SEQUENCE cellline.dnaseqRunSequence;
 CREATE SEQUENCE cellline.processedFusionSequence;
 
 -- from prolifDB 
-CREATE SEQUENCE cellline.plateIDSequence;
+--CREATE SEQUENCE cellline.plateIDSequence;
 CREATE SEQUENCE cellline.processedproliftestSequence;
 CREATE SEQUENCE cellline.processedcombiproliftestSequence;
 
