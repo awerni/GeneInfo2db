@@ -1,8 +1,7 @@
 -- originally from base celllineDB
 
-CREATE INDEX idx_hybridization_celllinename on cellline.hybridization(celllinename);
 --CREATE INDEX snpannotation_id on cellline.snpannotation(dbsnpid);
-CREATE INDEX idx_copynumberregion ON cellline.copynumberregion(start, stop, chromosome, algorithm);
+--CREATE INDEX idx_copynumberregion ON cellline.copynumberregion(start, stop, chromosome, algorithm);
 --CREATE INDEX idx_processedcopynumber ON cellline.processedcopynumber(log2copynumber);
 CREATE INDEX idx_processedcopynumberensg ON cellline.processedcopynumber(ensg);
 --CREATE INDEX idx_processedcopynumbercell ON cellline.processedcopynumber(celllinename);
@@ -28,7 +27,7 @@ CREATE INDEX idx_cellline_tdpid on cellline.cellline(tdpid, species, tumortype);
 
 -- originally from prolifDB
 
-CREATE INDEX campaign_plate_index on cellline.plate (campaign);
-CREATE INDEX conc_measuredvalue_index on cellline.measuredvalue(isPositive(concentration));
-CREATE INDEX drugcat_measuredvalue_index on cellline.measuredvalue(drugid, category);
-CREATE INDEX plateid_plate_index on cellline.plate(plateid);
+--CREATE INDEX campaign_plate_index on cellline.plate (campaign);
+--CREATE INDEX conc_measuredvalue_index on cellline.measuredvalue(isPositive(concentration));
+--CREATE INDEX drugcat_measuredvalue_index on cellline.measuredvalue(drugid, category);
+--CREATE INDEX plateid_plate_index on cellline.plate(plateid);
