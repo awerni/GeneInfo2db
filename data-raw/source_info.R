@@ -83,17 +83,17 @@ taiga_info <- tibble::tribble(
   'sanger-crispr-project-score--e20b', 4, 'gene_dependency',
   'sanger-crispr-project-score--e20b', 4, 'gene_effect',
   'sanger-crispr-project-score--e20b', 4, 'gene_effect_unscaled',
+
   'demeter2-drive-0591', 12, 'gene_effect',
   'demeter2-drive-0591', 12, 'gene_dependency',
+
   'metabolomics-cd0c', 4, 'CCLE_metabolomics_20190502',
   'secondary-screen-0854', 18, 'secondary-dose-response-curve-parameters',
   'msi-0584', 6, 'msi',
-  'total-proteome--5c50', 1, 'protein_quant_current_normalized',
   'total-proteome--5c50', 2, 'normalized_protein_abundance',
-  'total-proteome--5c50', 2, 'peptide_counts',
-  'total-proteome--5c50', 2, 'protein_IDs',
   'depmap-rppa-1b43', 3, 'CCLE_RPPA_20181003',
   'depmap-rppa-1b43', 3, 'CCLE_RPPA_Ab_info_20181226',
+
   'metmap-data-f459', 3, 'metmap500_metastatic_potential',
   'metmap-data-f459', 3, 'metmap500_penetrance'
 )
@@ -130,10 +130,7 @@ taiga_info <- tibble::tribble(
 #   "ccle", "", 'CCLE_metabolomics_20190502',
 #   "prism", "", 'secondary-dose-response-curve-parameters',
 #   "ccle", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", 'msi',
-#   "total-proteome", "", 'protein_quant_current_normalized',
 #   "total-proteome", "", 'normalized_protein_abundance',
-#   "total-proteome", "", 'peptide_counts',
-#   "total-proteome", "", 'protein_IDs',
 #   "ccle", "", 'CCLE_RPPA_20181003',
 #   "ccle", "", 'CCLE_RPPA_Ab_info_20181226',
 #   "metmap", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-020-2969-2/MediaObjects/41586_2020_2969_MOESM7_ESM.xlsx", '41586_2020_2969_MOESM7_ESM.xlsx'
@@ -148,7 +145,8 @@ depmap_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/13681534
 drive_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/6025238/files") %>%
   mutate(data_name = "demeter2-drive", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
-  filter(grepl("(D2_DRIVE_gene_dep_scores|D2_DRIVE_seed_dep_scores)", data_file))
+  filter(grepl("(D2_DRIVE_gene_dep_scores|D2_DRIVE_seed_dep_scores)", data_file)) %>%
+  mutate(data_file = gsub("^D2_DRIVE_", "", data_file))
 
 prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/9393293/files") %>%
   mutate(data_name = "prism", data_file = gsub("\\.csv$", "", name)) %>%
