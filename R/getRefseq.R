@@ -4,7 +4,7 @@ getRefseq <- function(refseq_info, species_name) {
     dplyr::filter(species == species_name) %>%
     as.list()
 
-  a <- read_tsv(rs$file, col_names = c("size", "file")) %>%
+  a <- readr::read_tsv(rs$file, col_names = c("size", "file")) %>%
     dplyr::filter(grepl("rna.fna.gz", file)) %>%
     dplyr::arrange(file)
 
@@ -12,7 +12,7 @@ getRefseq <- function(refseq_info, species_name) {
     curr_file  <- paste0(gsub("([^\\/]+$)", "", rs$file), my_file)
     print(curr_file)
 
-    read_tsv(curr_file, col_names = c("content")) %>%
+    readr::read_tsv(curr_file, col_names = c("content")) %>%
       dplyr::filter(grepl(">", content)) %>%
       tidyr::separate(content, c("refseqid", "refseqdesc"), sep = " ", extra = "merge") %>%
       dplyr::mutate(refseqid = gsub(">", "", refseqid))
@@ -47,7 +47,7 @@ getRefseq <- function(refseq_info, species_name) {
   sys_command <- paste0("zcat gene2refseq.gz | egrep \"^(\\#tax_id|", rs$taxid, ")\" > ", new_file)
   system(sys_command)
      
-  gene2refseq <- read_tsv(new_file) %>%
+  gene2refseq <- readr::read_tsv(new_file) %>%
     dplyr::select(taxid = `#tax_id`, geneid = GeneID, refseqid = RNA_nucleotide_accession.version) %>%
     dplyr::filter(taxid == rs$taxid) %>%
     dplyr::filter(!refseqid == "-") %>%
