@@ -1,90 +1,6 @@
 getUniprot <- function() {
   
-  ftp_path <- "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/"
-  
-  # file_sprot <-"uniprot_sprot_human.dat.gz"
-  # url <- paste0(ftp_path, "taxonomic_divisions/", file_sprot)
-  # if (!file.exists(file_sprot)) {
-  #   download.file(url, destfile = file_sprot, method = "wget", quiet = TRUE)
-  # }
-
-  # file_trembl <- "uniprot_trembl_human.dat.gz"
-  # url2 <- paste0(ftp_path, "taxonomic_divisions/", file_trembl)
-  # if (!file.exists(file_trembl)) {
-  #   download.file(url2, destfile = file_trembl, method = "wget", quiet = TRUE)
-  # }
-  # file_trembl <- "uniprot_trembl_human_part.dat"
-  # trembl_anno <- read_lines(file_trembl) %>%
-  #   grep("(^ID|^DE   RecName|^DE   SubName)", ., value = TRUE) %>%
-  #   matrix(., ncol = 2, byrow = TRUE) %>%
-  #   as.data.frame(stringsAsFactors = FALSE) %>%
-  #   dplyr::mutate(V1 = gsub("(ID   |Reviewed\\;.*)", "", V1),
-  #                 V2 = gsub("(DE   RecName: Full\\=|\\;)", "", V2)) %>%
-  #   dplyr::mutate(V1 = gsub("(^ *| *$)", "", V1)) %>%
-  #   dplyr::rename(uniprotid = V1, proteinname = V2)
-
-  # uniprot_anno <- read_lines(file_sprot) %>%
-  #   grep("(^ID|^DE   RecName)", ., value = TRUE) %>%
-  #   matrix(., ncol = 2, byrow = TRUE) %>%
-  #   as.data.frame(stringsAsFactors = FALSE) %>%
-  #   dplyr::mutate(V1 = gsub("(ID   |Reviewed\\;.*)", "", V1),
-  #          V2 = gsub("(DE   RecName: Full\\=|\\;)", "", V2)) %>%
-  #   dplyr::mutate(V1 = gsub("(^ *| *$)", "", V1)) %>%
-  #   dplyr::rename(uniprotid = V1, proteinname = V2)
-
-  # ---------- accession ------
-  # uniprot_anno2 <- read_lines(file_sprot) %>%
-  #   grep("(^ID|^AC)", ., value = TRUE)
-  # 
-  # ac <- NULL
-  # res <- NULL
-  # for (d in uniprot_anno2) {
-  #   if (grepl("^ID", d)) {
-  #     d1 = gsub("(ID   |Reviewed\\;.*)", "", d)
-  #     d1 = gsub("(^ *| *$)", "", d1)
-  #     res <- c(res, ac)
-  #     res <- c(res, d1)
-  #     ac <- NULL
-  #   }
-  #   if (grepl("^AC", d)) {
-  #     ac <- paste(ac, gsub("(AC   |\\;)", "", d))
-  #   }
-  # }
-  # res <- c(res, ac)
-  # 
-  # uniprot_accession <- matrix(res, ncol = 2, byrow = TRUE) %>%
-  #   as.data.frame(stringsAsFactors = FALSE) %>%
-  #   dplyr::mutate(V2 = gsub("(^ *| *$)", "", V2)) %>%
-  #   dplyr::mutate(V2 = strsplit(V2, " ")) %>%
-  #   tidyr::unnest(cols = c(V2)) %>%
-  #   dplyr::rename(uniprotid = V1, accession = V2)
-  
-  # ---------------------------
-  
-  protein_IDs <- getTaiga("protein_IDs")
-  
-  file_uniprot2 <-"HUMAN_9606_idmapping_selected.tab.gz"
-  url3 <- paste0(ftp_path, "idmapping/by_organism/", file_uniprot2)
-  
-  if (!file.exists(file_uniprot2)) {
-    download.file(url3, destfile = file_uniprot2, method = "wget", quiet = TRUE)
-  }
-  
-  id_map <- read_tsv(file_uniprot2, col_names = FALSE) %>%
-    dplyr::select(accession = X1, uniprotid = X2, geneid = X3, ensg = X19, enst = X20, ensp = X21)
-  
-  id_map2 <- protein_IDs %>%
-    dplyr::mutate(accession = gsub("\\-.*{1}", "", Uniprot_Acc)) %>%
-    dplyr::left_join(id_map, by = "accession") %>%
-    dplyr::select(-uniprotid) %>%
-    dplyr::rename(uniprotid = Uniprot)
-  
-  uniprot_anno <- id_map2 %>%
-    dplyr::select(uniprotid, proteinname = Description) %>%
-    dplyr::mutate(proteinname = gsub(".*_.*? {1}", "", proteinname)) %>%
-    dplyr::mutate(proteinname = gsub("Isoform .*? of {1}", "", proteinname)) %>%
-    unique()
-  
+  # ----------------------------
   con <- getPostgresqlConnection()
   
   allENSG <- dplyr::tbl(con, "gene") %>%
@@ -99,10 +15,42 @@ getUniprot <- function() {
   
   RPostgres::dbDisconnect(con)
   
-  uniprot_accession <- id_map2 %>%
-    select(uniprotid, accession) %>%
-    filter(uniprotid %in% protein_IDs$Uniprot) %>%
+  # ---------------------------
+  ftp_path <- "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/"
+  file_uniprot2 <-"HUMAN_9606_idmapping_selected.tab.gz"
+  url3 <- paste0(ftp_path, file_uniprot2)
+  
+  if (!file.exists(file_uniprot2)) {
+    download.file(url3, destfile = file_uniprot2, method = "wget", quiet = TRUE)
+  }
+  
+  # ---------------------------
+  protein.quant.current.normalized <- getFileData('protein_quant_current_normalized.csv.gz')
+  
+  uniprot_anno <- protein.quant.current.normalized %>% 
+    select(uniprotid = Uniprot, proteinname = Description) %>% 
+    mutate(proteinname = gsub(".*_.*? {1}", "", proteinname)) %>%
+    mutate(proteinname = gsub("Isoform .*? of {1}", "", proteinname)) %>% 
     unique()
+  
+  uniprot_accession <- protein.quant.current.normalized %>% 
+    select(uniprotid = Uniprot, accession = Uniprot_Acc) %>% 
+    mutate(accession = gsub("\\-.*{1}", "", accession)) %>%
+    unique()
+  
+  # ------------ mappings to ENSG and geneid ---------------
+  
+  #id_map <- getFileData("HUMAN_9606_idmapping_selected.tab.gz")
+  
+  id_map <- read_tsv(file_uniprot2, col_names = FALSE) %>%
+    dplyr::select(accession = X1, uniprotid = X2, geneid = X3, ensg = X19, enst = X20, ensp = X21)
+  
+  id_map2 <- protein.quant.current.normalized %>%
+    dplyr::select(Protein_Id, Uniprot_Acc, Uniprot, Description) %>%
+    dplyr::mutate(accession = gsub("\\-.*{1}", "", Uniprot_Acc)) %>%
+    dplyr::left_join(id_map, by = "accession") %>%
+    dplyr::select(-uniprotid, -Uniprot_Acc) %>%
+    dplyr::rename(uniprotid = Uniprot)
   
   uniprot_geneid <- id_map2 %>%
     dplyr::select(uniprotid, geneid) %>%
