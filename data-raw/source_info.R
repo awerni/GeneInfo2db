@@ -36,7 +36,7 @@ refseq_info <- tibble::tribble(
 taiga_info <- tibble::tribble(
   ~data_name, ~data_version, ~data_file,
   
-  'internal-21q1-4fc4', 30, 'sample_info',
+  'internal-21q1-4fc4', 30, 'sample_info', # ok
   'other-ccle2-c93e', 1, 'Cell_lines_annotations_20181226',
   
   'internal-21q1-4fc4', 30,'CCLE_expression_full',
@@ -98,44 +98,7 @@ taiga_info <- tibble::tribble(
   'metmap-data-f459', 3, 'metmap500_penetrance'
 )
 
-# ------figshare (depmap) links -----------
-# download_file_info <- tibble::tribble(
-#   ~data_name, ~url, ~data_file,
-#   "depmap", "https://ndownloader.figshare.com/files/25494443", 'sample_info',
-#   "depmap", "https://depmap.org/portal/download/api/download?file_name=ccle%2Fccle_2019%2FCell_lines_annotations_20181226.txt&bucket=depmap-external-downloads", 'Cell_lines_annotations_20181226',
-#   "depmap", "https://ndownloader.figshare.com/files/25797014", 'CCLE_expression_full',
-#   "depmap", "https://ndownloader.figshare.com/files/25797008", 'CCLE_RNAseq_reads',
-#   "depmap", "https://ndownloader.figshare.com/files/25797206", 'CCLE_RNAseq_transcripts',
-#   "depmap", "https://ndownloader.figshare.com/files/25770017", 'CCLE_gene_cn',
-#   "depmap", "https://ndownloader.figshare.com/files/25494419", 'CCLE_mutations',
-#   
-#   # ----- Avana -----
-#   "depmap", "https://ndownloader.figshare.com/files/25770032", 'Achilles_gene_dependency',
-#   "depmap", "https://ndownloader.figshare.com/files/25770029", 'Achilles_gene_effect',
-#   "depmap", "https://ndownloader.figshare.com/files/25770041", 'Achilles_gene_effect_unscaled',
-#   "depmap", "https://ndownloader.figshare.com/files/25494437", 'nonessentials',
-#   "depmap", "https://ndownloader.figshare.com/files/25494434", 'common_essentials',
-#   
-#   # --- sanger ---
-#   "sanger", "https://ndownloader.figshare.com/files/16623887", 'essential_genes',
-#   "sanger", "https://ndownloader.figshare.com/files/16623890", 'nonessential_genes',
-#   "sanger", "https://ndownloader.figshare.com/files/16623884", 'gene_dependency',
-#   "sanger", "https://ndownloader.figshare.com/files/16623881", 'gene_effect',
-#   "sanger", "https://ndownloader.figshare.com/files/16623851", 'gene_effect_unscaled',
-#   
-#   # ---- drive ----
-#   "demeter2-drive", "", 'gene_effect',
-#   "demeter2-drive", "https://ndownloader.figshare.com/files/11489693", 'gene_dependency',
-#   
-#   "ccle", "", 'CCLE_metabolomics_20190502',
-#   "prism", "", 'secondary-dose-response-curve-parameters',
-#   "ccle", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", 'msi',
-#   "total-proteome", "", 'normalized_protein_abundance',
-#   "ccle", "", 'CCLE_RPPA_20181003',
-#   "ccle", "", 'CCLE_RPPA_Ab_info_20181226',
-#   "metmap", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-020-2969-2/MediaObjects/41586_2020_2969_MOESM7_ESM.xlsx", '41586_2020_2969_MOESM7_ESM.xlsx'
-# )
-
+# ------figshare (depmap) and direct links -----------
 depmap_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/13681534/files") %>%
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
@@ -153,16 +116,26 @@ prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/9393293/f
   select(data_name,  url = download_url, data_file) %>%
   filter(data_file %in% c("secondary-screen-dose-response-curve-parameters"))
 
+sanger_info <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732/files") %>%
+  mutate(data_name = "sanger", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) %>%
+  select(data_name,  url = download_url, data_file)
+
 other_info <- tibble::tribble(
   ~data_name, ~url, ~data_file,
+  "ccle", "https://depmap.org/portal/download/api/download?file_name=ccle%2Fccle_2019%2FCell_lines_annotations_20181226.txt&bucket=depmap-external-downloads", "Cell_lines_annotations_20181226", 
   "ccle", "https://depmap.org/portal/download/api/download?file_name=ccle%2Fccle_2019%2FCCLE_metabolomics_20190502.csv&bucket=depmap-external-downloads", "CCLE_metabolomics_20190502",
-  "ccle", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", 'msi',
+  #"ccle", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", 'msi',
   "ccle", "https://depmap.org/portal/download/api/download?file_name=ccle%2Fccle_2019%2FCCLE_RPPA_20181003.csv&bucket=depmap-external-downloads", "CCLE_RPPA_20181003",
-  "ccle", "https://depmap.org/portal/download/api/download?file_name=ccle%2Fccle_2019%2FCCLE_RPPA_Ab_info_20181226.csv&bucket=depmap-external-downloads", "CCLE_RPPA_Ab_info_20181226"
+  "ccle", "https://depmap.org/portal/download/api/download?file_name=ccle%2Fccle_2019%2FCCLE_RPPA_Ab_info_20181226.csv&bucket=depmap-external-downloads", "CCLE_RPPA_Ab_info_20181226",
+  "total-proteome", "https://gygi.hms.harvard.edu/data/ccle/protein_quant_current_normalized.csv.gz", "protein_quant_current_normalized.csv.gz",
+  "uniprot", "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping_selected.tab.gz", "HUMAN_9606_idmapping_selected.tab.gz",
+  "metmap", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-020-2969-2/MediaObjects/41586_2020_2969_MOESM7_ESM.xlsx", 'metmap',
+  "msi", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", "msi"
 )
   
 download_file_info <- depmap_info %>%
   bind_rows(drive_info) %>%
+  bind_rows(sanger_info) %>%
   bind_rows(prism_info) %>%
   bind_rows(other_info)
 
@@ -194,7 +167,6 @@ gmt.files <- tibble::tribble(
   "c8.all.v7.2.entrez.gmt", "c8", "cell type signatures", "all cell type signatures",
   "h.all.v7.2.entrez.gmt", "h", "hallmark", "hallmark"
 )
-
 
 # -----------------
 save(db_info, gene_info, refseq_info, db_compara, taiga_info, download_file_info, gmt.files, file = "data/source_info.rdata")
