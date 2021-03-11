@@ -31,7 +31,7 @@ getProteomicsMassSpec <- function() {
   #                 accession = gsub("-.*", "", accession)) %>%
   #   dplyr::inner_join(uniprotaccession, by = "accession") %>%
   #   dplyr::select(-uniprot)
-  
+
   protein_long1 <- protein.quant.current.normalized %>%
     dplyr::select(accession = Uniprot_Acc, uniprotid = Uniprot, matches("TenPx..$")) %>% 
     tidyr::pivot_longer(!c(accession, uniprotid), names_to = "cellline_TenPx", values_to = "score") %>%
@@ -43,21 +43,28 @@ getProteomicsMassSpec <- function() {
     summarise(n = n(), .groups = "drop")
   
   double_filter2 <- double_filter1 %>%
-    group_by(celllinename) %>%
-    summarise(n = n()) %>%
-    filter(n > 1)
+    dplyr::group_by(celllinename) %>%
+    dplyr::summarise(n = n(), groups = "drop") %>%
+    dplyr::filter(n > 1)
   
   double_filter3 <- double_filter1 %>%
-    filter(celllinename %in% double_filter2$celllinename) %>%
-    group_by(celllinename) %>%
-    slice_min(n, n = 1)
+    dplyr::filter(celllinename %in% double_filter2$celllinename) %>%
+    dplyr::group_by(celllinename) %>%
+    dplyr::slice_min(n, n = 1)
   
   protein_long <- protein_long1 %>%
-    filter(!cellline_TenPx %in% double_filter3$cellline_TenPx) %>%
+    #dplyr::filter(!cellline_TenPx %in% double_filter3$cellline_TenPx) %>%
     dplyr::mutate(isoform = ifelse(grepl("-", accession), gsub(".*-", "", accession), "0")) %>%
     dplyr::mutate(isoform = as.numeric(isoform),
                   accession = gsub("-.*", "", accession)) %>%
-    dplyr::filter(celllinename %in% cellline$celllinename)
+    dplyr::filter(celllinename %in% cellline$celllinename) %>%
+    dplyr::select(-cellline_TenPx) %>%
+    group_by(celllinename, accession, uniprotid, isoform) %>%
+    summarise(score = mean(score, na.rm = TRUE), .groups = "drop")
+
+  #p1 <- protein_long %>% group_by(celllinename) %>% summarise(score = sum(score))
+  #p2 <- protein_long2 %>% group_by(celllinename) %>% summarise(score = sum(score))
+  #p1 %>% left_join(p2, by= "celllinename") %>% mutate(correct = score.x == score.y) %>% View()
   
   list(
     cellline.processedproteinmassspec = protein_long
