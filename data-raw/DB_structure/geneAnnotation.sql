@@ -311,7 +311,7 @@ REFSEQID             TEXT                 not null,
 GENEID               INTEGER              null,
 TAXID                INTEGER              not null,
 REFSEQDESC           TEXT                 null,
-CDNASEQUENCE         TEXT                 not null,
+CDNASEQUENCE         TEXT                 null,
 constraint PK_REFSEQ primary key (REFSEQID)
 );
 
