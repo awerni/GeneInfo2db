@@ -17,6 +17,9 @@ getFileDownload <- function(dfile, only_download = FALSE) {
   #~data_name, ~url, ~data_file,
 
   clean_up <- FALSE
+  if (file.exists(de$data_file)) {
+    if (file.info(de$data_file)$size == 0) file.remove(de$data_file)
+  }
   if (!file.exists(de$data_file)) {
     download.file(de$url, destfile = de$data_file, method = "wget", quiet = TRUE)
     clean_up <- TRUE
@@ -24,17 +27,20 @@ getFileDownload <- function(dfile, only_download = FALSE) {
   
   if (only_download) return(clean_up)
   
-  l <- readLines(de$data_file, n = 1)
-  if (grepl("\t", l)) {
-    data <- readr::read_tsv(de$data_file, na = c("", "NA"), guess_max = 200)
-  } else if (grepl(",", l)) {
-    data <- readr::read_delim(de$data_file, delim = ",", na = c("", "NA"), guess_max = 200)
-  } else if (grepl(";", l)) {
-    data <- readr::read_delim(de$data_file, delim = ";", na = c("", "NA"), guess_max = 200)
+  if (coalesce(readxl::format_from_signature(de$data_file) == "xlsx", FALSE)) {
+    data <- readxl::read_xlsx(de$data_file,  guess_max = 10000)
   } else {
-    data <- readr::read_csv2(de$data_file, na = c("", "NA"), guess_max = 200)
+    l <- readLines(de$data_file, n = 1)
+    if (grepl("\t", l)) {
+      data <- readr::read_tsv(de$data_file, na = c("", "NA"), guess_max = 200)
+    } else if (grepl(",", l)) {
+      data <- readr::read_delim(de$data_file, delim = ",", na = c("", "NA"), guess_max = 200)
+    } else if (grepl(";", l)) {
+      data <- readr::read_delim(de$data_file, delim = ";", na = c("", "NA"), guess_max = 200)
+    } else {
+      data <- readr::read_csv2(de$data_file, na = c("", "NA"), guess_max = 200)
+    }
   }
-  
   if (clean_up) file.remove(de$data_file)
   
   return(data)
