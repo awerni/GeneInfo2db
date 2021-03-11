@@ -13,7 +13,7 @@ getProteomicsMassSpec <- function() {
   RPostgres::dbDisconnect(con)
   
   # -------------------------
-  protein.quant.current.normalized <-getFileData('protein_quant_current_normalized')
+  protein.quant.current.normalized <- getFileData('protein_quant_current_normalized')
   #normalized_protein_abundance <- getFileData("normalized_protein_abundance")
   #protein_IDs <- getFileData("protein_IDs")
   #sample_info <- getFileData("sample_info@proteome")
