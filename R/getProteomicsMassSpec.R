@@ -13,25 +13,51 @@ getProteomicsMassSpec <- function() {
   RPostgres::dbDisconnect(con)
   
   # -------------------------
-  #protein.quant.current.normalized <-getFileData('protein_quant_current_normalized')
-  normalized_protein_abundance <- getFileData("normalized_protein_abundance")
+  protein.quant.current.normalized <-getFileData('protein_quant_current_normalized')
+  #normalized_protein_abundance <- getFileData("normalized_protein_abundance")
   #protein_IDs <- getFileData("protein_IDs")
   #sample_info <- getFileData("sample_info@proteome")
   
-  protein_long <- normalized_protein_abundance %>%
-    as.data.frame() %>%
-    tibble::rownames_to_column("depmap") %>%
-    tidyr::pivot_longer(!depmap, names_to = "uniprot", values_to = "score") %>%
+  # protein_long <- normalized_protein_abundance %>%
+  #   as.data.frame() %>%
+  #   tibble::rownames_to_column("depmap") %>%
+  #   tidyr::pivot_longer(!depmap, names_to = "uniprot", values_to = "score") %>%
+  #   dplyr::filter(!is.na(score)) %>%
+  #   dplyr::inner_join(cellline, by = "depmap") %>%
+  #   dplyr::select(-depmap) %>%
+  #   dplyr::mutate(accession = gsub("(.*\\(|\\))", "", uniprot),
+  #                 isoform = ifelse(grepl("-", accession), gsub(".*-", "", accession), "0")) %>%
+  #   dplyr::mutate(isoform = as.numeric(isoform),
+  #                 accession = gsub("-.*", "", accession)) %>%
+  #   dplyr::inner_join(uniprotaccession, by = "accession") %>%
+  #   dplyr::select(-uniprot)
+  
+  double_filter <- protein.quant.current.normalized %>%
+    dplyr::select(accession = Uniprot_Acc, uniprotid = Uniprot, matches("TenPx..$")) %>% 
+    tidyr::pivot_longer(!c(accession, uniprotid), names_to = "cellline_TenPx", values_to = "score") %>%
+    dplyr::mutate(celllinename = gsub("_TenPx..$", "", cellline_TenPx)) %>%
     dplyr::filter(!is.na(score)) %>%
-    dplyr::inner_join(cellline, by = "depmap") %>%
-    dplyr::select(-depmap) %>%
-    dplyr::mutate(accession = gsub("(.*\\(|\\))", "", uniprot),
-                  isoform = ifelse(grepl("-", accession), gsub(".*-", "", accession), "0")) %>%
+    group_by(cellline_TenPx, celllinename) %>%
+    summarise(n = n(), .groups = "drop") %>%
+    group_by(celllinename) %>%
+    summarise(n = n())
+  
+  protein_long <- protein.quant.current.normalized %>%
+    dplyr::select(accession = Uniprot_Acc, uniprotid = Uniprot, matches("TenPx..$")) %>% 
+    tidyr::pivot_longer(!c(accession, uniprotid), names_to = "cellline_TenPx", values_to = "score") %>%
+    dplyr::mutate(isoform = ifelse(grepl("-", accession), gsub(".*-", "", accession), "0"),
+                  celllinename = gsub("_TenPx..$", "", cellline_TenPx)) %>%
     dplyr::mutate(isoform = as.numeric(isoform),
                   accession = gsub("-.*", "", accession)) %>%
-    dplyr::inner_join(uniprotaccession, by = "accession") %>%
-    dplyr::select(-uniprot)
- 
+    dplyr::filter(!is.na(score)) %>%
+    dplyr::filter(celllinename %in% cellline$celllinename)
+  
+  protein_long3 <-  protein_long2 %>%
+    dplyr::select(celllinename, cellline_TenPx) %>%
+    group_by(cellline_TenPx, celllinename) %>%
+    summarise(n = n(), .groups = "drop")
+  
+  
   list(
     cellline.processedproteinmassspec = protein_long
   )
