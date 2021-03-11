@@ -32,31 +32,32 @@ getProteomicsMassSpec <- function() {
   #   dplyr::inner_join(uniprotaccession, by = "accession") %>%
   #   dplyr::select(-uniprot)
   
-  double_filter <- protein.quant.current.normalized %>%
+  protein_long1 <- protein.quant.current.normalized %>%
     dplyr::select(accession = Uniprot_Acc, uniprotid = Uniprot, matches("TenPx..$")) %>% 
     tidyr::pivot_longer(!c(accession, uniprotid), names_to = "cellline_TenPx", values_to = "score") %>%
-    dplyr::mutate(celllinename = gsub("_TenPx..$", "", cellline_TenPx)) %>%
     dplyr::filter(!is.na(score)) %>%
-    group_by(cellline_TenPx, celllinename) %>%
-    summarise(n = n(), .groups = "drop") %>%
-    group_by(celllinename) %>%
-    summarise(n = n())
+    dplyr::mutate(celllinename = gsub("_TenPx..$", "", cellline_TenPx))
   
-  protein_long <- protein.quant.current.normalized %>%
-    dplyr::select(accession = Uniprot_Acc, uniprotid = Uniprot, matches("TenPx..$")) %>% 
-    tidyr::pivot_longer(!c(accession, uniprotid), names_to = "cellline_TenPx", values_to = "score") %>%
-    dplyr::mutate(isoform = ifelse(grepl("-", accession), gsub(".*-", "", accession), "0"),
-                  celllinename = gsub("_TenPx..$", "", cellline_TenPx)) %>%
-    dplyr::mutate(isoform = as.numeric(isoform),
-                  accession = gsub("-.*", "", accession)) %>%
-    dplyr::filter(!is.na(score)) %>%
-    dplyr::filter(celllinename %in% cellline$celllinename)
-  
-  protein_long3 <-  protein_long2 %>%
-    dplyr::select(celllinename, cellline_TenPx) %>%
+  double_filter1 <- protein_long1 %>%
     group_by(cellline_TenPx, celllinename) %>%
     summarise(n = n(), .groups = "drop")
   
+  double_filter2 <- double_filter1 %>%
+    group_by(celllinename) %>%
+    summarise(n = n()) %>%
+    filter(n > 1)
+  
+  double_filter3 <- double_filter1 %>%
+    filter(celllinename %in% double_filter2$celllinename) %>%
+    group_by(celllinename) %>%
+    slice_min(n, n = 1)
+  
+  protein_long <- protein_long1 %>%
+    filter(!cellline_TenPx %in% double_filter3$cellline_TenPx) %>%
+    dplyr::mutate(isoform = ifelse(grepl("-", accession), gsub(".*-", "", accession), "0")) %>%
+    dplyr::mutate(isoform = as.numeric(isoform),
+                  accession = gsub("-.*", "", accession)) %>%
+    dplyr::filter(celllinename %in% cellline$celllinename)
   
   list(
     cellline.processedproteinmassspec = protein_long
