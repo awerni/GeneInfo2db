@@ -122,11 +122,11 @@ sanger_info <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732
 
 other_info <- tibble::tribble(
   ~data_name, ~url, ~data_file,
-  "ccle", "https://depmap.org/portal/download/api/download?file_name=ccle%2Fccle_2019%2FCell_lines_annotations_20181226.txt&bucket=depmap-external-downloads", "Cell_lines_annotations_20181226", 
-  "ccle", "https://depmap.org/portal/download/api/download?file_name=ccle%2Fccle_2019%2FCCLE_metabolomics_20190502.csv&bucket=depmap-external-downloads", "CCLE_metabolomics_20190502",
+  "ccle", "https://data.broadinstitute.org/ccle/Cell_lines_annotations_20181226.txt", "Cell_lines_annotations_20181226", 
+  "ccle", "https://data.broadinstitute.org/ccle/CCLE_metabolomics_20190502.csv", "CCLE_metabolomics_20190502",
   #"ccle", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", 'msi',
-  "ccle", "https://depmap.org/portal/download/api/download?file_name=ccle%2Fccle_2019%2FCCLE_RPPA_20181003.csv&bucket=depmap-external-downloads", "CCLE_RPPA_20181003",
-  "ccle", "https://depmap.org/portal/download/api/download?file_name=ccle%2Fccle_2019%2FCCLE_RPPA_Ab_info_20181226.csv&bucket=depmap-external-downloads", "CCLE_RPPA_Ab_info_20181226",
+  "ccle", "https://data.broadinstitute.org/ccle/CCLE_RPPA_20181003.csv", "CCLE_RPPA_20181003",
+  "ccle", "https://data.broadinstitute.org/ccle/CCLE_RPPA_Ab_info_20181226.csv", "CCLE_RPPA_Ab_info_20181226",
   "total-proteome", "https://gygi.hms.harvard.edu/data/ccle/protein_quant_current_normalized.csv.gz", "protein_quant_current_normalized.csv.gz",
   "uniprot", "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping_selected.tab.gz", "HUMAN_9606_idmapping_selected.tab.gz",
   "metmap", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-020-2969-2/MediaObjects/41586_2020_2969_MOESM7_ESM.xlsx", 'metmap',
