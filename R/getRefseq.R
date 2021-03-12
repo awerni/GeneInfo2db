@@ -40,7 +40,7 @@ getRefseq <- function(refseq_info, species_name) {
   }
   
   if (start_download) {
-    download.file("ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/gene2refseq.gz", destfile = "gene2refseq.gz", method = "wget")
+    download.file("ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/gene2refseq.gz", destfile = "gene2refseq.gz", method = "auto")
   }
   
   new_file <- paste0("gene2refseq_", rs$taxid)
