@@ -15,20 +15,36 @@ getRNAseq <- function() {
   expr_TPM <- getFileData("CCLE_expression_full")
   colnames(expr_TPM) <- gsub("(^.*\\(|\\))", "", colnames(expr_TPM))
   
-  expr_TPM_long <- expr_TPM %>%
-    as.data.frame(stringsAsFactors = FALSE) %>%
-    tibble::rownames_to_column("rnaseqrunid") %>%
-    tidyr::pivot_longer(!rnaseqrunid, names_to = "ensg", values_to = "log2tpm")
-  
-  depmap_ID <- rownames(expr_TPM)
+  if ("matrix" %in% class(expr_TPM)) {
+    depmap_ID <- rownames(expr_TPM)
+    expr_TPM_long <- expr_TPM %>%
+      as.data.frame(stringsAsFactors = FALSE) %>%
+      tibble::rownames_to_column("rnaseqrunid") %>%
+      tidyr::pivot_longer(!rnaseqrunid, names_to = "ensg", values_to = "log2tpm")
+  } else {
+    depmap_ID <- expr_TPM[, 1]
+    expr_TPM_long <- expr_TPM %>%
+      dplyr::rename(rnaseqrunid = X1) %>%
+      tidyr::pivot_longer(!rnaseqrunid, names_to = "ensg", values_to = "log2tpm")
+  }
   rm(expr_TPM)
   
-  expr_counts_long <- getFileData("CCLE_RNAseq_reads") %>%
-    as.data.frame(stringsAsFactors = FALSE) %>%
-    tibble::rownames_to_column("rnaseqrunid") %>%
+  expr_counts <- getFileData("CCLE_RNAseq_reads")
+  colnames(expr_counts) <- gsub("(^.*\\(|\\))", "", colnames(expr_counts))
+  
+  if ("matrix" %in% class(expr_counts)) {
+    expr_counts_long <- expr_count %>%
+      as.data.frame(stringsAsFactors = FALSE) %>%
+      tibble::rownames_to_column("rnaseqrunid")
+  } else {
+    expr_counts_long <- expr_counts %>%
+      dplyr::rename(rnaseqrunid = X1)
+  }
+  rm(expr_counts)
+  
+  expr_counts_long <- expr_counts_long %>%
     tidyr::pivot_longer(!rnaseqrunid, names_to = "ensg", values_to = "counts")  %>%
-    dplyr::mutate(ensg = gsub("\\)", "", gsub("^.*\\(", "", ensg)),
-                  counts = as.integer(counts))
+    dplyr::mutate(counts = as.integer(counts))
   
   rnaseqrun <- cellline %>%
     dplyr::select(rnaseqrunid = depmap, celllinename) %>%
@@ -65,10 +81,7 @@ getRNAseq <- function() {
   } else {    
     CCLE.RNAseq <- expr_counts_long %>%
       inner_join(expr_TPM_long, by = c("ensg", "rnaseqrunid")) %>%
-      filter(ensg %in% genes$ensg & rnaseqrunid %in% rnaseqrun$rnaseqrunid)
-    
-    rm(expr_counts_long_set)
-    rm(expr_TPM_long_set)
+      filter(ensg %in% gene$ensg & rnaseqrunid %in% rnaseqrun$rnaseqrunid)
   }
 
   rnaseqgroup <- data.frame(
