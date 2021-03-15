@@ -13,7 +13,7 @@ getMetMap <- function() {
   RPostgres::dbDisconnect(con)
   
   # -------------------------
-  my_excel_file <- "41586_2020_2969_MOESM7_ESM.xlsx"
+  my_excel_file <- "metmap.xlsx"
   clean_up <- getFileDownload(my_excel_file, only_download = TRUE)
   
   data <- data.frame()
