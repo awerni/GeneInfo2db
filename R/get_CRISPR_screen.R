@@ -15,9 +15,18 @@ get_CRISPR_screen <- function(screen_name, screen_desc, file_essentials, file_no
     essential.genes <- getFileData(file_essentials)
     nonessential.genes <- getFileData(file_nonessentials)
     
-    gene_effect_unscaled <- getFileData(file_effect_unscaled)  %>%
-      as.data.frame() %>%
-      tibble::rownames_to_column("depmap") %>%
+    gene_effect_unscaled <- getFileData(file_effect_unscaled)  
+    
+    if ("matrix" %in% class(gene_effect_unscaled)) {
+      gene_effect_unscaled <- gene_effect_unscaled %>%
+        as.data.frame() %>%
+        tibble::rownames_to_column("depmap")
+    } else {
+      gene_effect_unscaled <- gene_effect_unscaled %>%
+        dplyr::rename(depmap = 1)
+    }
+    
+    gene_effect_unscaled <- gene_effect_unscaled %>%
       tidyr::pivot_longer(!depmap, names_to = "gene", values_to = "ceres_unscaled")
     
     # calc median ceres_unscaled per sample for nonessetial genes
