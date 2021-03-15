@@ -5,7 +5,7 @@ getUniprot <- function() {
 
   allENSG <- dplyr::tbl(con, "gene") %>%
     dplyr::filter(species == "human" & grepl("^ENSG", ensg)) %>%
-    dplyr::se lect(ensg) %>%
+    dplyr::select(ensg) %>%
     dplyr::collect()
 
   allGeneID <- dplyr::tbl(con, "entrezgene")  %>%
