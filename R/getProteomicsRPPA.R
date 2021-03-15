@@ -42,13 +42,21 @@ getProteomicsRPPA <- function() {
   
   ab_data <- getFileData('CCLE_RPPA_20181003')
   
-  ab_data_long <- ab_data %>%
-    as.data.frame() %>%
-    tibble::rownames_to_column("depmap") %>%
-    dplyr::inner_join(cellline, by = "depmap") %>%
-    dplyr::select(-depmap) %>%
-    tidyr::pivot_longer(!celllinename, names_to = "antibody", values_to = "score") %>%
-    dplyr::mutate(antibody = gsub("_Caution", "", antibody))
+  if ("matrix" %in% class(ab_data)) {
+    ab_data_long <- ab_data %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("depmap") %>%
+      dplyr::inner_join(cellline, by = "depmap") %>%
+      dplyr::select(-depmap) %>%
+      tidyr::pivot_longer(!celllinename, names_to = "antibody", values_to = "score") %>%
+      dplyr::mutate(antibody = gsub("_Caution", "", antibody))
+  } else {
+    ab_data_long <- ab_data %>%
+      dplyr::rename(celllinename = 1) %>%
+      dplyr::filter(celllinename %in% cellline$celllinename) %>%
+      tidyr::pivot_longer(!celllinename, names_to = "antibody", values_to = "score") %>%
+      dplyr::mutate(antibody = gsub("_Caution", "", antibody))
+  }
   
   list(public.antibody = ab_anno,
        public.gene2antibody = ab_anno_gene,
