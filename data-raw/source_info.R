@@ -35,49 +35,49 @@ refseq_info <- tibble::tribble(
 # ---- taiga links ----
 taiga_info <- tibble::tribble(
   ~data_name, ~data_version, ~data_file,
-  
+
   'internal-21q1-4fc4', 30, 'sample_info', # ok
   'other-ccle2-c93e', 1, 'Cell_lines_annotations_20181226',
-  
-  'internal-21q1-4fc4', 30,'CCLE_expression_full',
-  'internal-21q1-4fc4', 30,'CCLE_RNAseq_reads',
-  'internal-21q1-4fc4', 30,'CCLE_RNAseq_transcripts',
-  'internal-21q1-4fc4', 30,'CCLE_expression_transcripts_expected_count',
-  
+
+  'internal-21q1-4fc4', 30, 'CCLE_expression_full',
+  'internal-21q1-4fc4', 30, 'CCLE_RNAseq_reads',
+  'internal-21q1-4fc4', 30, 'CCLE_RNAseq_transcripts',
+  'internal-21q1-4fc4', 30, 'CCLE_expression_transcripts_expected_count',
+
   # --------- this is an exact duplication of the expression data above -----------
   #'depmap-rnaseq-expression-data-363a', 36, 'expression_genes_expected_count',
   #'depmap-rnaseq-expression-data-363a', 36, 'expression_genes_tpm',
   #'depmap-rnaseq-expression-data-363a', 36, 'expression_transcripts_expected_count',
   #'depmap-rnaseq-expression-data-363a', 36, 'expression_transcripts_tpm',
-  
-  'internal-21q1-4fc4', 30,'CCLE_gene_cn',
-  'internal-21q1-4fc4', 30,'CCLE_mutations',
-  
-  'internal-21q1-4fc4', 30,'Achilles_gene_dependency',
-  'internal-21q1-4fc4', 30,'Achilles_gene_effect',
-  'internal-21q1-4fc4', 30,'Achilles_gene_effect_unscaled',
-  'internal-21q1-4fc4', 30,'nonessentials',
-  'internal-21q1-4fc4', 30,'common_essentials',
-  
-  'internal-21q1-4fc4', 30,'Achilles_cell_line_efficacy',
-  'internal-21q1-4fc4', 30,'Achilles_cell_line_growth_rate',
-  'internal-21q1-4fc4', 30,'Achilles_common_essentials',
-  'internal-21q1-4fc4', 30,'Achilles_common_essentials_Chronos',
-  'internal-21q1-4fc4', 30,'Achilles_dropped_guides',
-  
-  'internal-21q1-4fc4', 30,'Achilles_gene_dependency_Chronos',
-  'internal-21q1-4fc4', 30,'Achilles_gene_effect_Chronos',
-  
-  'internal-21q1-4fc4', 30,'CCLE_fusions',
-  'internal-21q1-4fc4', 30,'CCLE_fusions_unfiltered',
-  
-  'internal-21q1-4fc4', 30,'CRISPR_common_essentials',
-  'internal-21q1-4fc4', 30,'CRISPR_common_essentials_Chronos',
-  'internal-21q1-4fc4', 30,'CRISPR_gene_dependency',
-  'internal-21q1-4fc4', 30,'CRISPR_gene_dependency_Chronos',
-  'internal-21q1-4fc4', 30,'CRISPR_gene_effect',
-  'internal-21q1-4fc4', 30,'CRISPR_gene_effect_Chronos',
-  
+
+  'internal-21q1-4fc4', 30, 'CCLE_gene_cn',
+  'internal-21q1-4fc4', 30, 'CCLE_mutations',
+
+  'internal-21q1-4fc4', 30, 'Achilles_gene_dependency',
+  'internal-21q1-4fc4', 30, 'Achilles_gene_effect',
+  'internal-21q1-4fc4', 30, 'Achilles_gene_effect_unscaled',
+  'internal-21q1-4fc4', 30, 'nonessentials',
+  'internal-21q1-4fc4', 30, 'common_essentials',
+
+  'internal-21q1-4fc4', 30, 'Achilles_cell_line_efficacy',
+  'internal-21q1-4fc4', 30, 'Achilles_cell_line_growth_rate',
+  'internal-21q1-4fc4', 30, 'Achilles_common_essentials',
+  'internal-21q1-4fc4', 30, 'Achilles_common_essentials_Chronos',
+  'internal-21q1-4fc4', 30, 'Achilles_dropped_guides',
+
+  'internal-21q1-4fc4', 30, 'Achilles_gene_dependency_Chronos',
+  'internal-21q1-4fc4', 30, 'Achilles_gene_effect_Chronos',
+
+  'internal-21q1-4fc4', 30, 'CCLE_fusions',
+  'internal-21q1-4fc4', 30, 'CCLE_fusions_unfiltered',
+
+  'internal-21q1-4fc4', 30, 'CRISPR_common_essentials',
+  'internal-21q1-4fc4', 30, 'CRISPR_common_essentials_Chronos',
+  'internal-21q1-4fc4', 30, 'CRISPR_gene_dependency',
+  'internal-21q1-4fc4', 30, 'CRISPR_gene_dependency_Chronos',
+  'internal-21q1-4fc4', 30, 'CRISPR_gene_effect',
+  'internal-21q1-4fc4', 30, 'CRISPR_gene_effect_Chronos',
+
   'sanger-crispr-project-score--e20b', 4, 'essential_genes',
   'sanger-crispr-project-score--e20b', 4, 'nonessential_genes',
   'sanger-crispr-project-score--e20b', 4, 'gene_dependency',
@@ -91,6 +91,7 @@ taiga_info <- tibble::tribble(
   'secondary-screen-0854', 18, 'secondary-dose-response-curve-parameters',
   'msi-0584', 6, 'msi',
   'total-proteome--5c50', 2, 'normalized_protein_abundance',
+  'total-proteome--5c50', 1, 'protein_quant_current_normalized',
   'depmap-rppa-1b43', 3, 'CCLE_RPPA_20181003',
   'depmap-rppa-1b43', 3, 'CCLE_RPPA_Ab_info_20181226',
 
@@ -122,17 +123,17 @@ sanger_info <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732
 
 other_info <- tibble::tribble(
   ~data_name, ~url, ~data_file,
-  "ccle", "https://data.broadinstitute.org/ccle/Cell_lines_annotations_20181226.txt", "Cell_lines_annotations_20181226", 
+  "ccle", "https://data.broadinstitute.org/ccle/Cell_lines_annotations_20181226.txt", "Cell_lines_annotations_20181226",
   "ccle", "https://data.broadinstitute.org/ccle/CCLE_metabolomics_20190502.csv", "CCLE_metabolomics_20190502",
   #"ccle", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", 'msi',
   "ccle", "https://data.broadinstitute.org/ccle/CCLE_RPPA_20181003.csv", "CCLE_RPPA_20181003",
   "ccle", "https://data.broadinstitute.org/ccle/CCLE_RPPA_Ab_info_20181226.csv", "CCLE_RPPA_Ab_info_20181226",
   "total-proteome", "https://gygi.hms.harvard.edu/data/ccle/protein_quant_current_normalized.csv.gz", "protein_quant_current_normalized.csv.gz",
   "uniprot", "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping_selected.tab.gz", "HUMAN_9606_idmapping_selected.tab.gz",
-  "metmap", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-020-2969-2/MediaObjects/41586_2020_2969_MOESM7_ESM.xlsx", 'metmap',
+  "metmap", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-020-2969-2/MediaObjects/41586_2020_2969_MOESM7_ESM.xlsx", 'metmap.xlsx',
   "msi", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", "msi"
 )
-  
+
 download_file_info <- depmap_info %>%
   bind_rows(drive_info) %>%
   bind_rows(sanger_info) %>%
