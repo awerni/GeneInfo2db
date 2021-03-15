@@ -41,18 +41,38 @@ get_CRISPR_screen <- function(screen_name, screen_desc, file_essentials, file_no
       dplyr::select(-ceres_nonessential_unscaled_median, -ceres_common.essentials_shifted_median)
   }
   
-  gene_effect_long_new <- getFileData(file_effect) %>% 
-    as.data.frame() %>%
-    tibble::rownames_to_column("depmap") %>%
+  # -----------
+  gene_effect_long_new <- getFileData(file_effect) 
+  
+  if ("matrix" %in% class(gene_effect_long_new)) {
+    gene_effect_long_new <- gene_effect_long_new  %>% 
+      as.data.frame() %>%
+      tibble::rownames_to_column("depmap") 
+  } else {
+    gene_effect_long_new <- gene_effect_long_new %>%
+      dplyr::rename(depmap = 1)
+  }
+    
+  gene_effect_long_new <- gene_effect_long_new %>%
     tidyr::pivot_longer(!depmap, names_to = "gene", values_to = "ceres") %>%
     dplyr::inner_join(cellline, by = "depmap") %>%
     dplyr::select(-depmap) %>%
     tidyr::separate(gene, c("symbol", "geneid"), sep = " ") %>%
     dplyr::mutate(geneid = as.numeric(gsub("(\\(|\\))", "", geneid)))
   
-  gene_dependency_long_new <- getFileData(file_dependency) %>%
-    as.data.frame() %>%
-    tibble::rownames_to_column("depmap") %>%
+  # ------------
+  gene_dependency_long_new <- getFileData(file_dependency)
+  
+  if ("matrix" %in% class(gene_dependency_long_new)) {
+    gene_dependency_long_new <- gene_dependency_long_new %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("depmap")
+  } else {
+    gene_dependency_long_new <- gene_dependency_long_new %>%
+      dplyr::rename(depmap = 1)
+  }
+  
+  gene_dependency_long_new <- gene_dependency_long_new %>%
     tidyr::pivot_longer(!depmap, names_to = "gene", values_to = "dep_prob") %>%
     dplyr::inner_join(cellline, by = "depmap") %>%
     dplyr::select(-depmap) %>%
