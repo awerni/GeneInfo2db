@@ -1,22 +1,24 @@
 getProteomicsMassSpec <- function() {
-  
+
   con <- getPostgresqlConnection()
-  
+
   cellline <- dplyr::tbl(con, dbplyr::in_schema("cellline", "cellline"))  %>%
     dplyr::filter(species == "human") %>%
     dplyr::select(celllinename, depmap) %>%
     dplyr::collect()
-  
+
   uniprotaccession <- dplyr::tbl(con, "uniprotaccession") %>%
     dplyr::collect()
-  
+
   RPostgres::dbDisconnect(con)
-  
+
   # -------------------------
-  protein.quant.current.normalized <- getFileData('protein_quant_current_normalized.csv.gz')
+  dfile <- "protein_quant_current_normalized"
+  if (getOption("useFileDownload")) dfile <- paste0(dfile, ".csv.gz")
+  protein.quant.current.normalized <- getFileData(dfile)
 
   protein_long <- protein.quant.current.normalized %>%
-    dplyr::select(accession = Uniprot_Acc, uniprotid = Uniprot, matches("TenPx..$")) %>% 
+    dplyr::select(accession = Uniprot_Acc, uniprotid = Uniprot, matches("TenPx..$")) %>%
     tidyr::pivot_longer(!c(accession, uniprotid), names_to = "cellline_TenPx", values_to = "score") %>%
     dplyr::filter(!is.na(score)) %>%
     dplyr::mutate(celllinename = gsub("_TenPx..$", "", cellline_TenPx)) %>%
@@ -25,8 +27,8 @@ getProteomicsMassSpec <- function() {
                   accession = gsub("-.*", "", accession)) %>%
     dplyr::filter(celllinename %in% cellline$celllinename) %>%
     dplyr::select(-cellline_TenPx) %>%
-    group_by(celllinename, accession, uniprotid, isoform) %>%
-    summarise(score = mean(score, na.rm = TRUE), .groups = "drop")
+    dplyr::group_by(celllinename, accession, uniprotid, isoform) %>%
+    dplyr::summarise(score = mean(score, na.rm = TRUE), .groups = "drop")
 
   list(
     cellline.processedproteinmassspec = protein_long
