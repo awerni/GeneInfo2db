@@ -9,9 +9,14 @@ getRNAseq <- function() {
     dplyr::filter(species == "human") %>% 
     dplyr::collect()
   
+  laboratory <- dplyr::tbl(con, "laboratory") %>% 
+    dplyr::collect()
+  
   RPostgres::dbDisconnect(con)
 
   # ------------------  
+  lab <- "Broad Institute"
+  
   expr_TPM <- getFileData("CCLE_expression_full")
   colnames(expr_TPM) <- gsub("(^.*\\(|\\))", "", colnames(expr_TPM))
   
@@ -22,9 +27,9 @@ getRNAseq <- function() {
       tibble::rownames_to_column("rnaseqrunid") %>%
       tidyr::pivot_longer(!rnaseqrunid, names_to = "ensg", values_to = "log2tpm")
   } else {
-    depmap_ID <- expr_TPM[, 1]
+    depmap_ID <- expr_TPM[[1]]
     expr_TPM_long <- expr_TPM %>%
-      dplyr::rename(rnaseqrunid = X1) %>%
+      dplyr::rename(rnaseqrunid = 1) %>%
       tidyr::pivot_longer(!rnaseqrunid, names_to = "ensg", values_to = "log2tpm")
   }
   rm(expr_TPM)
@@ -38,7 +43,7 @@ getRNAseq <- function() {
       tibble::rownames_to_column("rnaseqrunid")
   } else {
     expr_counts_long <- expr_counts %>%
-      dplyr::rename(rnaseqrunid = X1)
+      dplyr::rename(rnaseqrunid = 1)
   }
   rm(expr_counts)
   
@@ -49,7 +54,7 @@ getRNAseq <- function() {
   rnaseqrun <- cellline %>%
     dplyr::select(rnaseqrunid = depmap, celllinename) %>%
     dplyr::filter(rnaseqrunid %in% depmap_ID) %>%
-    dplyr::mutate(publish = TRUE, canonical = TRUE, rnaseqgroupid = 1, laboratory = 'Broad Institute')
+    dplyr::mutate(publish = TRUE, canonical = TRUE, rnaseqgroupid = 1, laboratory = lab)
   
   total_mem <- grep("total memory", system("vmstat -s -S M", intern = TRUE), value = TRUE)
   total_mem <- as.numeric(gsub("M total memory", "",total_mem))
@@ -89,10 +94,15 @@ getRNAseq <- function() {
     rnaseqname = 'untreated CCLE cellline reference set',
     processingpipeline = 'RNA-seq CCLE'
   )
-  
-  list(public.laboratory = data.frame(laboratory = 'Broad Institute'),
-       cellline.rnaseqgroup = rnaseqgroup,
-       cellline.rnaseqrun = rnaseqrun, 
-       cellline.processedrnaseq = CCLE.RNAseq)
-  
+
+  if (lab %in% laboratory$laboratory) {
+    list(cellline.rnaseqgroup = rnaseqgroup,
+         cellline.rnaseqrun = rnaseqrun, 
+         cellline.processedrnaseq = CCLE.RNAseq)
+  } else {
+    list(public.laboratory = data.frame(laboratory = lab),
+         cellline.rnaseqgroup = rnaseqgroup,
+         cellline.rnaseqrun = rnaseqrun, 
+         cellline.processedrnaseq = CCLE.RNAseq)
+  }
 }
