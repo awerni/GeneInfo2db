@@ -33,12 +33,12 @@ getRNAseq <- function() {
       tidyr::pivot_longer(!rnaseqrunid, names_to = "ensg", values_to = "log2tpm")
   }
   rm(expr_TPM)
-  
+
   expr_counts <- getFileData("CCLE_RNAseq_reads")
   colnames(expr_counts) <- gsub("(^.*\\(|\\))", "", colnames(expr_counts))
   
   if ("matrix" %in% class(expr_counts)) {
-    expr_counts_long <- expr_count %>%
+    expr_counts_long <- expr_counts %>%
       as.data.frame(stringsAsFactors = FALSE) %>%
       tibble::rownames_to_column("rnaseqrunid")
   } else {
