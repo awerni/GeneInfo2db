@@ -175,10 +175,30 @@ DROP VIEW IF EXISTS cellline.allTranscriptMutation;
 --WHERE publish;
 
 ----------------------------------------------------
+
+DROP VIEW IF EXISTS cellline.sequenced_transcript CASCADE;
+CREATE MATERIALIZED VIEW cellline.sequenced_transcript AS
+  SELECT distinct enst FROM cellline.processedsequence;
+
 DROP VIEW IF EXISTS cellline.processedsequenceview CASCADE;
 
 CREATE VIEW cellline.processedsequenceview AS
-SELECT symbol, t.ensg, ps.* from cellline.processedsequence ps JOIN transcript t on (t.enst = ps.enst AND iscanonical) join gene g on (g.ensg = t.ensg);
+SELECT symbol, t.ensg, ps.enst, dnamutation, aamutation, dnazygosity, rnazygosity
+ FROM cellline.processedsequence ps JOIN transcript t on (t.enst = ps.enst AND iscanonical) join gene g on (g.ensg = t.ensg);
+
+DROP VIEW IF EXISTS cellline.processedsequenceExtended CASCADE;
+CREATE VIEW cellline.processedsequenceExtended AS
+WITH sequenced_cellline AS (
+  SELECT distinct celllinename
+    FROM cellline.processedsequence
+  )
+  SELECT tr.ensg, e.enst, symbol, c.celllinename,
+    coalesce(dnamutation, 'wt') AS dnamutation, coalesce(aamutation, 'wt') AS aamutation, dnazygosity, exonscomplete
+    FROM (SELECT celllinename FROM sequenced_cellline) AS c
+    LEFT OUTER JOIN cellline.sequenced_transcript e ON (TRUE)
+    LEFT OUTER JOIN cellline.processedsequence ps ON (c.celllinename = ps.celllinename AND e.enst = ps.enst)
+    LEFT JOIN transcript tr ON (e.enst = tr.enst AND tr.iscanonical)
+    LEFT JOIN gene g ON (tr.ensg = g.ensg);
 
 DROP VIEW IF EXISTS cellline.processedcopynumberview;
 CREATE VIEW cellline.processedcopynumberview AS
@@ -236,11 +256,12 @@ SELECT gene_set, celllinename, sum(log2tpm) AS log2tpm_sum, sum((log2tpm - log2t
 
 DROP VIEW IF EXISTS cellline.processeddepletionscoreview CASCADE;
 CREATE VIEW cellline.processeddepletionscoreview AS
-SELECT d.ensg, symbol, celllinename, depletionscreen, rsa, ataris, ceres, escore FROM cellline.processeddepletionscore d
+SELECT d.ensg, symbol, celllinename, depletionscreen, ceres_old, dep_prob, ceres, d2 FROM cellline.processeddepletionscore d
 JOIN gene g ON (d.ENSG = g.ENSG);
 
 DROP MATERIALIZED VIEW IF EXISTS cellline.mutationalburden CASCADE;
 CREATE MATERIALIZED VIEW cellline.mutationalburden AS
-SELECT psv.celllinename, species, tumortype, sum((aamutation <> 'wt')::INT4)/count(*)::REAL AS mutational_fraction
-  FROM cellline.processedsequenceview psv JOIN cellline.cellline cl ON cl.celllinename = psv.celllinename
-  GROUP BY psv.celllinename, species, tumortype having count(*) > 10000;
+SELECT psv.celllinename, species, tumortype,
+  sum((aamutation <> 'wt')::INT4)/count(*)::REAL AS mutational_fraction, count(*) as seq_genes
+  FROM cellline.processedsequenceExtended psv JOIN cellline.cellline cl ON cl.celllinename = psv.celllinename
+  GROUP BY psv.celllinename, species, tumortype;
