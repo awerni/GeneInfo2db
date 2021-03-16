@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 9.x                               */
-/* Created on:     2/26/2021 10:21:01 AM                        */
+/* Created on:     3/16/2021 6:14:01 PM                         */
 /*==============================================================*/
 
 
@@ -225,11 +225,13 @@ create table PROCESSEDDEPLETIONSCORE (
    ENSG                 TEXT                 not null,
    CELLLINENAME         TEXT                 not null,
    DEPLETIONSCREEN      TEXT                 not null,
-   RSA                  FLOAT4               null,
-   ATARIS               FLOAT4               null,
    CERES                FLOAT4               null,
-   ESCORE               FLOAT4               null,
    DEP_PROB             FLOAT4               null,
+   CERES_OLD            FLOAT4               null,
+   D2                   FLOAT4               null,
+   D2_PROB              FLOAT4               null,
+   CHRONOS              FLOAT4               null,
+   CHRONOS_PROB         FLOAT4               null,
    constraint PK_PROCESSEDDEPLETIONSCORE primary key (DEPLETIONSCREEN, CELLLINENAME, ENSG)
 );
 
