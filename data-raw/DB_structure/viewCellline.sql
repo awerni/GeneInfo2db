@@ -228,3 +228,16 @@ SELECT psv.celllinename, species, tumortype,
   sum((aamutation <> 'wt')::INT4)/count(*)::REAL AS mutational_fraction, count(*) as seq_genes
   FROM cellline.processedsequenceExtended psv JOIN cellline.cellline cl ON cl.celllinename = psv.celllinename
   GROUP BY psv.celllinename, species, tumortype;
+
+DROP VIEW IF EXISTS cellline.doseresponsecurve;
+CREATE VIEW cellline.doseresponsecurve AS
+  SELECT processedproliftest.proliftestid, processedproliftest.celllinename,
+    processedproliftest.drugid, processedproliftest.campaign,
+    processedproliftest.laboratory, processedproliftest.proliferationtest,
+    processedproliftest.timepoint_in_hours, processedproliftest.tzero,
+    processedproliftest.top, processedproliftest.bottom,
+    processedproliftest.slope, processedproliftest.ec50,
+    processedproliftest.ec50operator, processedproliftest.ic50,
+    processedproliftest.ic50perator, processedproliftest.gi50,
+    processedproliftest.gi50operator, processedproliftest.actarea,
+    processedproliftest.amax FROM cellline.processedproliftest;
