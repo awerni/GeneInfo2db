@@ -4,7 +4,7 @@
 #' @return nothing
 
 createDatabase <- function(db_part) {
-  if (db_part %in% c("recreateSchema", "geneAnnotation", "celllineDB", "db_glue")) {
+  if (db_part %in% c("recreateSchema", "geneAnnotation", "celllineDB", "db_glue", "refreshView")) {
 
     split_SQL <- function(my_SQL) {
       s <- stringr::str_split(my_SQL, ";", simplify = FALSE) %>% unlist()
