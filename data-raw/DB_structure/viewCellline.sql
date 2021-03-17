@@ -49,24 +49,6 @@ SELECT celllinename,
   array(SELECT counts FROM cellline.processedrnaseq p WHERE p.rnaseqrunid = r.rnaseqrunid AND ensg IN (SELECT ensg from cellline.expressed_ensg) ORDER BY ensg) AS counts
   FROM cellline.rnaseqrun r WHERE canonical AND publish AND rnaseqgroupid IN (select rnaseqgroupid from cellline.rnaseqgroup WHERE rnaseqname like 'untreated %cellline reference set%');
 
----
-
-DROP MATERIALIZED VIEW IF EXISTS cellline.processedrnaseq_array_full;
-
-DROP MATERIALIZED VIEW IF EXISTS cellline.expressed_ensg_full;
-
-CREATE MATERIALIZED VIEW cellline.expressed_ensg_full AS
-SELECT distinct p.ensg, species
-  FROM cellline.processedrnaseq p JOIN public.gene g ON (p.ensg = g.ensg)
-  ORDER by species, p.ensg;
-
-CREATE MATERIALIZED VIEW cellline.processedrnaseq_array_full AS
-SELECT celllinename,
-  array(SELECT log2tpm FROM cellline.processedrnaseq p WHERE p.rnaseqrunid = r.rnaseqrunid ORDER BY ensg) AS log2tpm,
-  array(SELECT counts FROM cellline.processedrnaseq p WHERE p.rnaseqrunid = r.rnaseqrunid ORDER BY ensg) AS counts
-  FROM cellline.rnaseqrun r WHERE canonical AND publish AND rnaseqgroupid IN (select rnaseqgroupid from cellline.rnaseqgroup WHERE rnaseqname like 'untreated %cellline reference set%');
-
-
 -----------
 DROP MATERIALIZED VIEW IF EXISTS cellline.processedrnaseqtranscript_array;
 
@@ -84,25 +66,6 @@ CREATE MATERIALIZED VIEW cellline.processedrnaseqtranscript_array AS
 SELECT celllinename,
   array(SELECT log2tpm FROM cellline.processedrnaseqtranscript p WHERE p.rnaseqrunid = r.rnaseqrunid AND enst IN (SELECT enst from cellline.expressed_enst) ORDER BY enst) AS log2tpm,
   array(SELECT counts FROM cellline.processedrnaseqtranscript p WHERE p.rnaseqrunid = r.rnaseqrunid AND enst IN (SELECT enst from cellline.expressed_enst) ORDER BY enst) AS counts
-  FROM cellline.rnaseqrun r WHERE canonical AND publish AND rnaseqgroupid IN (select rnaseqgroupid from cellline.rnaseqgroup WHERE rnaseqname like 'untreated %cellline reference set%');
-
----
-
-DROP MATERIALIZED VIEW IF EXISTS cellline.processedrnaseqtranscript_array_full;
-
-DROP MATERIALIZED VIEW IF EXISTS cellline.expressed_enst_full;
-
-CREATE MATERIALIZED VIEW cellline.expressed_enst_full AS
-SELECT distinct p.enst, species
-  FROM cellline.processedrnaseqtranscript p
-    JOIN public.transcript t ON (p.enst = t.enst)
-    JOIN public.gene g ON (g.ensg = t.ensg)
-    ORDER by species, p.enst;
-
-CREATE MATERIALIZED VIEW cellline.processedrnaseqtranscript_array_full AS
-SELECT celllinename,
-  array(SELECT log2tpm FROM cellline.processedrnaseqtranscript p WHERE p.rnaseqrunid = r.rnaseqrunid ORDER BY enst) AS log2tpm,
-  array(SELECT counts FROM cellline.processedrnaseqtranscript p WHERE p.rnaseqrunid = r.rnaseqrunid ORDER BY enst) AS counts
   FROM cellline.rnaseqrun r WHERE canonical AND publish AND rnaseqgroupid IN (select rnaseqgroupid from cellline.rnaseqgroup WHERE rnaseqname like 'untreated %cellline reference set%');
 
 ---
