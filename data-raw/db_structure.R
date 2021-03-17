@@ -19,4 +19,7 @@ db_glue_file <- c("storedprocedure.sql", "storedprocedureCellline.sql",
 db_glue_list <- sapply(db_glue_file, function(f) readr::read_file(paste0(p, f)))
 db_glue <- paste(db_glue_list, collapse = "")
 
-save(recreateSchema, geneAnnotation, celllineDB, db_glue, file = "data/db_schema.rdata")
+refreshView <- readr::read_file(paste0(p, "refreshMaterializedViews.sql")) %>%
+  gsub(pattern = "(\n|\r)", replacement = "")
+
+save(recreateSchema, geneAnnotation, celllineDB, db_glue, refreshView, file = "data/db_schema.rdata")
