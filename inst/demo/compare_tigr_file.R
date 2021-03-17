@@ -26,7 +26,7 @@ file_msi <- getMicrosatelliteStability()
 options("useFileDownload" = FALSE)
 taigr_msi <- getMicrosatelliteStability()
 
-# --------- gene expression ------------
+# --------- gene expression ------------ OK
 options("useFileDownload" = TRUE)
 file_rnaseq <- getRNAseq()
 options("useFileDownload" = FALSE)
@@ -38,7 +38,7 @@ file_mutations <- getMutations()
 options("useFileDownload" = FALSE)
 taigr_mutations <- getMutations()
 
-# --------- copy numbers -----------------
+# --------- copy numbers --------------- OK
 options("useFileDownload" = TRUE)
 file_cn <- getCopynumber()
 options("useFileDownload" = FALSE)
@@ -57,7 +57,7 @@ options("useFileDownload" = FALSE)
 taigr_massspec <- getProteomicsMassSpec()
 
 # --------- depletion screens ----------
-options("useFileDownload" = TRUE)
+options("useFileDownload" = TRUE) # ---- OK
 file_avana <- getAvana()
 options("useFileDownload" = FALSE)
 taigr_avana <- getAvana()
