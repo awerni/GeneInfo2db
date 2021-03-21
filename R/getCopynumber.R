@@ -26,13 +26,13 @@ getCopynumber <- function() {
                                geneid = c(sapply(gene_name$geneid, rep, times = nrow(CCLE.gene.cn)))) %>%
       dplyr::inner_join(cellline, by = "depmap") %>%
       dplyr::select(-depmap) %>%
-      dplyr::mutate(cn = 2^log2cn - 1) 
+      dplyr::mutate(cn = 2*(2^log2cn - 1)) 
     
     gene2ensg <- get_gene_translation(gene_name$geneid)
     
     CCLE.gene.cn <- CCLE.gene.cn %>%
       dplyr::inner_join(gene2ensg, by = "geneid") %>%
-      dplyr::mutate(log2relativecopynumber = log2(cn/2 + 1)) %>%
+      dplyr::mutate(log2relativecopynumber = log2(cn) - 1) %>%
       dplyr::select(celllinename, ensg, log2relativecopynumber) %>%
       dplyr::distinct(celllinename, ensg, .keep_all = TRUE)
     
@@ -49,7 +49,7 @@ getCopynumber <- function() {
       tidyr::pivot_longer(!depmap, names_to = "geneid", values_to = "log2cn") %>%
       dplyr::inner_join(cellline, by = "depmap") %>%
       dplyr::mutate(geneid = as.numeric(geneid),
-                    log2relativecopynumber = log2(((2^log2cn - 1)/2) + 1)) %>%
+                    log2relativecopynumber = log2(2*(2^log2cn - 1)) - 1) %>%
       dplyr::inner_join(gene2ensg, by = "geneid") %>%
       dplyr::select(celllinename, ensg, log2relativecopynumber) %>%
       dplyr::distinct(celllinename, ensg, .keep_all = TRUE)
@@ -57,7 +57,7 @@ getCopynumber <- function() {
   
   av_cn <- CCLE.gene.cn %>%
     dplyr::group_by(celllinename) %>%
-    dplyr::summarize(avg_cn = mean(2*2^log2relativecopynumber - 1))
+    dplyr::summarize(avg_cn = mean(2*2^log2relativecopynumber))
   print(summary(av_cn$avg_cn))
   
   list(
