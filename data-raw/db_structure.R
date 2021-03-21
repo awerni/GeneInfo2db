@@ -22,4 +22,7 @@ db_glue <- paste(db_glue_list, collapse = "")
 refreshView <- readr::read_file(paste0(p, "refreshMaterializedViews.sql")) %>%
   gsub(pattern = "(\n|\r)", replacement = "")
 
-save(recreateSchema, geneAnnotation, celllineDB, db_glue, refreshView, file = "data/db_schema.rdata")
+alternative_celllinename <- readr::read_file(paste0(p, "refreshMaterializedViews.sql")) %>%
+  gsub(pattern = "(\n|\r)", replacement = "")
+
+save(recreateSchema, geneAnnotation, celllineDB, db_glue, refreshView, alternative_celllinename, file = "data/db_schema.rdata")
