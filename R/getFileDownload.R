@@ -32,13 +32,13 @@ getFileDownload <- function(dfile, only_download = FALSE) {
   } else {
     l <- readLines(de$data_file, n = 1)
     if (grepl("\t", l)) {
-      data <- readr::read_tsv(de$data_file, na = c("", "NA"))
+      data <- readr::read_tsv(de$data_file, na = c("", "NA"), guess_max = 2000)
     } else if (grepl(",", l)) {
-      data <- readr::read_csv(de$data_file, na = c("", "NA"))
+      data <- readr::read_csv(de$data_file, na = c("", "NA"), guess_max = 2000)
     } else if (grepl(";", l)) {
-      data <- readr::read_delim(de$data_file, delim = ";", na = c("", "NA"))
+      data <- readr::read_delim(de$data_file, delim = ";", na = c("", "NA"), guess_max = 2000)
     } else {
-      data <- readr::read_csv2(de$data_file, na = c("", "NA"))
+      data <- readr::read_csv2(de$data_file, na = c("", "NA"), guess_max = 2000)
     }
   }
   if (clean_up) file.remove(de$data_file)
