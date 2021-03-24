@@ -99,6 +99,13 @@ taiga_info <- tibble::tribble(
   'metmap-data-f459', 3, 'metmap500_penetrance'
 )
 
+taiga_version <- tibble::tribble(
+  ~description, ~information,
+  "Depmap Version", "internal 21q1",
+  "metabolomics", "CCLE_metabolomics_20190502",
+  "Proteomics", "CCLE_RPPA_20181003"
+)
+
 # ------figshare (depmap) and direct links -----------
 depmap_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/13681534/files") %>%
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
@@ -140,6 +147,13 @@ download_file_info <- depmap_info %>%
   bind_rows(prism_info) %>%
   bind_rows(other_info)
 
+file_version <- tibble::tribble(
+  ~description, ~information,
+  "Depmap Version", "public 21q1",
+  "metabolomics", "CCLE_metabolomics_20190502",
+  "Proteomics", "CCLE_RPPA_20181003"
+)
+
 # -------------MSigDB --------------------
 
 gmt.files <- tibble::tribble(
@@ -170,4 +184,5 @@ gmt.files <- tibble::tribble(
 )
 
 # -----------------
-save(db_info, gene_info, refseq_info, db_compara, taiga_info, download_file_info, gmt.files, file = "data/source_info.rdata")
+save(db_info, gene_info, refseq_info, db_compara, taiga_info, download_file_info, 
+     gmt.files, taiga_version, file_version, file = "data/source_info.rdata")
