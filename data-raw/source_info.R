@@ -36,13 +36,13 @@ refseq_info <- tibble::tribble(
 taiga_info <- tibble::tribble(
   ~data_name, ~data_version, ~data_file,
 
-  'internal-21q1-4fc4', 30, 'sample_info', # ok
-  'other-ccle2-c93e', 1, 'Cell_lines_annotations_20181226',
+  'internal-21q2-9d16', 17, 'sample_info', # ok
+  'other-ccle2-c93e', 2, 'Cell_lines_annotations_20181226',
 
-  'internal-21q1-4fc4', 30, 'CCLE_expression_full',
-  'internal-21q1-4fc4', 30, 'CCLE_RNAseq_reads',
-  'internal-21q1-4fc4', 30, 'CCLE_RNAseq_transcripts',
-  'internal-21q1-4fc4', 30, 'CCLE_expression_transcripts_expected_count',
+  'internal-21q2-9d16', 17, 'CCLE_expression_full',
+  'internal-21q2-9d16', 17, 'CCLE_RNAseq_reads',
+  'internal-21q2-9d16', 17, 'CCLE_RNAseq_transcripts',
+  'internal-21q2-9d16', 17, 'CCLE_expression_transcripts_expected_count',
 
   # --------- this is an exact duplication of the expression data above -----------
   #'depmap-rnaseq-expression-data-363a', 36, 'expression_genes_expected_count',
@@ -50,33 +50,33 @@ taiga_info <- tibble::tribble(
   #'depmap-rnaseq-expression-data-363a', 36, 'expression_transcripts_expected_count',
   #'depmap-rnaseq-expression-data-363a', 36, 'expression_transcripts_tpm',
 
-  'internal-21q1-4fc4', 30, 'CCLE_gene_cn',
-  'internal-21q1-4fc4', 30, 'CCLE_mutations',
+  'internal-21q2-9d16', 17, 'CCLE_gene_cn',
+  'internal-21q2-9d16', 17, 'CCLE_mutations',
 
-  'internal-21q1-4fc4', 30, 'Achilles_gene_dependency',
-  'internal-21q1-4fc4', 30, 'Achilles_gene_effect',
-  'internal-21q1-4fc4', 30, 'Achilles_gene_effect_unscaled',
-  'internal-21q1-4fc4', 30, 'nonessentials',
-  'internal-21q1-4fc4', 30, 'common_essentials',
+  'internal-21q2-9d16', 17, 'Achilles_gene_dependency',
+  'internal-21q2-9d16', 17, 'Achilles_gene_effect',
+  'internal-21q2-9d16', 17, 'Achilles_gene_effect_unscaled',
+  'internal-21q2-9d16', 17, 'nonessentials',
+  'internal-21q2-9d16', 17, 'common_essentials',
 
-  'internal-21q1-4fc4', 30, 'Achilles_cell_line_efficacy',
-  'internal-21q1-4fc4', 30, 'Achilles_cell_line_growth_rate',
-  'internal-21q1-4fc4', 30, 'Achilles_common_essentials',
-  'internal-21q1-4fc4', 30, 'Achilles_common_essentials_Chronos',
-  'internal-21q1-4fc4', 30, 'Achilles_dropped_guides',
+  'internal-21q2-9d16', 17, 'Achilles_cell_line_efficacy',
+  'internal-21q2-9d16', 17, 'Achilles_cell_line_growth_rate',
+  'internal-21q2-9d16', 17, 'Achilles_common_essentials',
+  'internal-21q2-9d16', 17, 'Achilles_common_essentials_Chronos',
+  'internal-21q2-9d16', 17, 'Achilles_dropped_guides',
 
-  'internal-21q1-4fc4', 30, 'Achilles_gene_dependency_Chronos',
-  'internal-21q1-4fc4', 30, 'Achilles_gene_effect_Chronos',
+  'internal-21q2-9d16', 17, 'Achilles_gene_dependency_Chronos',
+  'internal-21q2-9d16', 17, 'Achilles_gene_effect_Chronos',
 
-  'internal-21q1-4fc4', 30, 'CCLE_fusions',
-  'internal-21q1-4fc4', 30, 'CCLE_fusions_unfiltered',
+  'internal-21q2-9d16', 17, 'CCLE_fusions',
+  'internal-21q2-9d16', 17, 'CCLE_fusions_unfiltered',
 
-  'internal-21q1-4fc4', 30, 'CRISPR_common_essentials',
-  'internal-21q1-4fc4', 30, 'CRISPR_common_essentials_Chronos',
-  'internal-21q1-4fc4', 30, 'CRISPR_gene_dependency',
-  'internal-21q1-4fc4', 30, 'CRISPR_gene_dependency_Chronos',
-  'internal-21q1-4fc4', 30, 'CRISPR_gene_effect',
-  'internal-21q1-4fc4', 30, 'CRISPR_gene_effect_Chronos',
+  'internal-21q2-9d16', 17, 'CRISPR_common_essentials',
+  'internal-21q2-9d16', 17, 'CRISPR_common_essentials_Chronos',
+  'internal-21q2-9d16', 17, 'CRISPR_gene_dependency',
+  'internal-21q2-9d16', 17, 'CRISPR_gene_dependency_Chronos',
+  'internal-21q2-9d16', 17, 'CRISPR_gene_effect',
+  'internal-21q2-9d16', 17, 'CRISPR_gene_effect_Chronos',
 
   'sanger-crispr-project-score--e20b', 4, 'essential_genes',
   'sanger-crispr-project-score--e20b', 4, 'nonessential_genes',
@@ -101,13 +101,13 @@ taiga_info <- tibble::tribble(
 
 taiga_version <- tibble::tribble(
   ~description, ~information,
-  "Depmap Version", "internal 21q1",
+  "Depmap Version", "internal 21q2",
   "metabolomics", "CCLE_metabolomics_20190502",
   "Proteomics", "CCLE_RPPA_20181003"
 )
 
 # ------figshare (depmap) and direct links -----------
-depmap_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/13681534/files") %>%
+depmap_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/14541774/files") %>%
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
   filter(data_file %in% c("sample_info", "CCLE_expression_full", "CCLE_RNAseq_reads", "CCLE_RNAseq_transcripts", "CCLE_gene_cn", "CCLE_mutations",
@@ -158,31 +158,31 @@ file_version <- tibble::tribble(
 
 gmt.files <- tibble::tribble(
   ~file, ~collection, ~collection_name, ~gene_set_group,
-  "c1.all.v7.2.entrez.gmt", "c1", "positional", "positional",
-  "c2.cgp.v7.2.entrez.gmt", "c2", "curated", "chemical and genetic perturbations",
-  "c2.cp.biocarta.v7.2.entrez.gmt", "c2", "curated", "biocarta",
-  "c2.cp.kegg.v7.2.entrez.gmt", "c2", "curated", "KEGG",
-  "c2.cp.pid.v7.2.entrez.gmt", "c2", "curated", "PID",
-  "c2.cp.reactome.v7.2.entrez.gmt", "c2", "curated", "Reactome",
-  "c2.cp.wikipathways.v7.2.entrez.gmt", "c2", "curated", "wiki pathways",
-  "c2.cp.v7.2.entrez.gmt", "c2", "curated", "canonical pathways",
-  "c3.mir.mirdb.v7.2.entrez.gmt", "c3", "regulatory target", "MIRDB targets",
-  "c3.mir.mir_legacy.v7.2.entrez.gmt", "c3", "regulatory target", "Legacy microRNA targets",
-  #"c3.mir.v7.2.entrez.gmt", "c3", "regulatory target", "all microRNA targets",
-  "c3.tft.gtrd.v7.2.entrez.gmt", "c3", "regulatory target", "GTRD targets",
-  "c3.tft.tft_legacy.v7.2.entrez.gmt", "c3", "regulatory target", "Legacy transcription factor targets",
-  #"c3.tft.v7.2.entrez.gmt", "c3", "regulatory target", "all transcription factor targets",
-  "c4.cgn.v7.2.entrez.gmt", "c4", "computational", "cancer gene neighborhoods",
-  "c4.cm.v7.2.entrez.gmt", "c4", "computational", "cancer modules",
-  "c5.go.bp.v7.2.entrez.gmt", "c5", "gene ontology", "biological processes",
-  "c5.go.cc.v7.2.entrez.gmt", "c5", "gene ontology", "cellular components",
-  "c5.go.mf.v7.2.entrez.gmt", "c5", "gene ontology", "molecular functions",
-  "c6.all.v7.2.entrez.gmt", "c6", "oncogenic signatures", "all oncogenic signatures",
-  "c7.all.v7.2.entrez.gmt", "c7", "immunologic signatures", "all immunologic signatures ",
-  "c8.all.v7.2.entrez.gmt", "c8", "cell type signatures", "all cell type signatures",
-  "h.all.v7.2.entrez.gmt", "h", "hallmark", "hallmark"
+  "c1.all.v7.4.entrez.gmt", "c1", "positional", "positional",
+  "c2.cgp.v7.4.entrez.gmt", "c2", "curated", "chemical and genetic perturbations",
+  "c2.cp.biocarta.v7.4.entrez.gmt", "c2", "curated", "biocarta",
+  "c2.cp.kegg.v7.4.entrez.gmt", "c2", "curated", "KEGG",
+  "c2.cp.pid.v7.4.entrez.gmt", "c2", "curated", "PID",
+  "c2.cp.reactome.v7.4.entrez.gmt", "c2", "curated", "Reactome",
+  "c2.cp.wikipathways.v7.4.entrez.gmt", "c2", "curated", "wiki pathways",
+  "c2.cp.v7.4.entrez.gmt", "c2", "curated", "canonical pathways",
+  "c3.mir.mirdb.v7.4.entrez.gmt", "c3", "regulatory target", "MIRDB targets",
+  "c3.mir.mir_legacy.v7.4.entrez.gmt", "c3", "regulatory target", "Legacy microRNA targets",
+  #"c3.mir.v7.4.entrez.gmt", "c3", "regulatory target", "all microRNA targets",
+  "c3.tft.gtrd.v7.4.entrez.gmt", "c3", "regulatory target", "GTRD targets",
+  "c3.tft.tft_legacy.v7.4.entrez.gmt", "c3", "regulatory target", "Legacy transcription factor targets",
+  #"c3.tft.v7.4.entrez.gmt", "c3", "regulatory target", "all transcription factor targets",
+  "c4.cgn.v7.4.entrez.gmt", "c4", "computational", "cancer gene neighborhoods",
+  "c4.cm.v7.4.entrez.gmt", "c4", "computational", "cancer modules",
+  "c5.go.bp.v7.4.entrez.gmt", "c5", "gene ontology", "biological processes",
+  "c5.go.cc.v7.4.entrez.gmt", "c5", "gene ontology", "cellular components",
+  "c5.go.mf.v7.4.entrez.gmt", "c5", "gene ontology", "molecular functions",
+  "c6.all.v7.4.entrez.gmt", "c6", "oncogenic signatures", "all oncogenic signatures",
+  "c7.all.v7.4.entrez.gmt", "c7", "immunologic signatures", "all immunologic signatures ",
+  "c8.all.v7.4.entrez.gmt", "c8", "cell type signatures", "all cell type signatures",
+  "h.all.v7.4.entrez.gmt", "h", "hallmark", "hallmark"
 )
 
 # -----------------
-save(db_info, gene_info, refseq_info, db_compara, taiga_info, download_file_info, 
+save(db_info, gene_info, refseq_info, db_compara, taiga_info, download_file_info,
      gmt.files, taiga_version, file_version, file = "data/source_info.rdata")
