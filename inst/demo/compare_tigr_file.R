@@ -6,7 +6,7 @@ options("dbhost" = "charlotte")
 #options("dbname" = "bioinfo_21Q1.hg38")
 options("dbname" = "bioinfo_test.hg38")
 options("useFileDownload" = TRUE)
-options("msigdb_path" = "~/Download/msigdb_v7.2_files_to_download_locally/msigdb_v7.2_GMTs/")
+options("msigdb_path" = "~/Download/msigdb_v7.4_files_to_download_locally/msigdb_v7.4_GMTs/")
 
 # ---------- Uniprot ------------------- OK
 options("useFileDownload" = TRUE)
