@@ -63,5 +63,12 @@ setLocalFileRepo <- function(path) {
 #' }
 #' 
 useLocalFileRepo <- function(path) {
-  file.path(getLocalFileRepo(), path)
+  
+  repoPath <- getLocalFileRepo()
+  if(is.null(repoPath) || is.na(repoPath) || repoPath == "") {
+    # local file repo is not used - a path without modification is being returned
+    path
+  } else {
+    file.path(repoPath, path)
+  }
 }
