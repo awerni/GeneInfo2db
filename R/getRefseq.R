@@ -4,7 +4,7 @@ getRefseq <- function(refseq_info, species_name) {
     dplyr::filter(species == species_name) %>%
     as.list()
 
-  a <- readr::read_tsv(rs$file, col_names = c("size", "file")) %>%
+  a <- safeReadFile(rs$file, col_names = c("size", "file")) %>%
     dplyr::filter(grepl("rna.fna.gz", file)) %>%
     dplyr::arrange(file)
 
@@ -12,7 +12,7 @@ getRefseq <- function(refseq_info, species_name) {
     curr_file  <- paste0(gsub("([^\\/]+$)", "", rs$file), my_file)
     print(curr_file)
 
-    readr::read_tsv(curr_file, col_names = c("content")) %>%
+    safeReadFile(curr_file, col_names = c("content")) %>%
       dplyr::filter(grepl(">", content)) %>%
       tidyr::separate(content, c("refseqid", "refseqdesc"), sep = " ", extra = "merge") %>%
       dplyr::mutate(refseqid = gsub(">", "", refseqid))
