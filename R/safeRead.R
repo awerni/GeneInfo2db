@@ -63,7 +63,6 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
 #'
 #' @param url url to file.
 #' @param read_fnc function used to read file from disk. Default \code{\link{read_tsv}} from \code{readr} package.
-#' @param subdir subdirectory for a local cache. Default: \code{gene-data/ftp-ncbi}. Could be a path returned from \code{\link{tempdir}}.
 #' @param ... other parameres passed to \code{read_fnc}.
 #'
 #' @return
@@ -85,7 +84,7 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
 #' safeReadFile("ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz")
 #' }
 #' 
-safeReadFile <- function(url, read_fnc = readr::read_tsv, subdir = "gene-data/ftp-ncbi", .retries = 20, .waitTime = 20, ...) {
+safeReadFile <- function(url, read_fnc = readr::read_tsv, .retries = 20, .waitTime = 20, ...) {
   
   filename <- useLocalFileRepo(basename(url))
   
@@ -143,7 +142,7 @@ safeReadFile <- function(url, read_fnc = readr::read_tsv, subdir = "gene-data/ft
     } else {
       log_trace("Problem with downloaded file - Retrying {url} - number of retries left {.retries - 1}")
       Sys.sleep(.waitTime)
-      res <- safeReadFile(url, read_fnc = read_fnc, subdir = subdir, .retries = .retries - 1, .waitTime = .waitTime, ...)
+      res <- safeReadFile(url, read_fnc = read_fnc, .retries = .retries - 1, .waitTime = .waitTime, ...)
     }
   }
   res
