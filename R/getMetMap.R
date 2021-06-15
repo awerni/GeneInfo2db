@@ -13,22 +13,27 @@ getMetMap <- function() {
   RPostgres::dbDisconnect(con)
   
   # -------------------------
-  my_excel_file <- "metmap.xlsx"
-  clean_up <- getFileDownload(my_excel_file, only_download = TRUE)
+  excel_file <- download_file_info %>%
+    dplyr::filter(data_file == "metmap.xlsx") %>%
+    as.list()
   
-  data <- data.frame()
-  for (s in readxl::excel_sheets(my_excel_file)) {
-    data2 <- readxl::read_xlsx(my_excel_file, sheet = s) %>%
-      rename(celllinename = 1) %>%
-      mutate(organ = gsub("(metp500\\.|5)", "", s))
-    if (nrow(data) == 0) {
-      data <- data2
-    } else {
-      data <- data %>% bind_rows(data2)
+  readMetmapExcel <- function(filepath) {
+    data <- data.frame()
+    
+    for (s in readxl::excel_sheets(filepath)) {
+      data2 <- readxl::read_xlsx(filepath, sheet = s) %>%
+        rename(celllinename = 1) %>%
+        mutate(organ = gsub("(metp500\\.|5)", "", s))
+      if (nrow(data) == 0) {
+        data <- data2
+      } else {
+        data <- data %>% bind_rows(data2)
+      }
     }
+    data
   }
   
-  if (clean_up) file.remove(my_excel_file)
+  data <- safeReadFile(excel_file$url, read_fnc = readMetmapExcel)
   
   unknown <- setdiff(data$celllinename, cellline$celllinename)
   if (length(unknown) > 0) {

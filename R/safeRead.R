@@ -35,6 +35,27 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
     
   if(.retries < 0) stop(".retries must be greater or equal to zero!")
   
+  # Checking if the file exists:
+  # If yes, then it also check the local and remote file sizes - if they are different
+  # then the local copy is removed
+  # we assume that the file was only partially downloaded or a new version is available
+  # in both cases - the downloading needs to start from scratch
+  if (file.exists(filename)) {
+    size2download <- download_filesize(url)
+    currentSize <- file.info(filename)$size
+    
+    logger::log_trace("{filename}: Size to download: {size2download}, Current Size: {currentSize}, Match size: {size2download == currentSize}")
+    if (currentSize != size2download) {
+      logger::log_trace("Removing old instance of {filename} - sizes do not match.")
+      file.remove(filename)
+    } else {
+      log_trace("File is already in cache and it's good to go.")
+      return(list(status = 0, .retries = .retries))
+    }
+  }
+  
+  log_trace("File {filename} not available local cache. Downloading from {url} using safeDownloadFile().")
+  
   status <- tryCatch(download.file(url, filename), error = function(err) {
     log_error("Cannot download the {url}.")
     if(file.exists(filename)) unlink(filename)
@@ -53,12 +74,9 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
     }
   }
   
-  list(status = status, .retries = .retries)
+  return(list(status = status, .retries = .retries))
 }
 
-  
-  
-  
 #' Safe read file from url.
 #'
 #' @param url url to file.
@@ -84,39 +102,19 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
 #' safeReadFile("ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz")
 #' }
 #' 
-safeReadFile <- function(url, read_fnc = readr::read_tsv, .retries = 20, .waitTime = 20, ...) {
+safeReadFile <- function(url, filename = NULL, read_fnc = readr::read_tsv, .retries = 20, .waitTime = 20, ...) {
   
-  filename <- useLocalFileRepo(basename(url))
-  
-  # Checking if the file exists:
-  # If yes, then it also check the local and remote file sizes - if they are different
-  # then the local copy is removed
-  # we assume that the file was only partially downloaded or a new version is available
-  # in both cases - the downloading needs to start from scratch
-  if (file.exists(filename)) {
-    size2download <- download_filesize(url)
-    currentSize <- file.info(filename)$size
-    
-    logger::log_trace("{filename}: Size to download: {size2download}, Current Size: {currentSize}, Match size: {size2download == currentSize}")
-    if (currentSize != size2download) {
-      logger::log_trace("Removing old instance of {filename} - sizes do not match.")
-      file.remove(filename)
-    }
+  if(is.null(filename)) {
+    log_trace("filename in safeReadFile is NULL using basename(url): {basename(url)}")
+    filename <- basename(url)
+    filename <- useLocalFileRepo(filename)
   }
-  
   
   # If file is not in a local cache, the function below tries to download it.
-  # Note that it uses safeDownloadFile which tries .retries times if it is not able to succeed.
-  if(!file.exists(filename)) {
-    log_trace("File {filename} not available local cache. Downloading from {url} using safeDownloadFile().")
-    status <- safeDownloadFile(url, filename, .retries, .waitTime)
-    .retries <- status$.retries # update retries to include retires used in recurrent safeDownloadFile calls.
-    
-  } else {
-    log_trace("File {filename} present in local cache. No need to download.")
-  }
-  
-  
+  # Note that it uses safeDownloadFile which tries \code{.retries} times if it is not able to succeed in a given attempt.
+  status <- safeDownloadFile(url, filename, .retries, .waitTime)
+  .retries <- status$.retries # update retries to include retires used in recurrent safeDownloadFile calls.
+
   # Safely reading the file:
   # it needs to use tryCatch becaue sometimes even when the safeDownloadFile succeed, the archive still
   # can be corrupted leading to error on this stage. In such case (the reading below fails), safeReadFile
@@ -146,4 +144,38 @@ safeReadFile <- function(url, read_fnc = readr::read_tsv, .retries = 20, .waitTi
     }
   }
   res
+}
+
+
+############ Guess file reading function ############
+#' Guess reading function from its content (e.g. csv, tab separated etc) and use that function to read a file.
+#'
+#' @param filepath 
+#'
+#' @return a data frame resulting from 
+#' @export
+#'
+#' @examples
+guessingReadingFunction <- function(filepath) {
+  
+  if (coalesce(readxl::format_from_signature(filepath) == "xlsx", FALSE)) {
+    log_trace("Using eadxl::read_xlsx to read {filepath}")
+    readxl::read_xlsx(filepath,  guess_max = 10000)
+  } else {
+    l <- readLines(filepath, n = 1)
+    if (grepl("\t", l)) {
+      log_trace("Using readr::read_tsv to read {filepath}")
+      readr::read_tsv(filepath, na = c("", "NA"), guess_max = 2000)
+    } else if (grepl(",", l)) {
+      log_trace("Using readr::read_csv to read {filepath}")
+      readr::read_csv(filepath, na = c("", "NA"), guess_max = 2000)
+    } else if (grepl(";", l)) {
+      log_trace("Using readr::read_delim with delim = ';' to read {filepath}")
+      readr::read_delim(filepath, delim = ";", na = c("", "NA"), guess_max = 2000)
+    } else {
+      log_trace("Using readr::read_csv2 to read {filepath}")
+      readr::read_csv2(filepath, na = c("", "NA"), guess_max = 2000)
+    }
+  }
+  
 }
