@@ -16,7 +16,7 @@
 #' 
 download_filesize <- function(url) {
   
-  if(substr(url,1,3) == "ftp") {
+  rcurlFileSize <- function(url) {
     size <- RCurl::getURL(url, nobody = 1L, header = 1L) # get header without body
     size <- (
       stringi::stri_extract_all_regex(size, "Content-Length: [0-9]+")
@@ -27,7 +27,13 @@ download_filesize <- function(url) {
     return(size)
   }
   
-  as.numeric(httr::HEAD(url)$headers$`content-length`)
+  if(substr(url,1,3) == "ftp") {
+    rcurlFileSize(url)
+  }
+  
+  size <- as.numeric(httr::HEAD(url)$headers$`content-length`)
+  if(length(size) == 0) size <- rcurlFileSize(url)
+  size
 }
 
 
