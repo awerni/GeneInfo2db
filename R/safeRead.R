@@ -4,11 +4,12 @@
 #'
 #' @return file size of the file from the url.
 #'
+#' @importFrom RCurl getURL
+#' @importFrom stringi stri_extract_all_regex
+#' @importFrom httr HEAD
+#'
 #' @examples
 #' 
-#' @importFrom RCurl getURL
-#' @importFrom stringistri_extract_all_regex
-#' @importFrom httr HEAD
 #' 
 #' \dontrun{
 #' download_filesize("ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz")
@@ -28,7 +29,7 @@ download_filesize <- function(url) {
   }
   
   if(substr(url,1,3) == "ftp") {
-    rcurlFileSize(url)
+    return(rcurlFileSize(url))
   }
   
   size <- as.numeric(httr::HEAD(url)$headers$`content-length`)
@@ -158,13 +159,18 @@ safeReadFile <- function(url, filename = NULL, read_fnc = readr::read_tsv, .retr
 #'
 #' @param filepath 
 #'
-#' @return a data frame resulting from 
+#' @return a data frame resulting from read the file
+#' 
+#' 
+#' @importFrom dplyr coalesce
+#' @importFrom readxl read_xlsx
+#' 
 #' @export
 #'
 #' @examples
 guessingReadingFunction <- function(filepath) {
   
-  if (coalesce(readxl::format_from_signature(filepath) == "xlsx", FALSE)) {
+  if (dplyr::coalesce(readxl::format_from_signature(filepath) == "xlsx", FALSE)) {
     log_trace("Using eadxl::read_xlsx to read {filepath}")
     readxl::read_xlsx(filepath,  guess_max = 10000)
   } else {

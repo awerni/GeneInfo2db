@@ -1,3 +1,13 @@
+#' Title
+#'
+#' @return
+#' @export
+#' 
+#' @importFrom dplyr na_if
+#' @importFrom logger log_trace
+#' @importFrom magrittr `%>%`
+#'
+#' @examples
 getCelllineAnnotation <- function() {
 
   cell_model_passport <- safeReadFile("https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz", read_fnc = readr::read_csv) %>%

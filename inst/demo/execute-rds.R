@@ -2,14 +2,16 @@ library(RMariaDB)
 library(tidyverse)
 library(GeneInfo2db)
 library(logger)
-logger::log_threshold(TRACE)
-options(dbname = "cliff6", dbhost = "localhost", dbuser = "postgres")
+
 
 save_data <- function(x, filename) {
   
   log_trace("---- {filename} -----")
-  dir.create("db-parts", showWarnings = FALSE)
-  filename <- file.path("db-parts", sprintf("%s.rds", filename))
+  
+  dirName <- GeneInfo2db:::useLocalFileRepo("db-parts")
+  dir.create(dirName, showWarnings = FALSE)
+  
+  filename <- file.path(dirName, sprintf("%s.rds", filename))
   
   if(is.data.frame(x)) {
     log_trace("{filename}: {nrow(x)}")
@@ -21,7 +23,7 @@ save_data <- function(x, filename) {
   }
   saveRDS(x, filename)
 }
-read_rds <- function(name) readRDS(sprintf("db-parts/%s.rds", name))
+read_rds <- function(name) readRDS(GeneInfo2db:::useLocalFileRepo(sprintf("db-parts/%s.rds", name)))
 
 getEnsembl(db_info, "human") %>% save_data("human-getEnsembl")
 getEntrez(gene_info, refseq_info, "human") %>% save_data("human-getEntrez")
@@ -33,9 +35,9 @@ createDatabase("geneAnnotation")
 createDatabase("celllineDB")
 createDatabase("db_glue")
 
-human <- readRDS("db-parts/human-getEnsembl.rds")
-humanEnterez <- readRDS("db-parts/human-getEntrez.rds")
-humanEntrezGene2EnsemblGene <- readRDS("db-parts/human-getEntrezGene2EnsemblGene.rds")
+human <- read_rds("human-getEnsembl")
+humanEnterez <- read_rds("human-getEntrez")
+humanEntrezGene2EnsemblGene <- read_rds("human-getEntrezGene2EnsemblGene")
 
 writeDatabase(human)
 writeDatabase(humanEnterez)
@@ -45,23 +47,22 @@ writeEntrezGene2EnsemblGene(humanEntrezGene2EnsemblGene)
 ################## Next steps ################## 
 
 getUniprot() %>% save_data("uniprot")
-readRDS("db-parts/uniprot.rds") %>% writeDatabase()
+read_rds("uniprot") %>% writeDatabase()
 
 getCelllineAnnotation() %>% save_data("getCelllineAnnotation")
-readRDS("db-parts/getCelllineAnnotation.rds") %>% writeDatabase()
+read_rds("getCelllineAnnotation") %>% writeDatabase()
 
 getMicrosatelliteStability() %>% save_data("getMicrosatelliteStability")
-readRDS("db-parts/getMicrosatelliteStability.rds") %>% writeDatabase()
+read_rds("getMicrosatelliteStability") %>% writeDatabase()
 
 # --------- gene expression ------
 getRNAseq() %>% save_data("getRNAseq")
-
-readRDS("db-parts/getRNAseq.rds") %>% writeDatabase()
+read_rds("getRNAseq") %>% writeDatabase()
 
 # --------- mutations -------------
 getMutations() %>% save_data("getMutations")
 
-readRDS("db-parts/getMutations.rds") %>% writeDatabase()
+read_rds("getMutations.rds") %>% writeDatabase()
 invisible(replicate(10, gc()))
 modifyCanonicalTranscript()
 
@@ -69,19 +70,19 @@ modifyCanonicalTranscript()
 # --------- copy numbers -----------------
 getCopynumber() %>% save_data("getCopynumber")
 invisible(replicate(10, gc()))
-readRDS("db-parts/getCopynumber.rds") %>% writeDatabase()
+read_rds("getCopynumber.rds") %>% writeDatabase()
 
 
 # --------- protein expression -----
 getProteomicsRPPA() %>% save_data("getProteomicsRPPA")
-readRDS("db-parts/getProteomicsRPPA.rds") %>% writeDatabase()
+read_rds("getProteomicsRPPA") %>% writeDatabase()
 getProteomicsMassSpec() %>% save_data("getProteomicsMassSpec")
-readRDS("db-parts/getProteomicsMassSpec.rds") %>% writeDatabase()
+read_rds("getProteomicsMassSpec") %>% writeDatabase()
 invisible(replicate(10, gc()))
 
 # --------- depletion screens ------------
 getAvana() %>% save_data("getAvana")
-readRDS("db-parts/getAvana.rds") %>% writeDatabase()
+read_rds("getAvana") %>% writeDatabase()
 getSanger() %>% save_data("getSanger")
 
 read_rds("getSanger") %>% writeDatabase()
