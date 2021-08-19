@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 9.x                               */
-/* Created on:     3/16/2021 6:14:01 PM                         */
+/* Created on:     8/19/2021 5:30:28 AM                         */
 /*==============================================================*/
 
 
@@ -291,6 +291,7 @@ create table PROCESSEDPROLIFTEST (
    GI50OPERATOR         CHAR(1)              null,
    ACTAREA              FLOAT4               null,
    AMAX                 FLOAT4               null,
+   MAXCONC              FLOAT4               null,
    constraint PK_PROCESSEDPROLIFTEST primary key (PROLIFTESTID)
 );
 
