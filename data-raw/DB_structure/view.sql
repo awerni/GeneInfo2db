@@ -54,6 +54,10 @@ FROM (SELECT t2e.ense, t2e.enst, t2e.exon, t2e.transstart, t2e.transend, e.chrom
   (SELECT exon FROM transcript2exon WHERE transend IS NOT NULL AND enst = t.enst) AS endexon 
   FROM transcript2exon t2e natural join exon e join transcript t ON t.enst = t2e.enst) AS x;
 
+CREATE OR REPLACE VIEW datastackstat AS
+SELECT datastackid, key, created, count(*) AS rows
+  FROM (SELECT datastackid, created, jsonb_object_keys(jsonb_array_elements(playload)) AS key FROM datastack ) AS t
+  WHERE key IN ('celllinename', 'tissuename') GROUP BY datastackid, key, created ORDER BY created;
 
 --WITH celllinetpm AS (
 --      SELECT prv.celllinename, ensg, log2tpm FROM cellline.processedrnaseqview prv join cellline.cellline c ON c.celllinename = prv.celllinename
@@ -70,4 +74,4 @@ FROM (SELECT t2e.ense, t2e.enst, t2e.exon, t2e.transstart, t2e.transend, e.chrom
 --    SELECT ensg, minWhisker, maxWhisker, percentile[1] AS p25, percentile[2] AS p50, percentile[3] AS p75, 
 --      (SELECT max(log2tpm) FROM celllinetpm WHERE ensg = bl.ensg AND log2tpm > percentile[3] AND log2tpm <= maxWhisker) AS endwhisker FROM boxlimit bl;
 --
---explain analyze select ensg, percentile_cont(array[0.25, 0.5, 0.75]) within group (order by log2tpm) as percentile, percentile  from cellline.processedrnaseqview prv join cellline.cellline c on c.celllinename = prv.celllinename WHERE tumortype = 'melanoma' and ensg in (select ensg from gene where biotype = 'protein_coding' and species = 'human') GROUP by ensg;;
+--explain analyze select ensg, percentile_cont(array[0.25, 0.5, 0.75]) within group (order by log2tpm) as percentile, percentile  from cellline.processedrnaseqview prv join cellline.cellline c on c.celllinename = prv.celllinename WHERE tumortype = 'melanoma' and ensg in (select ensg from gene where biotype = 'protein_coding' and species = 'human') GROUP by ensg;
