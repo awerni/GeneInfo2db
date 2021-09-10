@@ -25,8 +25,7 @@ getUniprot <- function() {
   }
   # ---------------------------
 
-  dfile <- "protein_quant_current_normalized"
-  if (getOption("useFileDownload")) dfile <- paste0(dfile, ".csv.gz")
+  dfile <- "protein_quant_current_normalized.csv.gz"
   protein.quant.current.normalized <- getFileData(dfile)
 
   uniprot_anno <- protein.quant.current.normalized %>%

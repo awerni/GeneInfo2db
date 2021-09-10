@@ -15,6 +15,7 @@ getFileData <- function(dfile) {
 #'
 #' @return no value returned. Called for side effects.
 #' @export
-registerGeneInfoDownloadFunction <- function(fun = getFileDownload) {
+registerGeneInfoDownloadFunction <- function(fun = getFileDownload, version = file_version) {
   options("GeneInfo2db.getFileDownload" = fun)
+  options("GeneInfo2db.version" = file_version)
 }

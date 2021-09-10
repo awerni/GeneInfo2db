@@ -1,7 +1,3 @@
 getVersion <- function() {
-  if (getOption("useFileDownload")) {
-    list(public.information = file_version)
-  } else {
-    list(public.information = taiga_version)
-  }
+  list(public.information = getOption("GeneInfo2db.version"))
 }

@@ -13,8 +13,7 @@ getProteomicsMassSpec <- function() {
   RPostgres::dbDisconnect(con)
 
   # -------------------------
-  dfile <- "protein_quant_current_normalized"
-  if (getOption("useFileDownload")) dfile <- paste0(dfile, ".csv.gz")
+  dfile <- "protein_quant_current_normalized.csv.gz"
   protein.quant.current.normalized <- getFileData(dfile)
 
   protein_long <- protein.quant.current.normalized %>%
