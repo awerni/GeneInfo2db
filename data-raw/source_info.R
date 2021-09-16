@@ -1,3 +1,7 @@
+### CAUTION !
+### This scirpt is not run during the building process.
+library(dplyr)
+
 # ---  Ensembl Gene File ---
 # db_info <- tibble::tribble(
 #   ~species, ~database, ~symbol_source, ~transcriptname_source,
@@ -110,5 +114,5 @@ gmt.files <- tibble::tribble(
 )
 
 # -----------------
-save(db_info, gene_info, refseq_info, db_compara, taiga_info, download_file_info,
-     gmt.files, taiga_version, file_version, file = "data/source_info.rdata")
+save(db_info, gene_info, refseq_info, db_compara, download_file_info,
+     gmt.files, file_version, file = "data/source_info.rdata")
