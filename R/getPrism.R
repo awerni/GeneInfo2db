@@ -11,8 +11,7 @@ getPrism <- function() {
 
   # -----------------------------------
 
-  dfile <- "secondary-dose-response-curve-parameters"
-  if (getOption("useFileDownload")) dfile <- "secondary-screen-dose-response-curve-parameters"
+  dfile <- "secondary-screen-dose-response-curve-parameters"
   prism_data <- getFileData(dfile)
 
   prism_drugs <- prism_data %>%

@@ -1,3 +1,7 @@
+### CAUTION !
+### This scirpt is not run during the building process.
+library(dplyr)
+
 # ---  Ensembl Gene File ---
 # db_info <- tibble::tribble(
 #   ~species, ~database, ~symbol_source, ~transcriptname_source,
@@ -30,80 +34,6 @@ refseq_info <- tibble::tribble(
   "human",  9606, "ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.files.installed",
   "mouse", 10090, "ftp://ftp.ncbi.nlm.nih.gov/refseq/M_musculus/mRNA_Prot/mouse.files.installed",
   "rat",   10116, "ftp://ftp.ncbi.nlm.nih.gov/refseq/R_norvegicus/mRNA_Prot/rat.files.installed",
-)
-
-# ---- taiga links ----
-taiga_info <- tibble::tribble(
-  ~data_name, ~data_version, ~data_file,
-
-  'internal-21q2-9d16', 17, 'sample_info', # ok
-  'other-ccle2-c93e', 2, 'Cell_lines_annotations_20181226',
-
-  'internal-21q2-9d16', 17, 'CCLE_expression_full',
-  'internal-21q2-9d16', 17, 'CCLE_RNAseq_reads',
-  'internal-21q2-9d16', 17, 'CCLE_RNAseq_transcripts',
-  'internal-21q2-9d16', 17, 'CCLE_expression_transcripts_expected_count',
-
-  # --------- this is an exact duplication of the expression data above -----------
-  #'depmap-rnaseq-expression-data-363a', 36, 'expression_genes_expected_count',
-  #'depmap-rnaseq-expression-data-363a', 36, 'expression_genes_tpm',
-  #'depmap-rnaseq-expression-data-363a', 36, 'expression_transcripts_expected_count',
-  #'depmap-rnaseq-expression-data-363a', 36, 'expression_transcripts_tpm',
-
-  'internal-21q2-9d16', 17, 'CCLE_gene_cn',
-  'internal-21q2-9d16', 17, 'CCLE_mutations',
-
-  'internal-21q2-9d16', 17, 'Achilles_gene_dependency',
-  'internal-21q2-9d16', 17, 'Achilles_gene_effect',
-  'internal-21q2-9d16', 17, 'Achilles_gene_effect_unscaled',
-  'internal-21q2-9d16', 17, 'nonessentials',
-  'internal-21q2-9d16', 17, 'common_essentials',
-
-  'internal-21q2-9d16', 17, 'Achilles_cell_line_efficacy',
-  'internal-21q2-9d16', 17, 'Achilles_cell_line_growth_rate',
-  'internal-21q2-9d16', 17, 'Achilles_common_essentials',
-  'internal-21q2-9d16', 17, 'Achilles_common_essentials_Chronos',
-  'internal-21q2-9d16', 17, 'Achilles_dropped_guides',
-
-  'internal-21q2-9d16', 17, 'Achilles_gene_dependency_Chronos',
-  'internal-21q2-9d16', 17, 'Achilles_gene_effect_Chronos',
-
-  'internal-21q2-9d16', 17, 'CCLE_fusions',
-  'internal-21q2-9d16', 17, 'CCLE_fusions_unfiltered',
-
-  'internal-21q2-9d16', 17, 'CRISPR_common_essentials',
-  'internal-21q2-9d16', 17, 'CRISPR_common_essentials_Chronos',
-  'internal-21q2-9d16', 17, 'CRISPR_gene_dependency',
-  'internal-21q2-9d16', 17, 'CRISPR_gene_dependency_Chronos',
-  'internal-21q2-9d16', 17, 'CRISPR_gene_effect',
-  'internal-21q2-9d16', 17, 'CRISPR_gene_effect_Chronos',
-
-  'sanger-crispr-project-score--e20b', 4, 'essential_genes',
-  'sanger-crispr-project-score--e20b', 4, 'nonessential_genes',
-  'sanger-crispr-project-score--e20b', 4, 'gene_dependency',
-  'sanger-crispr-project-score--e20b', 4, 'gene_effect',
-  'sanger-crispr-project-score--e20b', 4, 'gene_effect_unscaled',
-
-  'demeter2-drive-0591', 12, 'gene_effect',
-  'demeter2-drive-0591', 12, 'gene_dependency',
-
-  'metabolomics-cd0c', 4, 'CCLE_metabolomics_20190502',
-  'secondary-screen-0854', 18, 'secondary-dose-response-curve-parameters',
-  'msi-0584', 6, 'msi',
-  'total-proteome--5c50', 2, 'normalized_protein_abundance',
-  'total-proteome--5c50', 1, 'protein_quant_current_normalized',
-  'depmap-rppa-1b43', 3, 'CCLE_RPPA_20181003',
-  'depmap-rppa-1b43', 3, 'CCLE_RPPA_Ab_info_20181226',
-
-  'metmap-data-f459', 3, 'metmap500_metastatic_potential',
-  'metmap-data-f459', 3, 'metmap500_penetrance'
-)
-
-taiga_version <- tibble::tribble(
-  ~description, ~information,
-  "Depmap Version", "internal 21q2",
-  "metabolomics", "CCLE_metabolomics_20190502",
-  "Proteomics", "CCLE_RPPA_20181003"
 )
 
 # ------figshare (depmap) and direct links -----------
@@ -184,5 +114,5 @@ gmt.files <- tibble::tribble(
 )
 
 # -----------------
-save(db_info, gene_info, refseq_info, db_compara, taiga_info, download_file_info,
-     gmt.files, taiga_version, file_version, file = "data/source_info.rdata")
+save(db_info, gene_info, refseq_info, db_compara, download_file_info,
+     gmt.files, file_version, file = "data/source_info.rdata")

@@ -15,8 +15,17 @@ getUniprot <- function() {
 
   RPostgres::dbDisconnect(con)
 
-  dfile <- "protein_quant_current_normalized"
-  if (getOption("useFileDownload")) dfile <- paste0(dfile, ".csv.gz")
+  # ---------------------------
+  ftp_path <- "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/"
+  file_uniprot2 <-"HUMAN_9606_idmapping_selected.tab.gz"
+  url3 <- paste0(ftp_path, file_uniprot2)
+
+  if (!file.exists(file_uniprot2)) {
+    download.file(url3, destfile = file_uniprot2, method = "wget", quiet = TRUE)
+  }
+  # ---------------------------
+
+  dfile <- "protein_quant_current_normalized.csv.gz"
   protein.quant.current.normalized <- getFileData(dfile)
 
   uniprot_anno <- protein.quant.current.normalized %>%
@@ -31,7 +40,6 @@ getUniprot <- function() {
     unique()
 
   # ------------ mappings to ENSG and geneid ---------------
-
   #id_map <- getFileData("HUMAN_9606_idmapping_selected.tab.gz")
   ftp_path <- "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/"
   file_uniprot2 <-"HUMAN_9606_idmapping_selected.tab.gz"
