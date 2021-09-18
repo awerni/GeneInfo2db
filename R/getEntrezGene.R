@@ -4,7 +4,7 @@ getEntrezGene <- function(gene_info, species_name) {
     dplyr::filter(species == species_name) %>%
     as.list()
 
-  entrez_data <- read_tsv(db$file)
+  entrez_data <- safeReadFile(db$file)
 
   e <- entrez_data %>%
     dplyr::select(taxid = `#tax_id`, geneid = GeneID, symbol = Symbol, 

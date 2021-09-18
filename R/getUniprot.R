@@ -40,10 +40,12 @@ getUniprot <- function() {
     unique()
 
   # ------------ mappings to ENSG and geneid ---------------
-
   #id_map <- getFileData("HUMAN_9606_idmapping_selected.tab.gz")
-
-  id_map <- read_tsv(file_uniprot2, col_names = FALSE) %>%
+  ftp_path <- "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/"
+  file_uniprot2 <-"HUMAN_9606_idmapping_selected.tab.gz"
+  url3 <- paste0(ftp_path, file_uniprot2)
+  
+  id_map <- safeReadFile(url3, col_names = FALSE) %>%
     dplyr::select(accession = X1, uniprotid = X2, geneid = X3, ensg = X19, enst = X20, ensp = X21)
 
   id_map2 <- protein.quant.current.normalized %>%

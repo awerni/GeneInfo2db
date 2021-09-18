@@ -1,4 +1,4 @@
-get_CRISPR_screen <- function(screen_name, screen_desc, file_essentials, file_nonessentials, file_effect, file_effect_unscaled, file_dependency) {
+get_CRISPR_screen <- function(screen_name, screen_desc, file_essentials, file_nonessentials, file_effect, file_effect_unscaled, file_dependency, splits = 50) {
   
   con <- getPostgresqlConnection()
   
@@ -50,6 +50,15 @@ get_CRISPR_screen <- function(screen_name, screen_desc, file_essentials, file_no
       dplyr::select(-ceres_nonessential_unscaled_median, -ceres_common.essentials_shifted_median)
   }
   
+  separate_gene <- function(x) {
+    res <- stringi::stri_split_fixed(x$gene, pattern = " ", simplify = TRUE)
+    (x 
+      %>% mutate(symbol = res[,1], geneid = res[,2]) 
+      %>% dplyr::mutate(geneid = as.numeric(gsub("(\\(|\\))", "", geneid)))
+      %>% select(-gene)
+    )
+  }
+  
   # -----------
   gene_effect_long_new <- getFileData(file_effect) 
   
@@ -61,13 +70,17 @@ get_CRISPR_screen <- function(screen_name, screen_desc, file_essentials, file_no
     gene_effect_long_new <- gene_effect_long_new %>%
       dplyr::rename(depmap = 1)
   }
-    
+  
   gene_effect_long_new <- gene_effect_long_new %>%
-    tidyr::pivot_longer(!depmap, names_to = "gene", values_to = "ceres") %>%
+    #tidyr::pivot_longer(!depmap, names_to = "gene", values_to = "ceres") %>%
+    tidyr::gather(key = "gene", value = "ceres", -depmap) %>%
     dplyr::inner_join(cellline, by = "depmap") %>%
     dplyr::select(-depmap) %>%
-    tidyr::separate(gene, c("symbol", "geneid"), sep = " ") %>%
-    dplyr::mutate(geneid = as.numeric(gsub("(\\(|\\))", "", geneid)))
+    separate_gene
+  
+  
+  
+  ensg <- get_gene_translation(geneid = unique(gene_effect_long_new$geneid))
   
   # ------------
   gene_dependency_long_new <- getFileData(file_dependency)
@@ -85,18 +98,20 @@ get_CRISPR_screen <- function(screen_name, screen_desc, file_essentials, file_no
     tidyr::pivot_longer(!depmap, names_to = "gene", values_to = "dep_prob") %>%
     dplyr::inner_join(cellline, by = "depmap") %>%
     dplyr::select(-depmap) %>%
-    tidyr::separate(gene, c("symbol", "geneid"), sep = " ") %>%
-    dplyr::mutate(geneid = as.numeric(gsub("(\\(|\\))", "", geneid))) %>%
+    separate_gene %>%
+    #tidyr::separate(gene, c("symbol", "geneid"), sep = " ") %>%
+    #dplyr::mutate(geneid = as.numeric(gsub("(\\(|\\))", "", geneid))) %>%
     dplyr::mutate(dep_prob = ifelse(dep_prob < 1e-45, 0, dep_prob))
   
   gene_effect_long_old <-  calc_unscaled_to_old_ceres() %>%
     dplyr::inner_join(cellline, by = "depmap") %>%
     dplyr::select(-depmap, -ceres_unscaled) %>%
-    tidyr::separate(gene, c("symbol", "geneid"), sep = " ") %>%
-    dplyr::mutate(geneid = as.numeric(gsub("(\\(|\\))", "", geneid))) %>%
+    separate_gene %>%
+    #tidyr::separate(gene, c("symbol", "geneid"), sep = " ") %>%
+    #dplyr::mutate(geneid = as.numeric(gsub("(\\(|\\))", "", geneid))) %>%
     dplyr::rename(ceres_old = ceres)
   
-  ensg <- get_gene_translation(unique(gene_effect_long_new$geneid))
+  
   
   gene_effect_long <- gene_effect_long_new %>%
     dplyr::inner_join(gene_effect_long_old, by = c("symbol", "geneid", "celllinename")) %>%

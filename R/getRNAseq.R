@@ -1,4 +1,4 @@
-getRNAseq <- function() {
+getRNAseq <- function(.splits = 20) {
   con <- getPostgresqlConnection()
   
   gene <- dplyr::tbl(con, "gene") %>%
@@ -13,7 +13,7 @@ getRNAseq <- function() {
     dplyr::collect()
   
   RPostgres::dbDisconnect(con)
-
+  
   # ------------------  
   lab <- "Broad Institute"
   
@@ -30,10 +30,12 @@ getRNAseq <- function() {
     depmap_ID <- expr_TPM[[1]]
     expr_TPM_long <- expr_TPM %>%
       dplyr::rename(rnaseqrunid = 1) %>%
-      tidyr::pivot_longer(!rnaseqrunid, names_to = "ensg", values_to = "log2tpm")
+      tidyr::gather(key = "ensg", value = "log2tpm", -rnaseqrunid)
+    #tidyr::pivot_longer(!rnaseqrunid, names_to = "ensg", values_to = "log2tpm")
   }
   rm(expr_TPM)
-
+  invisible(replicate(5, gc()))
+  
   expr_counts <- getFileData("CCLE_RNAseq_reads")
   colnames(expr_counts) <- gsub("(^.*\\(|\\))", "", colnames(expr_counts))
   
@@ -46,9 +48,11 @@ getRNAseq <- function() {
       dplyr::rename(rnaseqrunid = 1)
   }
   rm(expr_counts)
+  invisible(replicate(5, gc()))
   
   expr_counts_long <- expr_counts_long %>%
-    tidyr::pivot_longer(!rnaseqrunid, names_to = "ensg", values_to = "counts")  %>%
+    tidyr::gather(key = "ensg", value = "counts", -rnaseqrunid) %>%
+    #tidyr::pivot_longer(!rnaseqrunid, names_to = "ensg", values_to = "counts")  %>%
     dplyr::mutate(counts = as.integer(counts))
   
   rnaseqrun <- cellline %>%
@@ -58,43 +62,51 @@ getRNAseq <- function() {
   
   total_mem <- grep("total memory", system("vmstat -s -S M", intern = TRUE), value = TRUE)
   total_mem <- as.numeric(gsub("M total memory", "",total_mem))
-                    
+  
   if (total_mem < 32000) {
     file_n <- 1
-    for (n in split(depmap_ID, cut(1:length(depmap_ID), 3))) {
+    allSplits <- split(depmap_ID, cut(1:length(depmap_ID), .splits))
+    
+    for (n in allSplits) {
+      
+      freeMemory <- gsub(grep("free memory", system("vmstat -s -S M", intern = TRUE), value = TRUE), pattern = " |(free memory)", replacement = "")
+      log_trace("getRNAseq - split {file_n} - Free memory: {freeMemory}")
       expr_counts_long_set <- expr_counts_long %>% filter(rnaseqrunid %in% n)
       expr_TPM_long_set <- expr_TPM_long %>% filter(rnaseqrunid %in% n)
-  
+      
       CCLE.RNAseq_set <- expr_counts_long_set %>%
         dplyr::inner_join(expr_TPM_long_set, by = c("ensg", "rnaseqrunid")) %>%
         dplyr::filter(ensg %in% gene$ensg & rnaseqrunid %in% rnaseqrun$rnaseqrunid)
-  
-      write_rds(CCLE.RNAseq_set, paste0("CCLE.RNAseq_set", file_n, ".rds"))
+      
+      write_rds(CCLE.RNAseq_set, useLocalFileRepo(paste0("tmp-CCLE.RNAseq_set", file_n, ".rds")))
       file_n <- file_n + 1
       rm(expr_counts_long_set)
       rm(expr_TPM_long_set)
       rm(CCLE.RNAseq_set)
+      invisible(gc())
     }
-  
-    CCLE.RNAseq <- bind_rows(read_rds("CCLE.RNAseq_set1.rds"),
-                             read_rds("CCLE.RNAseq_set2.rds"),
-                             read_rds("CCLE.RNAseq_set3.rds"))
-  
-    file.remove("CCLE.RNAseq_set1.rds")
-    file.remove("CCLE.RNAseq_set2.rds")
-    file.remove("CCLE.RNAseq_set3.rds")
-  } else {    
+    
+    rm(expr_counts_long)
+    rm(expr_TPM_long)
+    invisible(replicate(10, gc()))
+    
+    
+    allFiles <- dir(useLocalFileRepo(""), pattern = "tmp-CCLE.RNAseq_set[0-9]+.rds", full.names = TRUE)
+    CCLE.RNAseq <- map_dfr(allFiles, readRDS)
+    
+    unlink(allFiles)
+  } else {
     CCLE.RNAseq <- expr_counts_long %>%
       inner_join(expr_TPM_long, by = c("ensg", "rnaseqrunid")) %>%
       filter(ensg %in% gene$ensg & rnaseqrunid %in% rnaseqrun$rnaseqrunid)
   }
-
+  
   rnaseqgroup <- data.frame(
     rnaseqgroupid = 1,
     rnaseqname = 'untreated CCLE cellline reference set',
     processingpipeline = 'RNA-seq CCLE'
   )
-
+  
   if (lab %in% laboratory$laboratory) {
     list(cellline.rnaseqgroup = rnaseqgroup,
          cellline.rnaseqrun = rnaseqrun, 
