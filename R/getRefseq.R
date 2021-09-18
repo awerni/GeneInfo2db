@@ -24,7 +24,7 @@ getRefseq <- function(refseq_info, species_name) {
   start_download <- FALSE
   if (file.exists("gene2refseq.gz")) {
     file_prop <- readr::read_delim(
-      "http://ftp.ncbi.nlm.nih.gov/gene/DATA/", delim = " ", comment = "->",
+      "ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/", delim = " ", comment = "->",
       col_names = c("perm", "s", "user", "group", "size", "m", "d", "y_t", "file"), 
       trim_ws = TRUE
     ) %>%
@@ -40,7 +40,7 @@ getRefseq <- function(refseq_info, species_name) {
   }
   
   if (start_download) {
-    download.file("http://ftp.ncbi.nlm.nih.gov/gene/DATA/gene2refseq.gz", destfile = "gene2refseq.gz", method = "auto")
+    download.file("ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/gene2refseq.gz", destfile = "gene2refseq.gz", method = "auto")
   }
   
   new_file <- paste0("gene2refseq_", rs$taxid)
