@@ -1,6 +1,16 @@
+#' Title
+#'
+#' @return
+#' @export
+#' 
+#' @importFrom dplyr na_if
+#' @importFrom logger log_trace
+#' @importFrom magrittr `%>%`
+#'
+#' @examples
 getCelllineAnnotation <- function() {
 
-  cell_model_passport <-readr::read_csv("https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz") %>%
+  cell_model_passport <- safeReadFile("https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz", read_fnc = readr::read_csv) %>%
     dplyr::filter(model_type == "Cell Line")
 
   cell_model_passport1 <- cell_model_passport %>%
