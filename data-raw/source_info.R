@@ -37,7 +37,9 @@ refseq_info <- tibble::tribble(
 )
 
 # ------figshare (depmap) and direct links -----------
-depmap_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/14541774/files") %>%
+DEPMAP_API_PATH <- 15160110
+DEPMAP_VERSION  <- "21q3"
+depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", DEPMAP_API_PATH)) %>%
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
   filter(data_file %in% c("sample_info", "CCLE_expression_full", "CCLE_RNAseq_reads", "CCLE_RNAseq_transcripts", "CCLE_gene_cn", "CCLE_mutations",
@@ -79,7 +81,7 @@ download_file_info <- depmap_info %>%
 
 file_version <- tibble::tribble(
   ~description, ~information,
-  "Depmap Version", "public 21q1",
+  "Depmap Version", paste("public", DEPMAP_VERSION),
   "metabolomics", "CCLE_metabolomics_20190502",
   "Proteomics", "CCLE_RPPA_20181003"
 )
