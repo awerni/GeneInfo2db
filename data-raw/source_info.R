@@ -20,20 +20,20 @@ db_info <- tibble::tribble(
 db_compara <- "ensembl_compara_101"
 
 # --- Entrez Gene File
-# complete file ftp://ftp.ncbi.nih.gov/gene/DATA/gene_info.gz
+# complete file https://ftp.ncbi.nih.gov/gene/DATA/gene_info.gz
 gene_info <- tibble::tribble(
   ~species, ~taxid, ~file,
-  "human",  9606, "ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz",
-  "mouse", 10090, "ftp://ftp.ncbi.nlm.nih.gov/refseq/M_musculus/Mus_musculus.gene_info.gz",
-  "rat",   10116, "ftp://ftp.ncbi.nlm.nih.gov/refseq/R_norvegicus/Rattus_norvegicus.gene_info.gz",
+  "human",  9606, "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz",
+  "mouse", 10090, "https://ftp.ncbi.nlm.nih.gov/refseq/M_musculus/Mus_musculus.gene_info.gz",
+  "rat",   10116, "https://ftp.ncbi.nlm.nih.gov/refseq/R_norvegicus/Rattus_norvegicus.gene_info.gz",
 )
 
 # --- Refseq File ---
 refseq_info <- tibble::tribble(
   ~species, ~taxid, ~file,
-  "human",  9606, "ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.files.installed",
-  "mouse", 10090, "ftp://ftp.ncbi.nlm.nih.gov/refseq/M_musculus/mRNA_Prot/mouse.files.installed",
-  "rat",   10116, "ftp://ftp.ncbi.nlm.nih.gov/refseq/R_norvegicus/mRNA_Prot/rat.files.installed",
+  "human",  9606, "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.files.installed",
+  "mouse", 10090, "https://ftp.ncbi.nlm.nih.gov/refseq/M_musculus/mRNA_Prot/mouse.files.installed",
+  "rat",   10116, "https://ftp.ncbi.nlm.nih.gov/refseq/R_norvegicus/mRNA_Prot/rat.files.installed",
 )
 
 # ------figshare (depmap) and direct links -----------
@@ -68,7 +68,7 @@ other_info <- tibble::tribble(
   "ccle", "https://data.broadinstitute.org/ccle/CCLE_RPPA_20181003.csv", "CCLE_RPPA_20181003",
   "ccle", "https://data.broadinstitute.org/ccle/CCLE_RPPA_Ab_info_20181226.csv", "CCLE_RPPA_Ab_info_20181226",
   "total-proteome", "https://gygi.hms.harvard.edu/data/ccle/protein_quant_current_normalized.csv.gz", "protein_quant_current_normalized.csv.gz",
-  "uniprot", "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping_selected.tab.gz", "HUMAN_9606_idmapping_selected.tab.gz",
+  "uniprot", "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping_selected.tab.gz", "HUMAN_9606_idmapping_selected.tab.gz",
   "metmap", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-020-2969-2/MediaObjects/41586_2020_2969_MOESM7_ESM.xlsx", 'metmap.xlsx',
   "msi", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", "msi"
 )
