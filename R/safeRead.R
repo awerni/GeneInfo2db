@@ -18,7 +18,14 @@
 download_filesize <- function(url) {
   
   rcurlFileSize <- function(url) {
-    size <- RCurl::getURL(url, nobody = 1L, header = 1L) # get header without body
+    
+    if(!getOption("GeneInfo2db.ExperimentalCurlSizeRequest", default = FALSE)) {
+      size <- RCurl::getURL(url, nobody = 1L, header = 1L) # get header without body
+    } else {
+      # this is the most experimental implementation but it should work
+      # in most places. Some servers does not support nobody request
+      size <- paste(system2("curl", paste("-s -I -X GET", url), TRUE), collapse = "\n")
+    }
     size <- (
       stringi::stri_extract_all_regex(size, "Content-Length: [0-9]+")
       %>% stringi::stri_extract_all_regex("[0-9]+") 
