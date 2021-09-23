@@ -60,6 +60,14 @@ sanger_info <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732
   mutate(data_name = "sanger", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) %>%
   select(data_name,  url = download_url, data_file)
 
+sanger_info2 <- tibble::tribble(
+  ~"data_name", ~"url", ~"data_file",
+  "sanger", "https://ndownloader.figshare.com/files/16623887", "essential_genes",
+  "sanger", "https://ndownloader.figshare.com/files/16623890", "nonessential_genes"
+)
+  
+sanger_info <- bind_rows(sanger_info, sanger_info2)
+
 other_info <- tibble::tribble(
   ~data_name, ~url, ~data_file,
   "ccle", "https://data.broadinstitute.org/ccle/Cell_lines_annotations_20181226.txt", "Cell_lines_annotations_20181226",
