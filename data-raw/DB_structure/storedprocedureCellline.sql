@@ -5,7 +5,7 @@
 -- Author:           Andreas Wernitznig
 -------------------------------------------------------------------------------
 
-CREATE OR REPLACE LANGUAGE 'plperl';
+--CREATE OR REPLACE LANGUAGE 'plperl';
 
 -------------------------------------------------------------------------------
 -- findMutationORsnp(text, text)
