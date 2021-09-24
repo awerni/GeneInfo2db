@@ -1,4 +1,5 @@
 importFrom(magrittr, "%>%")
+importFrom(logger, log_trace)
 export(createDatabase)
 export(createSigIFN)
 export(createSigTP53)

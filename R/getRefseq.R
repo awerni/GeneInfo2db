@@ -21,7 +21,7 @@ getRefseq <- function(refseq_info, species_name) {
   refseq_name <- purrr::map_dfr(a$file, readFasta)
 
   # ------- refseq --------
-  url <- "ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/gene2refseq.gz"
+  url <- "https://ftp.ncbi.nlm.nih.gov/gene/DATA/gene2refseq.gz"
   readGene2Refseq <- function(filename, rs) {
     new_file <- paste0(filename, rs$taxid)
     sys_command <- paste0(sprintf("zcat %s | egrep \"^(\\#tax_id|", filename), rs$taxid, ")\" > ", new_file)

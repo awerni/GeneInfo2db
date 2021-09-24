@@ -7,12 +7,13 @@
 #' @importFrom RCurl getURL
 #' @importFrom stringi stri_extract_all_regex
 #' @importFrom httr HEAD
+#' @importFrom logger log_trace
 #'
 #' @examples
 #' 
 #' 
 #' \dontrun{
-#' download_filesize("ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz")
+#' download_filesize("https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz")
 #' }
 #' 
 download_filesize <- function(url) {
@@ -113,7 +114,7 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
 #' @examples
 #' 
 #' \dontrun{
-#' safeReadFile("ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz")
+#' safeReadFile("https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz")
 #' }
 #' 
 safeReadFile <- function(url, filename = NULL, read_fnc = readr::read_tsv, .retries = 20, .waitTime = 20, ...) {
