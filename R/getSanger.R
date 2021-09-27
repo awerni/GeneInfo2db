@@ -16,9 +16,6 @@ getSanger <- function() {
     file_dependency = "gene_dependency@sanger-chronos"
   )
   
-  ceres$cellline.processeddepletionscore
-  chronos$cellline.processeddepletionscore
-  
   fullData <- full_join(
     ceres$cellline.processeddepletionscore,
     chronos$cellline.processeddepletionscore,
