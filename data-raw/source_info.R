@@ -42,8 +42,26 @@ DEPMAP_VERSION  <- "21q3"
 depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", DEPMAP_API_PATH)) %>%
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
-  filter(data_file %in% c("sample_info", "CCLE_expression_full", "CCLE_RNAseq_reads", "CCLE_RNAseq_transcripts", "CCLE_gene_cn", "CCLE_mutations",
-           "Achilles_gene_dependency", "Achilles_gene_effect", "Achilles_gene_effect_unscaled", "nonessentials", "common_essentials"))
+  filter(
+    data_file %in% c(
+      "sample_info",
+      "CCLE_expression_full",
+      "CCLE_RNAseq_reads",
+      "CCLE_RNAseq_transcripts",
+      "CCLE_gene_cn",
+      "CCLE_mutations",
+      "Achilles_gene_dependency",
+      "Achilles_gene_effect",
+      "Achilles_gene_effect_unscaled",
+      "Achilles_gene_dependency_CERES",
+      "Achilles_gene_effect_CERES",
+      "Achilles_gene_effect_unscaled_CERES",
+      "Achilles_common_essentials_CERES", # to decide if needed, there's 
+      # no nonessentials like this above
+      "nonessentials",
+      "common_essentials"
+    )
+  )
 
 drive_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/6025238/files") %>%
   mutate(data_name = "demeter2-drive", data_file = gsub("\\.csv$", "", name)) %>%
@@ -56,17 +74,20 @@ prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/9393293/f
   select(data_name,  url = download_url, data_file) %>%
   filter(data_file %in% c("secondary-screen-dose-response-curve-parameters"))
 
-sanger_info <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732/files") %>%
-  mutate(data_name = "sanger", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) %>%
+sanger_info_chronos <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732/files") %>%
+  mutate(data_name = "sanger-chronos", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) %>%
   select(data_name,  url = download_url, data_file)
 
-sanger_info2 <- tibble::tribble(
+sanger_info_ceres <- tibble::tribble(
   ~"data_name", ~"url", ~"data_file",
-  "sanger", "https://ndownloader.figshare.com/files/16623887", "essential_genes",
-  "sanger", "https://ndownloader.figshare.com/files/16623890", "nonessential_genes"
+  "sanger-ceres", "https://ndownloader.figshare.com/files/16623887", "essential_genes",
+  "sanger-ceres", "https://ndownloader.figshare.com/files/16623890", "nonessential_genes",
+  "sanger-ceres", "https://ndownloader.figshare.com/files/16623881", "gene_effect",
+  "sanger-ceres", "https://ndownloader.figshare.com/files/16623851", "gene_effect_unscaled",
+  "sanger-ceres", "https://ndownloader.figshare.com/files/16623884", "gene_dependency"
 )
   
-sanger_info <- bind_rows(sanger_info, sanger_info2)
+sanger_info <- bind_rows(sanger_info_chronos, sanger_info_ceres)
 
 other_info <- tibble::tribble(
   ~data_name, ~url, ~data_file,
