@@ -1,4 +1,7 @@
-get_CRISPR_screen <- function(screen_name, screen_desc, file_essentials, file_nonessentials, file_effect, file_effect_unscaled, file_dependency, splits = 50) {
+get_CRISPR_screen <- function(screen_name, screen_desc, file_essentials,
+                              file_nonessentials, file_effect,
+                              file_effect_unscaled, file_dependency,
+                              splits = 50) {
   
   con <- getPostgresqlConnection()
   
@@ -95,20 +98,16 @@ get_CRISPR_screen <- function(screen_name, screen_desc, file_essentials, file_no
   }
   
   gene_dependency_long_new <- gene_dependency_long_new %>%
-    tidyr::pivot_longer(!depmap, names_to = "gene", values_to = "dep_prob") %>%
+    tidyr::pivot_longer(!depmap, names_to = "gene", values_to = "ceres_prob") %>%
     dplyr::inner_join(cellline, by = "depmap") %>%
     dplyr::select(-depmap) %>%
     separate_gene %>%
-    #tidyr::separate(gene, c("symbol", "geneid"), sep = " ") %>%
-    #dplyr::mutate(geneid = as.numeric(gsub("(\\(|\\))", "", geneid))) %>%
-    dplyr::mutate(dep_prob = ifelse(dep_prob < 1e-45, 0, dep_prob))
+    dplyr::mutate(ceres_prob = ifelse(ceres_prob < 1e-45, 0, ceres_prob))
   
   gene_effect_long_old <-  calc_unscaled_to_old_ceres() %>%
     dplyr::inner_join(cellline, by = "depmap") %>%
     dplyr::select(-depmap, -ceres_unscaled) %>%
     separate_gene %>%
-    #tidyr::separate(gene, c("symbol", "geneid"), sep = " ") %>%
-    #dplyr::mutate(geneid = as.numeric(gsub("(\\(|\\))", "", geneid))) %>%
     dplyr::rename(ceres_old = ceres)
   
   
@@ -117,7 +116,7 @@ get_CRISPR_screen <- function(screen_name, screen_desc, file_essentials, file_no
     dplyr::inner_join(gene_effect_long_old, by = c("symbol", "geneid", "celllinename")) %>%
     dplyr::inner_join(gene_dependency_long_new, by = c("symbol", "geneid", "celllinename")) %>%
     dplyr::inner_join(ensg, by = "geneid") %>%
-    dplyr::select(celllinename, ensg, ceres, ceres_old, dep_prob) %>%
+    dplyr::select(celllinename, ensg, ceres, ceres_old, ceres_prob) %>%
     dplyr::mutate(depletionscreen = screen_name) %>%
     dplyr::distinct(celllinename, ensg, .keep_all = TRUE)
   

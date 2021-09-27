@@ -226,7 +226,7 @@ create table PROCESSEDDEPLETIONSCORE (
    CELLLINENAME         TEXT                 not null,
    DEPLETIONSCREEN      TEXT                 not null,
    CERES                FLOAT4               null,
-   DEP_PROB             FLOAT4               null,
+   CERES_PROB           FLOAT4               null,
    CERES_OLD            FLOAT4               null,
    D2                   FLOAT4               null,
    D2_PROB              FLOAT4               null,

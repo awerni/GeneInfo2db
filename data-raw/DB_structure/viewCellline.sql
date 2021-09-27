@@ -219,7 +219,7 @@ SELECT gene_set, celllinename, sum(log2tpm) AS log2tpm_sum, sum((log2tpm - log2t
 
 DROP VIEW IF EXISTS cellline.processeddepletionscoreview CASCADE;
 CREATE VIEW cellline.processeddepletionscoreview AS
-SELECT d.ensg, symbol, celllinename, depletionscreen, ceres_old, dep_prob, ceres, d2 FROM cellline.processeddepletionscore d
+SELECT d.ensg, symbol, celllinename, depletionscreen, ceres_old, ceres_prob, ceres, d2 FROM cellline.processeddepletionscore d
 JOIN gene g ON (d.ENSG = g.ENSG);
 
 DROP MATERIALIZED VIEW IF EXISTS cellline.mutationalburden CASCADE;
