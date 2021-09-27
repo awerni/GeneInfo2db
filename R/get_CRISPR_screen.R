@@ -131,6 +131,8 @@ get_CRISPR_screen <- function(screen_name, screen_desc, file_essentials,
 
 
 get_CRISPR_screen_chronos <- function(
+  screen_name,
+  screen_desc,
   file_effect,
   file_dependency
   ) {
