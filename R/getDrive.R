@@ -30,6 +30,7 @@ getDrive <- function() {
     dplyr::inner_join(ensg, by = "geneid") %>%
     dplyr::mutate(depletionscreen = "Drive") %>%
     dplyr::filter(celllinename %in% cellline$celllinename) %>%
+    dplyr::select(celllinename, ensg, d2) %>%
     dplyr::distinct(celllinename, ensg, .keep_all = TRUE)
   
   depletion_screen <- tibble::tribble(
