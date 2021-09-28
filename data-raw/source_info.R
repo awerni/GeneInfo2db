@@ -66,7 +66,7 @@ depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/
 drive_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/6025238/files") %>%
   mutate(data_name = "demeter2-drive", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
-  filter(grepl("(D2_DRIVE_gene_dep_scores|D2_DRIVE_seed_dep_scores)", data_file)) %>%
+  filter(grepl("(D2_DRIVE_gene_dep_scores)", data_file)) %>%
   mutate(data_file = gsub("^D2_DRIVE_", "", data_file))
 
 prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/9393293/files") %>%

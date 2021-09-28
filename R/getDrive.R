@@ -10,10 +10,13 @@ getDrive <- function() {
   
   # -------------------------
   
-  gene_effect_long <- getFileData('gene_effect@drive') %>%
+  gene_effect_long <- getFileData('gene_dep_scores@drive')
+  
+  gene_effect_long2 <- gene_effect_long %>%
     as.data.frame() %>%
-    tibble::rownames_to_column("celllinename") %>%
-    tidyr::pivot_longer(!celllinename, names_to = "gene", values_to = "d2") %>%
+    rename(gene = X1) %>%
+    #tibble::rownames_to_column("celllinename") %>%
+    tidyr::pivot_longer(!gene, names_to = "celllinename", values_to = "d2") %>%
     dplyr::mutate(geneid = gsub(".* \\(", "(", gene)) %>%
     dplyr::select(-gene) %>%
     dplyr::mutate(geneid = gsub("(\\(|\\))", "", geneid)) %>%
@@ -21,24 +24,10 @@ getDrive <- function() {
     dplyr::mutate(geneid = lapply(str_split(geneid, "&"), as.integer)) %>%
     tidyr::unnest(geneid)
   
-  gene_dependency_long <- getFileData("gene_dependency@drive") %>%
-    as.data.frame() %>%
-    tibble::rownames_to_column("celllinename") %>%
-    tidyr::pivot_longer(!celllinename, names_to = "gene", values_to = "ceres_prob") %>%
-    dplyr::mutate(geneid = gsub(".* \\(", "(", gene)) %>%
-    dplyr::select(-gene) %>%
-    dplyr::mutate(geneid = gsub("(\\(|\\))", "", geneid)) %>%
-    dplyr::filter(!is.na(geneid) & !is.na(ceres_prob)) %>%
-    dplyr::mutate(geneid = lapply(str_split(geneid, "&"), as.integer)) %>%
-    tidyr::unnest(geneid) %>%
-    dplyr::mutate(ceres_prob = ifelse(ceres_prob < 1e-45, 0, ceres_prob))
+  ensg <- get_gene_translation(unique(gene_effect_long2$geneid))
   
-  ensg <- get_gene_translation(unique(gene_effect_long$geneid))
-  
-  gene_effect_long2 <- gene_effect_long %>%
-    dplyr::inner_join(gene_dependency_long, by = c("geneid", "celllinename")) %>%
+  gene_effect_long2 <- gene_effect_long2 %>%
     dplyr::inner_join(ensg, by = "geneid") %>%
-    dplyr::select(celllinename, ensg, d2, ceres_prob) %>%
     dplyr::mutate(depletionscreen = "Drive") %>%
     dplyr::filter(celllinename %in% cellline$celllinename) %>%
     dplyr::distinct(celllinename, ensg, .keep_all = TRUE)
