@@ -59,6 +59,7 @@ create table CELLLINE (
    COMMENT              TEXT                 null,
    PUBLIC               BOOL                 null,
    TDPID                SERIAL               not null,
+   LOSSOFY              BOOL                 NULL,
    constraint PK_CELLLINE primary key (CELLLINENAME)
 );
 
