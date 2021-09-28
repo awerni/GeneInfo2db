@@ -1,3 +1,4 @@
+#' @export
 addLossOfY <- function() {
   sql1 <- paste0("SELECT celllinename, avg(totalabscopynumber) AS chrY_avg_abs_CN, ",
                  "avg(log2relativecopynumber) AS chrY_avg_rel_CN ",
