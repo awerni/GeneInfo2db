@@ -28,9 +28,9 @@ getDrive <- function() {
   
   gene_effect_long2 <- gene_effect_long2 %>%
     dplyr::inner_join(ensg, by = "geneid") %>%
+    dplyr::select(celllinename, ensg, d2) %>%
     dplyr::mutate(depletionscreen = "Drive") %>%
     dplyr::filter(celllinename %in% cellline$celllinename) %>%
-    dplyr::select(celllinename, ensg, d2) %>%
     dplyr::distinct(celllinename, ensg, .keep_all = TRUE)
   
   depletion_screen <- tibble::tribble(
