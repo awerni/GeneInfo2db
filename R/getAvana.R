@@ -1,11 +1,30 @@
 getAvana <- function() {
-  get_CRISPR_screen(
-    'Avana', 
-    'Broad Institute DepMap Avana CRISPR Screen',
-    "common_essentials",
-    "nonessentials",
-    "Achilles_gene_effect",
-    "Achilles_gene_effect_unscaled",
-    "Achilles_gene_dependency"
+  ceres <- get_CRISPR_screen(
+    screen_name = 'Avana', 
+    screen_desc = 'Broad Institute DepMap Avana CRISPR Screen',
+    file_essentials = "common_essentials",
+    file_nonessentials = "nonessentials",
+    file_effect = "Achilles_gene_effect_CERES",
+    file_effect_unscaled = "Achilles_gene_effect_unscaled_CERES",
+    file_dependency = "Achilles_gene_dependency_CERES"
   )
+  
+  chronos <- get_CRISPR_screen_chronos(
+    screen_name = 'Avana', 
+    screen_desc = 'Broad Institute DepMap Avana CRISPR Screen',
+    file_effect = "Achilles_gene_effect",
+    file_dependency = "Achilles_gene_dependency"
+  )
+  
+  fullData <- full_join(
+    ceres$cellline.processeddepletionscore,
+    chronos$cellline.processeddepletionscore,
+    by = c("celllinename", "ensg", "depletionscreen")
+  )
+  
+  list(
+    cellline.depletionscreen = ceres$cellline.depletionscreen,
+    cellline.processeddepletionscore = fullData
+  )
+  
 }

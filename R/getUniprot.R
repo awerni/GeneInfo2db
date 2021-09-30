@@ -16,7 +16,7 @@ getUniprot <- function() {
   RPostgres::dbDisconnect(con)
 
   # ---------------------------
-  ftp_path <- "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/"
+  ftp_path <- "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/"
   file_uniprot2 <-"HUMAN_9606_idmapping_selected.tab.gz"
   url3 <- paste0(ftp_path, file_uniprot2)
 
@@ -41,7 +41,7 @@ getUniprot <- function() {
 
   # ------------ mappings to ENSG and geneid ---------------
   #id_map <- getFileData("HUMAN_9606_idmapping_selected.tab.gz")
-  ftp_path <- "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/"
+  ftp_path <- "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/"
   file_uniprot2 <-"HUMAN_9606_idmapping_selected.tab.gz"
   url3 <- paste0(ftp_path, file_uniprot2)
   

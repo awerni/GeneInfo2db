@@ -21,11 +21,11 @@
 #' RPostgres::dbDisconnect(con)
 #' 
 getPostgresqlConnection <- function (
-  user       = Sys.getenv("DB_USER", unset = Sys.getenv("USER"))
-  , name     = Sys.getenv("DB_NAME")
-  , host     = Sys.getenv("DB_HOST")
-  , password = Sys.getenv("DB_PASSWORD")
-  , port     = as.integer(Sys.getenv("DB_PORT", 5432L))
+  user     = getOption("GeneInfo2db.DB_USER", default = Sys.getenv("USER")),
+  name     = getOption("GeneInfo2db.DB_NAME"),
+  host     = getOption("GeneInfo2db.DB_HOST"),
+  password = getOption("GeneInfo2db.DB_PASSWORD"),
+  port     = as.integer(getOption("GeneInfo2db.DB_PORT", default = 5432L))
 ) {
   drv <- RPostgres::dbDriver("Postgres")
   con <- try(RPostgres::dbConnect(drv, user = user, password = password, dbname = name, host = host, port = port))

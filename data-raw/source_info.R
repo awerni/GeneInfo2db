@@ -20,33 +20,53 @@ db_info <- tibble::tribble(
 db_compara <- "ensembl_compara_101"
 
 # --- Entrez Gene File
-# complete file ftp://ftp.ncbi.nih.gov/gene/DATA/gene_info.gz
+# complete file https://ftp.ncbi.nih.gov/gene/DATA/gene_info.gz
 gene_info <- tibble::tribble(
   ~species, ~taxid, ~file,
-  "human",  9606, "ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz",
-  "mouse", 10090, "ftp://ftp.ncbi.nlm.nih.gov/refseq/M_musculus/Mus_musculus.gene_info.gz",
-  "rat",   10116, "ftp://ftp.ncbi.nlm.nih.gov/refseq/R_norvegicus/Rattus_norvegicus.gene_info.gz",
+  "human",  9606, "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz",
+  "mouse", 10090, "https://ftp.ncbi.nlm.nih.gov/refseq/M_musculus/Mus_musculus.gene_info.gz",
+  "rat",   10116, "https://ftp.ncbi.nlm.nih.gov/refseq/R_norvegicus/Rattus_norvegicus.gene_info.gz",
 )
 
 # --- Refseq File ---
 refseq_info <- tibble::tribble(
   ~species, ~taxid, ~file,
-  "human",  9606, "ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.files.installed",
-  "mouse", 10090, "ftp://ftp.ncbi.nlm.nih.gov/refseq/M_musculus/mRNA_Prot/mouse.files.installed",
-  "rat",   10116, "ftp://ftp.ncbi.nlm.nih.gov/refseq/R_norvegicus/mRNA_Prot/rat.files.installed",
+  "human",  9606, "https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.files.installed",
+  "mouse", 10090, "https://ftp.ncbi.nlm.nih.gov/refseq/M_musculus/mRNA_Prot/mouse.files.installed",
+  "rat",   10116, "https://ftp.ncbi.nlm.nih.gov/refseq/R_norvegicus/mRNA_Prot/rat.files.installed",
 )
 
 # ------figshare (depmap) and direct links -----------
-depmap_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/14541774/files") %>%
+DEPMAP_API_PATH <- 15160110
+DEPMAP_VERSION  <- "21q3"
+depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", DEPMAP_API_PATH)) %>%
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
-  filter(data_file %in% c("sample_info", "CCLE_expression_full", "CCLE_RNAseq_reads", "CCLE_RNAseq_transcripts", "CCLE_gene_cn", "CCLE_mutations",
-           "Achilles_gene_dependency", "Achilles_gene_effect", "Achilles_gene_effect_unscaled", "nonessentials", "common_essentials"))
+  filter(
+    data_file %in% c(
+      "sample_info",
+      "CCLE_expression_full",
+      "CCLE_RNAseq_reads",
+      "CCLE_RNAseq_transcripts",
+      "CCLE_gene_cn",
+      "CCLE_mutations",
+      "Achilles_gene_dependency",
+      "Achilles_gene_effect",
+      "Achilles_gene_effect_unscaled",
+      "Achilles_gene_dependency_CERES",
+      "Achilles_gene_effect_CERES",
+      "Achilles_gene_effect_unscaled_CERES",
+      "Achilles_common_essentials_CERES", # to decide if needed, there's 
+      # no nonessentials like this above
+      "nonessentials",
+      "common_essentials"
+    )
+  )
 
 drive_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/6025238/files") %>%
   mutate(data_name = "demeter2-drive", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
-  filter(grepl("(D2_DRIVE_gene_dep_scores|D2_DRIVE_seed_dep_scores)", data_file)) %>%
+  filter(grepl("(D2_DRIVE_gene_dep_scores)", data_file)) %>%
   mutate(data_file = gsub("^D2_DRIVE_", "", data_file))
 
 prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/9393293/files") %>%
@@ -54,9 +74,20 @@ prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/9393293/f
   select(data_name,  url = download_url, data_file) %>%
   filter(data_file %in% c("secondary-screen-dose-response-curve-parameters"))
 
-sanger_info <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732/files") %>%
-  mutate(data_name = "sanger", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) %>%
+sanger_info_chronos <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732/files") %>%
+  mutate(data_name = "sanger-chronos", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) %>%
   select(data_name,  url = download_url, data_file)
+
+sanger_info_ceres <- tibble::tribble(
+  ~"data_name", ~"url", ~"data_file",
+  "sanger-ceres", "https://ndownloader.figshare.com/files/16623887", "essential_genes",
+  "sanger-ceres", "https://ndownloader.figshare.com/files/16623890", "nonessential_genes",
+  "sanger-ceres", "https://ndownloader.figshare.com/files/16623881", "gene_effect",
+  "sanger-ceres", "https://ndownloader.figshare.com/files/16623851", "gene_effect_unscaled",
+  "sanger-ceres", "https://ndownloader.figshare.com/files/16623884", "gene_dependency"
+)
+  
+sanger_info <- bind_rows(sanger_info_chronos, sanger_info_ceres)
 
 other_info <- tibble::tribble(
   ~data_name, ~url, ~data_file,
@@ -66,7 +97,7 @@ other_info <- tibble::tribble(
   "ccle", "https://data.broadinstitute.org/ccle/CCLE_RPPA_20181003.csv", "CCLE_RPPA_20181003",
   "ccle", "https://data.broadinstitute.org/ccle/CCLE_RPPA_Ab_info_20181226.csv", "CCLE_RPPA_Ab_info_20181226",
   "total-proteome", "https://gygi.hms.harvard.edu/data/ccle/protein_quant_current_normalized.csv.gz", "protein_quant_current_normalized.csv.gz",
-  "uniprot", "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping_selected.tab.gz", "HUMAN_9606_idmapping_selected.tab.gz",
+  "uniprot", "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping_selected.tab.gz", "HUMAN_9606_idmapping_selected.tab.gz",
   "metmap", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-020-2969-2/MediaObjects/41586_2020_2969_MOESM7_ESM.xlsx", 'metmap.xlsx',
   "msi", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", "msi"
 )
@@ -79,7 +110,7 @@ download_file_info <- depmap_info %>%
 
 file_version <- tibble::tribble(
   ~description, ~information,
-  "Depmap Version", "public 21q1",
+  "Depmap Version", paste("public", DEPMAP_VERSION),
   "metabolomics", "CCLE_metabolomics_20190502",
   "Proteomics", "CCLE_RPPA_20181003"
 )

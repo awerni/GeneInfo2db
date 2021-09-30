@@ -17,11 +17,25 @@ getCelllineAnnotation <- function() {
     dplyr::select(CCLE_Name = CCLE_ID, cell_model_passport2 = model_id)
 
   sample_info <- getFileData("sample_info") %>%
-    dplyr::mutate(CCLE_Name = ifelse(CCLE_Name == "", cell_line_name, CCLE_Name))
+    dplyr::mutate(CCLE_Name = ifelse(is.na(CCLE_Name) | CCLE_Name == "", cell_line_name, CCLE_Name)) %>%
+    dplyr::mutate(CCLE_Name = dplyr::coalesce(CCLE_Name, stripped_cell_line_name))
 
+  if(anyNA(sample_info$CCLE_Name)) {
+    print(sample_info[is.na(sample_info$CCLE_Name),])
+    stop("sample_info$CCLE_Name should not contain NA!")
+  }
+  
   if ("Alias" %in% colnames(sample_info)) {
     sample_info = sample_info %>% rename(alias = Alias)
   }
+  
+  #sample_info <- sample_info %>% distinct()
+  
+  no <- table(sample_info$CCLE_Name)
+  no <- names(no[no>1])
+  sample_info <- sample_info %>% filter(!CCLE_Name %in% no)
+  
+  
   
   cl_anno <- sample_info %>%
     dplyr::left_join(cell_model_passport1, by = "CCLE_Name") %>%
@@ -98,6 +112,12 @@ getCelllineAnnotation <- function() {
   cl_alternative2 <- cl_alternative %>%
     dplyr::filter(!alternative_celllinename %in% cl_dupl$alternative_celllinename)
 
+  
+  
+  if(anyNA(cl_anno$celllinename)) {
+    stop("celllinename in cl_anno cannot be NA!")
+  }
+  
   list(cellline.cellline = cl_anno,
        cellline.alternative_celllinename = cl_alternative2)
 }
