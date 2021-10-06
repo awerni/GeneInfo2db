@@ -54,7 +54,7 @@ pgpass2dbConfig <- function(line = 1, .pgpassPaths = c(".pgpass", "~/.pgpass")) 
 print.GeneInfo2DatabaseConfig <- function(x, ...) {
   
   print(x[-5])
-  cat("$pass\n    <hidden>")
+  cat("$pass\n    <hidden>\n")
   
   invisible(x)
 }
