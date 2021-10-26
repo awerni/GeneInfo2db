@@ -1,6 +1,8 @@
 #' Get database config from .pgpass file
 #'
-#' @param line which line of .pgpass should be used
+#' @param regex regular expression for matching the pgpass line. It has to resolve to
+#'              only one line from pgpass.
+#' @param lines which lines of .pgpass should be used.
 #' @param .pgpassPaths path to .pgpass file. Default value should work in most 
 #' cases.
 #'
@@ -10,7 +12,7 @@
 #' 
 #' @export
 #' 
-pgpass2dbConfig <- function(line = 1, .pgpassPaths = c(".pgpass", "~/.pgpass")) {
+pgpass2dbConfig <- function(regex = ".*", lines = NA, .pgpassPaths = c(".pgpass", "~/.pgpass")) {
   
   existingFiles <- .pgpassPaths[file.exists(.pgpassPaths)]
   
@@ -23,10 +25,28 @@ pgpass2dbConfig <- function(line = 1, .pgpassPaths = c(".pgpass", "~/.pgpass")) 
   file <- existingFiles[1]
   content <- readLines(file, warn = FALSE)
   
-  if(line > length(content)) {
-    stop(".pgpass does not have ", line, " lines")
+  if(!is.na(lines)) {
+    content <- content[lines]
+    
+    if(max(lines) > length(content)) {
+      stop(".pgpass does not have ", lines, " lines")
+    }
+    
   }
-  content <- content[[line]]
+  
+  if(length(content) == 1) {
+    content <- content[grepl(content, pattern = regex)]
+    if(length(content) > 1) {
+      
+      conf <- vapply(strsplit(content, split = ":"), FUN.VALUE = "", FUN = function(x) {
+        paste0(paste(head(x,-1), collapse = ":"), ":<PASSWORD-MASKED>")
+      })
+      conf <- paste(conf, collapse = "\n")
+      
+      stop("Cannot find unique entry using regex: '" ,regex, "':\n", conf)
+    }
+  }
+  
   
   pgpassContent <- strsplit(content, split = ":")[[1]]
   

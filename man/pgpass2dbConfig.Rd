@@ -4,10 +4,17 @@
 \alias{pgpass2dbConfig}
 \title{Get database config from .pgpass file}
 \usage{
-pgpass2dbConfig(line = 1, .pgpassPaths = c(".pgpass", "~/.pgpass"))
+pgpass2dbConfig(
+  regex = ".*",
+  lines = NA,
+  .pgpassPaths = c(".pgpass", "~/.pgpass")
+)
 }
 \arguments{
-\item{line}{which line of .pgpass should be used}
+\item{regex}{regular expression for matching the pgpass line. It has to resolve to
+only one line from pgpass.}
+
+\item{lines}{which lines of .pgpass should be used.}
 
 \item{.pgpassPaths}{path to .pgpass file. Default value should work in most 
 cases.}
