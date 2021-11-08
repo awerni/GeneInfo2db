@@ -150,14 +150,16 @@ SELECT symbol, t.ensg, ps.enst, dnamutation, aamutation, dnazygosity, rnazygosit
  FROM cellline.processedsequence ps JOIN transcript t on (t.enst = ps.enst AND iscanonical) join gene g on (g.ensg = t.ensg);
 
 DROP VIEW IF EXISTS cellline.processedsequenceExtended CASCADE;
+
+DROP MATERIALIZED VIEW IF EXISTS cellline.sequenced_cellline CASCADE;
+
+CREATE MATERIALIZED VIEW cellline.sequenced_cellline AS
+  SELECT distinct celllinename FROM cellline.processedsequence;
+
 CREATE VIEW cellline.processedsequenceExtended AS
-WITH sequenced_cellline AS (
-  SELECT distinct celllinename
-    FROM cellline.processedsequence
-  )
   SELECT tr.ensg, e.enst, symbol, c.celllinename,
     coalesce(dnamutation, 'wt') AS dnamutation, coalesce(aamutation, 'wt') AS aamutation, dnazygosity, exonscomplete
-    FROM (SELECT celllinename FROM sequenced_cellline) AS c
+    FROM (SELECT celllinename FROM cellline.sequenced_cellline) AS c
     LEFT OUTER JOIN cellline.sequenced_transcript e ON (TRUE)
     LEFT OUTER JOIN cellline.processedsequence ps ON (c.celllinename = ps.celllinename AND e.enst = ps.enst)
     LEFT JOIN transcript tr ON (e.enst = tr.enst AND tr.iscanonical)
