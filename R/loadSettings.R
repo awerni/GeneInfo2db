@@ -1,61 +1,58 @@
-#' Get database config from .pgpass file
+#' Get password from .pgpass file
 #'
-#' @param regex regular expression for matching the pgpass line. It has to resolve to
-#'              only one line from pgpass.
-#' @param lines which lines of .pgpass should be used.
-#' @param .pgpassPaths path to .pgpass file. Default value should work in most 
-#' cases.
-#'
-#' @return list with database configuration.
+#' @param dbsettings incomplete list of dbhost, dbname, dbuser, dbport, or dbpass
+#' @return complete list with database configuration.
 #' 
-#' @note To use specific config, it need to be set using \code{setDBconfig}.
+#' @note the return value of this function is used to specify DB config for \code{setDBconfig}.
 #' 
 #' @export
 #' 
-pgpass2dbConfig <- function(regex = ".*", lines = NA, .pgpassPaths = c(".pgpass", "~/.pgpass")) {
+getDBConfig <- function(dbsettings) {
   
-  existingFiles <- .pgpassPaths[file.exists(.pgpassPaths)]
-  
-  if(length(existingFiles) == 0) {
-    message("No .pgpass file found. ",
-    "Use Renviron to specify default vaues for postgres connection.")
+  pgpassFile <- Sys.getenv("PGPASSFILE")
+  if (pgpassFile == "") pgpassFile <- "~/.pgpass"
+
+  if(!file.exists(pgpassFile)) {
+    message("No .pgpass file found. ")
     return()
   }
   
-  file <- existingFiles[1]
-  content <- readLines(file, warn = FALSE)
+  fillMissing <- function(x, alt) {
+    ifelse(is.null(x) || is.na(x), alt, x)
+  } 
   
-  if(!is.na(lines)) {
-    content <- content[lines]
-    
-    if(max(lines) > length(content)) {
-      stop(".pgpass does not have ", lines, " lines")
-    }
-    
+  DBname <- fillMissing(dbsettings[["dbname"]], as.character(NA))
+  DBhost <- fillMissing(dbsettings[["dbhost"]], Sys.getenv("PGHOST"))
+  DBport <- fillMissing(dbsettings[["dbport"]], "5432")
+  DBuser <- fillMissing(dbsettings[["dbuser"]], Sys.getenv("USER"))
+  DBpass <- fillMissing(dbsettings[["dbpass"]], as.character(NA))
+  
+  if (DBname == "" | is.na(DBname) ) {
+    message("No database name found.")
+    return()
   }
   
-  if(length(content) == 1) {
-    content <- content[grepl(content, pattern = regex)]
-    if(length(content) > 1) {
-      
-      conf <- vapply(strsplit(content, split = ":"), FUN.VALUE = "", FUN = function(x) {
-        paste0(paste(head(x,-1), collapse = ":"), ":<PASSWORD-MASKED>")
-      })
-      conf <- paste(conf, collapse = "\n")
-      
-      stop("Cannot find unique entry using regex: '" ,regex, "':\n", conf)
-    }
+  if (DBhost == "" | is.na(DBhost)) {
+    message("No database hostname found.")
+    return()
   }
   
+  compare <- function(x, y) (x == y | y == "*")
   
-  pgpassContent <- strsplit(content, split = ":")[[1]]
-  
+  if (DBpass == "" | is.na(DBpass) | is.null(DBpass)) {
+    pgpass <- strsplit(scan("~/.pgpass", what = "", quiet = TRUE), ":")
+    n <- sapply(pgpass, function(x) {
+      compare(DBhost, x[[1]]) & compare(DBport, x[[2]]) & compare(DBname, x[[3]]) & compare(DBuser, x[[4]])
+    })
+    DBpass <- pgpass[[which(n)[1]]][[5]]
+  }
+ 
   config <- list(
-    host = pgpassContent[1], 
-    port = as.integer(pgpassContent[2]),
-    name = pgpassContent[3],
-    user = pgpassContent[4],
-    pass = pgpassContent[5]
+    host = DBhost,
+    port = DBport,
+    name = DBname,
+    user = DBuser,
+    pass = DBpass
   )
   
   class(config) <- "GeneInfo2DatabaseConfig"
@@ -111,7 +108,7 @@ setDBconfig <- function(host, port, name, user, pass) {
   options("GeneInfo2db.DB_USER" = user)
   options("GeneInfo2db.DB_PASSWORD" = pass)
   
-  message("Data base config:")
+  message("Database config:")
   message("GeneInfo2db.DB_HOST: ", getOption("GeneInfo2db.DB_HOST"))
   message("GeneInfo2db.DB_PORT: ", getOption("GeneInfo2db.DB_PORT"))
   message("GeneInfo2db.DB_NAME: ", getOption("GeneInfo2db.DB_NAME"))
