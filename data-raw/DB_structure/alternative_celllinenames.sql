@@ -1,6 +1,6 @@
-insert into cellline.alternative_celllinename select celllinename, depmap as alternative_celllinename, 'depmapID' as source from cellline.cellline WHERE depmap is not null;
-insert into cellline.alternative_celllinename select celllinename, cellosaurus as alternative_celllinename, 'cellosaurus' as source from cellline.cellline WHERE cellosaurus is not null;
-insert into cellline.alternative_celllinename select celllinename, cell_model_passport as alternative_celllinename, 'cell_model_passport' as source from cellline.cellline WHERE cell_model_passport is not null;
+INSERT INTO cellline.alternative_celllinename SELECT celllinename, depmap AS alternative_celllinename, 'depmapID' AS source FROM cellline.cellline WHERE depmap is not null;
+INSERT INTO cellline.alternative_celllinename SELECT celllinename, cellosaurus AS alternative_celllinename, 'cellosaurus' AS source FROM cellline.cellline WHERE cellosaurus is not null;
+INSERT INTO cellline.alternative_celllinename SELECT celllinename, cell_model_passport AS alternative_celllinename, 'cell_model_passport' AS source FROM cellline.cellline WHERE cell_model_passport is not null;
 
 INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('BC3_PLEURA','BC-3', 'Amgen');
 INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('BE2M17_AUTONOMIC_GANGLIA','BE(2)-M17', 'Amgen');

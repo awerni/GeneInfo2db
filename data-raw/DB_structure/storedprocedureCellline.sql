@@ -59,16 +59,14 @@ CREATE OR REPLACE FUNCTION cellline_expression(rnaseqrun TEXT[], min_max INT4)
 RETURNS TABLE (
     celllinename TEXT,
     ENSG TEXT,
-    log2fpkm real,
     log2tpm real,
-    log2cpm real, 
     counts INTEGER
   )
 AS $$
 BEGIN
   RETURN QUERY 
   WITH expr_data AS (
-    SELECT r.celllinename, e.ensg, e.log2fpkm, e.log2tpm, e.log2cpm, e.counts FROM cellline.processedrnaseq e
+    SELECT r.celllinename, e.ensg, e.log2tpm, e.counts FROM cellline.processedrnaseq e
     INNER JOIN cellline.rnaseqrun r ON r.rnaseqrunid = e.rnaseqrunid
     WHERE r.rnaseqrunid = ANY(rnaseqrun)
   ),

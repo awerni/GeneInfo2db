@@ -146,7 +146,7 @@ CREATE MATERIALIZED VIEW cellline.sequenced_transcript AS
 DROP VIEW IF EXISTS cellline.processedsequenceview CASCADE;
 
 CREATE VIEW cellline.processedsequenceview AS
-SELECT symbol, t.ensg, ps.enst, dnamutation, aamutation, dnazygosity, rnazygosity
+SELECT symbol, t.ensg, celllinename, ps.enst, dnamutation, aamutation, dnazygosity, rnazygosity
  FROM cellline.processedsequence ps JOIN transcript t on (t.enst = ps.enst AND iscanonical) join gene g on (g.ensg = t.ensg);
 
 DROP VIEW IF EXISTS cellline.processedsequenceExtended CASCADE;
@@ -180,7 +180,7 @@ SELECT pfg.processedfusion, pfg.celllinename, pfg.ensg1, pfg.ensg2, g1.symbol as
 
 DROP VIEW IF EXISTS cellline.processedrnaseqview CASCADE;
 CREATE VIEW cellline.processedrnaseqview AS
-SELECT prs.rnaseqrunid, celllinename, prs.ensg, prs.log2fpkm, prs.log2tpm, prs.log2cpm, prs.counts FROM cellline.processedrnaseq prs
+SELECT prs.rnaseqrunid, celllinename, prs.ensg, prs.log2tpm, prs.counts FROM cellline.processedrnaseq prs
   JOIN cellline.rnaseqrun nr ON nr.rnaseqrunid = prs.rnaseqrunid
   JOIN cellline.rnaseqgroup ng ON nr.rnaseqgroupid = ng.rnaseqgroupid
   WHERE nr.canonical AND (rnaseqname like 'untreated %cellline reference set%' AND processingpipeline LIKE 'RNA-seq%');
@@ -193,18 +193,18 @@ SELECT prs.rnaseqrunid, celllinename, prs.ensg, prs.log2fpkm, prs.log2tpm, prs.l
 --  JOIN cellline.rnaseqgroup ng ON nr.rnaseqgroupid = ng.rnaseqgroupid
 --  WHERE nr.canonical AND (rnaseqname like 'untreated %cellline reference set%' AND processingpipeline LIKE 'RNA-seq%')
 --)
---SELECT prs.rnaseqrunid, celllinename, prs.ensg, prs.log2fpkm, prs.log2tpm, prs.log2cpm, prs.counts FROM cellline.processedrnaseq prs
+--SELECT prs.rnaseqrunid, celllinename, prs.ensg, prs.log2tpm, prs.counts FROM cellline.processedrnaseq prs
 --  INNER JOIN rnaseqrun2 nr ON prs.rnaseqrunid = nr.rnaseqrunid;
 
 DROP VIEW IF EXISTS cellline.processedrnaseqtranscriptview CASCADE;
 CREATE VIEW cellline.processedrnaseqtranscriptview AS
-SELECT prs.rnaseqrunid, celllinename, prs.enst, prs.log2fpkm, prs.log2tpm, prs.counts FROM cellline.processedrnaseqtranscript prs
+SELECT prs.rnaseqrunid, celllinename, prs.enst, prs.log2tpm, prs.counts FROM cellline.processedrnaseqtranscript prs
   JOIN cellline.rnaseqrun nr ON nr.rnaseqrunid = prs.rnaseqrunid
   JOIN cellline.rnaseqgroup ng ON nr.rnaseqgroupid = ng.rnaseqgroupid
   WHERE nr.canonical AND (rnaseqname like 'untreated %cellline reference set%' AND processingpipeline LIKE 'RNA-seq%');
 
 --CREATE VIEW cellline.processedrnaseqview AS
---SELECT prs.rnaseqrunid, celllinename, prs.ensg, prs.log2fpkm, prs.log2tpm, prs.counts FROM cellline.rnaseqrun nr JOIN cellline.processedrnaseq prs ON (nr.rnaseqrunid = prs.rnaseqrunid) WHERE nr.canonical;
+--SELECT prs.rnaseqrunid, celllinename, prs.ensg, prs.log2tpm, prs.counts FROM cellline.rnaseqrun nr JOIN cellline.processedrnaseq prs ON (nr.rnaseqrunid = prs.rnaseqrunid) WHERE nr.canonical;
 
 ---
 
@@ -221,7 +221,7 @@ SELECT gene_set, celllinename, sum(log2tpm) AS log2tpm_sum, sum((log2tpm - log2t
 
 DROP VIEW IF EXISTS cellline.processeddepletionscoreview CASCADE;
 CREATE VIEW cellline.processeddepletionscoreview AS
-SELECT d.ensg, symbol, celllinename, depletionscreen, ceres_old, ceres_prob, ceres, d2 FROM cellline.processeddepletionscore d
+SELECT d.ensg, symbol, celllinename, depletionscreen, chronos, chronos_prob, d2, d2_prob FROM cellline.processeddepletionscore d
 JOIN gene g ON (d.ENSG = g.ENSG);
 
 DROP MATERIALIZED VIEW IF EXISTS cellline.mutationalburden CASCADE;

@@ -226,13 +226,9 @@ create table PROCESSEDDEPLETIONSCORE (
    ENSG                 TEXT                 not null,
    CELLLINENAME         TEXT                 not null,
    DEPLETIONSCREEN      TEXT                 not null,
-   CERES                FLOAT4               null,
-   CERES_PROB           FLOAT4               null,
-   CERES_OLD            FLOAT4               null,
-   D2                   FLOAT4               null,
-   D2_PROB              FLOAT4               null,
    CHRONOS              FLOAT4               null,
    CHRONOS_PROB         FLOAT4               null,
+   D2                   FLOAT4               null,
    constraint PK_PROCESSEDDEPLETIONSCORE primary key (DEPLETIONSCREEN, CELLLINENAME, ENSG)
 );
 
@@ -324,9 +320,7 @@ create table PROCESSEDPROTEINMASSSPEC (
 create table PROCESSEDRNASEQ (
    RNASEQRUNID          TEXT                 not null,
    ENSG                 TEXT                 not null,
-   LOG2FPKM             REAL                 null,
    LOG2TPM              REAL                 null,
-   LOG2CPM              REAL                 null,
    COUNTS               INT4                 null,
    constraint PK_PROCESSEDRNASEQ primary key (RNASEQRUNID, ENSG)
 );
@@ -337,9 +331,7 @@ create table PROCESSEDRNASEQ (
 create table PROCESSEDRNASEQTRANSCRIPT (
    RNASEQRUNID          TEXT                 not null,
    ENST                 TEXT                 not null,
-   LOG2FPKM             REAL                 null,
    LOG2TPM              REAL                 null,
-   LOG2CPM              REAL                 null,
    COUNTS               INT4                 null,
    constraint PK_PROCESSEDRNASEQTRANSCRIPT primary key (RNASEQRUNID, ENST)
 );

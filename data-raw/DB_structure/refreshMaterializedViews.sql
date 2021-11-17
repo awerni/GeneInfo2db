@@ -8,4 +8,4 @@ refresh materialized view cellline.processedcopynumber_array;
 refresh materialized view cellline.processedrnaseq_array;
 refresh materialized view cellline.processedrnaseqtranscript_array;
 refresh materialized view cellline.sequenced_transcript;
-
+refresh materialized view cellline.sequenced_cellline;
