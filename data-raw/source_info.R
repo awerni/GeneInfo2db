@@ -37,8 +37,8 @@ refseq_info <- tibble::tribble(
 )
 
 # ------figshare (depmap) and direct links -----------
-DEPMAP_API_PATH <- 15160110
-DEPMAP_VERSION  <- "21q3"
+DEPMAP_API_PATH <- 16924132 # 21Q3 = 15160110
+DEPMAP_VERSION  <- "21q4"
 depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", DEPMAP_API_PATH)) %>%
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
@@ -78,16 +78,17 @@ sanger_info_chronos <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles
   mutate(data_name = "sanger-chronos", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) %>%
   select(data_name,  url = download_url, data_file)
 
-sanger_info_ceres <- tibble::tribble(
-  ~"data_name", ~"url", ~"data_file",
-  "sanger-ceres", "https://ndownloader.figshare.com/files/16623887", "essential_genes",
-  "sanger-ceres", "https://ndownloader.figshare.com/files/16623890", "nonessential_genes",
-  "sanger-ceres", "https://ndownloader.figshare.com/files/16623881", "gene_effect",
-  "sanger-ceres", "https://ndownloader.figshare.com/files/16623851", "gene_effect_unscaled",
-  "sanger-ceres", "https://ndownloader.figshare.com/files/16623884", "gene_dependency"
-)
+# sanger_info_ceres <- tibble::tribble(
+#   ~"data_name", ~"url", ~"data_file",
+#   "sanger-ceres", "https://ndownloader.figshare.com/files/16623887", "essential_genes",
+#   "sanger-ceres", "https://ndownloader.figshare.com/files/16623890", "nonessential_genes",
+#   "sanger-ceres", "https://ndownloader.figshare.com/files/16623881", "gene_effect",
+#   "sanger-ceres", "https://ndownloader.figshare.com/files/16623851", "gene_effect_unscaled",
+#   "sanger-ceres", "https://ndownloader.figshare.com/files/16623884", "gene_dependency"
+# )
   
-sanger_info <- bind_rows(sanger_info_chronos, sanger_info_ceres)
+#sanger_info <- bind_rows(sanger_info_chronos, sanger_info_ceres)
+sanger_info <- sanger_info_chronos
 
 other_info <- tibble::tribble(
   ~data_name, ~url, ~data_file,
