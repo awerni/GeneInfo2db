@@ -107,6 +107,13 @@ SELECT DISTINCT processeddepletionscore.ensg,
    processeddepletionscore.depletionscreen
    FROM cellline.processeddepletionscore;
 
+---
+DROP MATERIALIZED VIEW IF EXISTS cellline.depletion_cellline;
+
+CREATE MATERIALIZED VIEW cellline.depletion_cellline AS
+SELECT DISTINCT celllinename, depletionscreen
+   FROM cellline.processeddepletionscore;
+
 -------------------------------------------------
 ---- Views for sequenceDB -----------------------
 -------------------------------------------------

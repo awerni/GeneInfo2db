@@ -10,3 +10,4 @@ refresh materialized view cellline.processedrnaseqtranscript_array;
 refresh materialized view cellline.sequenced_transcript;
 refresh materialized view cellline.sequenced_cellline;
 refresh materialized view cellline.depletion_ensg;
+refresh materialized view cellline.depletion_cellline;
