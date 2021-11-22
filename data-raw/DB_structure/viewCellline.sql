@@ -98,6 +98,15 @@ WITH rsspecies AS (SELECT DISTINCT species FROM cellline.rnaseqrun rsr JOIN cell
                                       WHERE cl.species = rss.species AND publish GROUP BY ensg ORDER BY variance(log2tpm) DESC LIMIT 1000) AS t ON TRUE)
 SELECT pr.rnaseqrunid, pr.ensg, log2tpm, species, variance, rank_number FROM cellline.processedrnaseq pr JOIN cellline.rnaseqrun rr ON rr.rnaseqrunid = pr.rnaseqrunid JOIN varying_ensg ve ON (pr.ensg = ve.ensg) WHERE rr.publish;
 
+---
+
+DROP MATERIALIZED VIEW IF EXISTS cellline.depletion_ensg;
+
+CREATE MATERIALIZED VIEW cellline.depletion_ensg AS
+SELECT DISTINCT processeddepletionscore.ensg,
+   processeddepletionscore.depletionscreen
+   FROM cellline.processeddepletionscore;
+
 -------------------------------------------------
 ---- Views for sequenceDB -----------------------
 -------------------------------------------------
@@ -221,7 +230,7 @@ SELECT gene_set, celllinename, sum(log2tpm) AS log2tpm_sum, sum((log2tpm - log2t
 
 DROP VIEW IF EXISTS cellline.processeddepletionscoreview CASCADE;
 CREATE VIEW cellline.processeddepletionscoreview AS
-SELECT d.ensg, symbol, celllinename, depletionscreen, chronos, chronos_prob, d2, d2_prob FROM cellline.processeddepletionscore d
+SELECT d.ensg, symbol, celllinename, depletionscreen, chronos, chronos_prob, d2 FROM cellline.processeddepletionscore d
 JOIN gene g ON (d.ENSG = g.ENSG);
 
 DROP MATERIALIZED VIEW IF EXISTS cellline.mutationalburden CASCADE;
