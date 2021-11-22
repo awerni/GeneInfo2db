@@ -56,7 +56,7 @@ depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/
       "Achilles_gene_dependency_CERES",
       "Achilles_gene_effect_CERES",
       "Achilles_gene_effect_unscaled_CERES",
-      "Achilles_common_essentials_CERES", # to decide if needed, there's 
+      "Achilles_common_essentials_CERES", # to decide if needed, there's
       # no nonessentials like this above
       "nonessentials",
       "common_essentials"
@@ -67,7 +67,7 @@ drive_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/6025238/f
   mutate(data_name = "demeter2-drive", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
   filter(grepl("(D2_DRIVE_gene_dep_scores)", data_file)) %>%
-  mutate(data_file = gsub("^D2_DRIVE_", "", data_file))
+  mutate(data_file = "gene_effect")
 
 prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/9393293/files") %>%
   mutate(data_name = "prism", data_file = gsub("\\.csv$", "", name)) %>%
@@ -75,7 +75,7 @@ prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/9393293/f
   filter(data_file %in% c("secondary-screen-dose-response-curve-parameters"))
 
 sanger_info_chronos <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732/files") %>%
-  mutate(data_name = "sanger-chronos", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) %>%
+  mutate(data_name = "sanger-crispr-project-score", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) %>%
   select(data_name,  url = download_url, data_file)
 
 # sanger_info_ceres <- tibble::tribble(
@@ -86,7 +86,7 @@ sanger_info_chronos <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles
 #   "sanger-ceres", "https://ndownloader.figshare.com/files/16623851", "gene_effect_unscaled",
 #   "sanger-ceres", "https://ndownloader.figshare.com/files/16623884", "gene_dependency"
 # )
-  
+
 #sanger_info <- bind_rows(sanger_info_chronos, sanger_info_ceres)
 sanger_info <- sanger_info_chronos
 
