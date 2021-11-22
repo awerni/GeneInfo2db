@@ -10,13 +10,21 @@ getDrive <- function() {
   
   # -------------------------
   
-  gene_effect_long <- getFileData('gene_dep_scores@drive')
+  gene_effect_long <- getFileData('gene_effect@drive') %>%
+    as.data.frame()
   
-  gene_effect_long2 <- gene_effect_long %>%
-    as.data.frame() %>%
-    rename(gene = X1) %>%
-    #tibble::rownames_to_column("celllinename") %>%
-    tidyr::pivot_longer(!gene, names_to = "celllinename", values_to = "d2") %>%
+  # the Drive RNAi come in 2 different formats 
+  if (grepl("\\(.*\\)", gene_effect_long[1, 1])) {
+    gene_effect_long2 <- gene_effect_long %>%
+      rename(gene = 1) %>%
+      tidyr::pivot_longer(!gene, names_to = "celllinename", values_to = "d2") 
+  } else {
+    gene_effect_long2 <- gene_effect_long %>%
+      tibble::rownames_to_column("celllinename") %>%
+      tidyr::pivot_longer(!celllinename, names_to = "gene", values_to = "d2")
+  }
+  
+  gene_effect_long2 <- gene_effect_long2 %>%
     dplyr::mutate(geneid = gsub(".* \\(", "(", gene)) %>%
     dplyr::select(-gene) %>%
     dplyr::mutate(geneid = gsub("(\\(|\\))", "", geneid)) %>%
