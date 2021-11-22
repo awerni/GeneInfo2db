@@ -2,7 +2,7 @@
 #'
 #' @return
 #' @export
-#' 
+#'
 #' @importFrom dplyr na_if
 #' @importFrom logger log_trace
 #' @importFrom magrittr `%>%`
@@ -24,19 +24,19 @@ getCelllineAnnotation <- function() {
     print(sample_info[is.na(sample_info$CCLE_Name),])
     stop("sample_info$CCLE_Name should not contain NA!")
   }
-  
+
   if ("Alias" %in% colnames(sample_info)) {
     sample_info = sample_info %>% rename(alias = Alias)
   }
-  
+
   #sample_info <- sample_info %>% distinct()
-  
+
   no <- table(sample_info$CCLE_Name)
   no <- names(no[no>1])
   sample_info <- sample_info %>% filter(!CCLE_Name %in% no)
-  
-  
-  
+
+
+
   cl_anno <- sample_info %>%
     dplyr::left_join(cell_model_passport1, by = "CCLE_Name") %>%
     dplyr::mutate(species = "human",
@@ -110,14 +110,13 @@ getCelllineAnnotation <- function() {
     dplyr::filter(n > 1)
 
   cl_alternative2 <- cl_alternative %>%
+    dplyr::filter(!is.na(alternative_celllinename)) %>%
     dplyr::filter(!alternative_celllinename %in% cl_dupl$alternative_celllinename)
 
-  
-  
   if(anyNA(cl_anno$celllinename)) {
     stop("celllinename in cl_anno cannot be NA!")
   }
-  
+
   list(cellline.cellline = cl_anno,
        cellline.alternative_celllinename = cl_alternative2)
 }
