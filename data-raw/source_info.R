@@ -103,11 +103,18 @@ other_info <- tibble::tribble(
   "msi", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", "msi"
 )
 
+drugcomb_info <- tibble::tribble(
+  ~data_name, ~url, ~data_file,
+  "drugcomb", "https://drugcomb.fimm.fi/jing/summary_v_1_5_update_with_drugIDs.csv", "summary_v_1_5_update_with_drugIDs.csv"
+)
+
+
 download_file_info <- depmap_info %>%
   bind_rows(drive_info) %>%
   bind_rows(sanger_info) %>%
   bind_rows(prism_info) %>%
-  bind_rows(other_info)
+  bind_rows(other_info) %>%
+  bind_rows(drugcomb_info)
 
 file_version <- tibble::tribble(
   ~description, ~information,
