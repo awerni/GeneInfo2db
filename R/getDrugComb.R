@@ -28,8 +28,6 @@ getDrugComb <- function() {
     slice(1) %>%
     ungroup()
   
-  ?    replace_na
-  
   dc_cl <- jsonlite::fromJSON("https://api.drugcomb.org/cell_lines") %>%
     filter(name %in% unique(data$cell_line_name)) #%>%
     #mutate_all(na_if(., "NA"))
@@ -88,11 +86,14 @@ getDrugComb <- function() {
     inner_join(dc_drug_mapper, by = "dname") %>%
     select(-ri_col, -dname) 
   
+  lab <- "Astra Zeneca"
+  camp <- "ASTRAZENECA_combi"
+  
   data_single <- data_single_row %>%
     bind_rows(data_single_col) %>%
     group_by(celllinename, drugid) %>%
     summarise(ic50 = geomean(ic50_single), actarea = mean(actarea_single), .groups = "drop") %>%
-    mutate(campaign = "ASTRAZENECA", proliferationtest = "SytoxGreen", laboratory = "Astra Zeneca")
+    mutate(campaign = camp, proliferationtest = "SytoxGreen", laboratory = lab)
   
   data_combi <- data2 %>%
     inner_join(dc_drug_mapper, by = c("drug_row" = "dname")) %>%
@@ -100,12 +101,13 @@ getDrugComb <- function() {
     inner_join(dc_drug_mapper, by = c("drug_col" = "dname")) %>%
     rename(drugid2 = drugid) %>%
     select(celllinename, drugid1, drugid2, combo6 = synergy_bliss) %>%
-    mutate(campaign = "ASTRAZENECA", proliferationtest = "SytoxGreen", laboratory = "Astra Zeneca")
+    mutate(campaign = camp, proliferationtest = "SytoxGreen", laboratory = lab)
   
   list(
+    cellline.campaign = tibble(campaign = "ASTRAZENECA_combi", campaigndesc = "Astra Zeneca drug combination screen"),
+    public.laboratory = tibble(laboratory = lab),
     cellline.processedproliftest = data_single,
     cellline.processedcombiproliftest = data_combi
   )
-  
 }
   
