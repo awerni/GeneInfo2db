@@ -3,6 +3,11 @@ getDrugComb <- function() {
   con <- getPostgresqlConnection()
   drug <- dplyr::tbl(con, dbplyr::in_schema("public", "drug"))  %>%
     dplyr::collect()
+  
+  cellline <- dplyr::tbl(con, dbplyr::in_schema("cellline", "cellline"))  %>%
+    dplyr::filter(species == "human")  %>% 
+    dplyr::collect()
+  
   RPostgres::dbDisconnect(con)
   
   dc_studies <- jsonlite::fromJSON("https://api.drugcomb.org/studies") %>%
@@ -23,8 +28,11 @@ getDrugComb <- function() {
     slice(1) %>%
     ungroup()
   
+  ?    replace_na
+  
   dc_cl <- jsonlite::fromJSON("https://api.drugcomb.org/cell_lines") %>%
-    filter(name %in% unique(data$cell_line_name))
+    filter(name %in% unique(data$cell_line_name)) #%>%
+    #mutate_all(na_if(., "NA"))
  
   dc_drugs2 <- dc_drugs %>%
     left_join(drug %>% select(drugid, scientificname), by = c("stitch_name" = "scientificname")) %>%
@@ -50,10 +58,54 @@ getDrugComb <- function() {
     
   #(!is.na(dc_drugs3$drugid)) %>% table()
   
+  dc_cellline_mapper <- dc_cl %>%
+    left_join(cellline %>% select(celllinename, cellosaurus), by = c("cellosaurus_accession" = "cellosaurus")) %>%
+    rename(celllinename1 = celllinename) %>%
+    left_join(cellline %>% select(celllinename, depmap), by = c("depmap_id" = "depmap")) %>%
+    mutate(celllinename = ifelse(is.na(celllinename), celllinename1, celllinename )) %>%
+    select(-celllinename1) %>%
+    rename(celllinename1 = celllinename) %>%
+    left_join(cellline %>% select(celllinename, cell_model_passport), by = c("cell_model_passport_id" = "cell_model_passport")) %>%
+    mutate(celllinename = ifelse(is.na(celllinename), celllinename1, celllinename )) %>%
+    select(name, celllinename) %>%
+    filter(!is.na(celllinename))
   
   data2 <- data %>%
     filter(drug_row %in% dc_drugs3$dname & drug_col %in% dc_drugs3$dname) %>%
+    inner_join(dc_cellline_mapper, by = c("cell_line_name" = "name"))
+  
+  geomean <- function(x) 2^(mean(log2(x)))
+  
+  data_single_row <- data2 %>%
+    select(dname = drug_row, celllinename, ri_row, ic50_single = ic50_row) %>%
+    mutate(actarea_single = ri_row/100) %>%
+    inner_join(dc_drug_mapper, by = "dname") %>%
+    select(-ri_row, -dname) 
     
- 
+  data_single_col <- data2 %>%
+    select(dname = drug_col, celllinename, ri_col, ic50_single = ic50_col) %>%
+    mutate(actarea_single = ri_col/100) %>%
+    inner_join(dc_drug_mapper, by = "dname") %>%
+    select(-ri_col, -dname) 
+  
+  data_single <- data_single_row %>%
+    bind_rows(data_single_col) %>%
+    group_by(celllinename, drugid) %>%
+    summarise(ic50 = geomean(ic50_single), actarea = mean(actarea_single), .groups = "drop") %>%
+    mutate(campaign = "ASTRAZENECA", proliferationtest = "SytoxGreen", laboratory = "Astra Zeneca")
+  
+  data_combi <- data2 %>%
+    inner_join(dc_drug_mapper, by = c("drug_row" = "dname")) %>%
+    rename(drugid1 = drugid) %>%
+    inner_join(dc_drug_mapper, by = c("drug_col" = "dname")) %>%
+    rename(drugid2 = drugid) %>%
+    select(celllinename, drugid1, drugid2, combo6 = synergy_bliss) %>%
+    mutate(campaign = "ASTRAZENECA", proliferationtest = "SytoxGreen", laboratory = "Astra Zeneca")
+  
+  list(
+    cellline.processedproliftest = data_single,
+    cellline.processedcombiproliftest = data_combi
+  )
+  
 }
   
