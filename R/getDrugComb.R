@@ -100,7 +100,9 @@ getDrugComb <- function() {
     rename(drugid1 = drugid) %>%
     inner_join(dc_drug_mapper, by = c("drug_col" = "dname")) %>%
     rename(drugid2 = drugid) %>%
-    select(celllinename, drugid1, drugid2, combo6 = synergy_bliss) %>%
+    select(celllinename, drugid1, drugid2, synergy_bliss) %>%
+    group_by(celllinename, drugid1, drugid2) %>%
+    summarise(combo6 = mean(synergy_bliss), .groups = "drop") %>%
     mutate(campaign = camp, proliferationtest = "SytoxGreen", laboratory = lab)
   
   list(
