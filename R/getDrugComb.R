@@ -96,10 +96,13 @@ getDrugComb <- function() {
     mutate(campaign = camp, proliferationtest = "SytoxGreen", laboratory = lab)
   
   data_combi <- data2 %>%
-    inner_join(dc_drug_mapper, by = c("drug_row" = "dname")) %>%
-    rename(drugid1 = drugid) %>%
     inner_join(dc_drug_mapper, by = c("drug_col" = "dname")) %>%
+    rename(drugid1 = drugid) %>%
+    inner_join(dc_drug_mapper, by = c("drug_row" = "dname")) %>%
     rename(drugid2 = drugid) %>%
+    mutate(d = if_else(drugid2 < drugid1, drugid2, drugid1)) %>%
+    mutate(drugid2 = if_else(drugid2 == d, drugid1, drugid2)) %>%
+    mutate(drugid1 = d) %>%
     select(celllinename, drugid1, drugid2, synergy_bliss) %>%
     group_by(celllinename, drugid1, drugid2) %>%
     summarise(combo6 = mean(synergy_bliss), .groups = "drop") %>%
