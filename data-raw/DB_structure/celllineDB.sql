@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 9.x                               */
-/* Created on:     8/19/2021 5:30:28 AM                         */
+/* Created on:     28/02/2022 3:01:47 pm                        */
 /*==============================================================*/
 
 
@@ -59,7 +59,7 @@ create table CELLLINE (
    COMMENT              TEXT                 null,
    PUBLIC               BOOL                 null,
    TDPID                SERIAL               not null,
-   LOSSOFY              BOOL                 NULL,
+   LOSSOFY              BOOL                 null,
    constraint PK_CELLLINE primary key (CELLLINENAME)
 );
 
@@ -406,6 +406,11 @@ alter table CELLLINE2GENESIGNATURE
       references CELLLINE (CELLLINENAME)
       on delete cascade on update cascade;
 
+alter table CELLLINE2GENESIGNATURE
+   add constraint FK_CELLLINE_REFERENCE_GENESIGN foreign key (SIGNATURE)
+      references GENESIGNATURE (SIGNATURE)
+      on delete cascade on update cascade;
+
 alter table CELLLINEASSIGNMENT
    add constraint FK_CELLLINE_Assignment foreign key (CELLLINENAME)
       references CELLLINE (CELLLINENAME)
@@ -424,6 +429,11 @@ alter table DNASEQRUN
 alter table FUSIONDESCRIPTION
    add constraint FK_FUSIONDE_REFERENCE_PROCESSE foreign key (PROCESSEDFUSION)
       references PROCESSEDFUSIONGENE (PROCESSEDFUSION)
+      on delete restrict on update restrict;
+
+alter table FUSIONDESCRIPTION
+   add constraint FK_FUSIONDE_REFERENCE_FUSIONTY foreign key (FUSIONTYPE)
+      references FUSIONTYPE (FUSIONTYPE)
       on delete restrict on update restrict;
 
 alter table HLATYPE
@@ -452,6 +462,16 @@ alter table MUTATIONAL_SIGNATURE_PROFILE
       on delete restrict on update restrict;
 
 alter table PROCESSEDCOMBIPROLIFTEST
+   add constraint FK_PROCESSE_DRUG1 foreign key (DRUGID1)
+      references DRUG (DRUGID)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDCOMBIPROLIFTEST
+   add constraint FK_PROCESSE_DRUG2 foreign key (DRUGID2)
+      references DRUG (DRUGID)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDCOMBIPROLIFTEST
    add constraint FK_PROCESSE_REFERENCE_CAMPAIGN foreign key (CAMPAIGN)
       references CAMPAIGN (CAMPAIGN)
       on delete restrict on update restrict;
@@ -461,10 +481,20 @@ alter table PROCESSEDCOMBIPROLIFTEST
       references CELLLINE (CELLLINENAME)
       on delete restrict on update restrict;
 
+alter table PROCESSEDCOMBIPROLIFTEST
+   add constraint FK_PROCESSE_REFERENCE_LABORATO foreign key (LABORATORY)
+      references LABORATORY (LABORATORY)
+      on delete restrict on update restrict;
+
 alter table PROCESSEDCOPYNUMBER
    add constraint FK_PROCESSE_CopyNumber_CELLLINE foreign key (CELLLINENAME)
       references CELLLINE (CELLLINENAME)
       on delete restrict on update restrict;
+
+alter table PROCESSEDCOPYNUMBER
+   add constraint FK_PROCESSEDCOPY_2_GENE foreign key (ENSG)
+      references GENE (ENSG)
+      on delete cascade on update cascade;
 
 alter table PROCESSEDDEPLETIONSCORE
    add constraint FK_PROCESSE_REFERENCE_DEPLETIO foreign key (DEPLETIONSCREEN)
@@ -472,8 +502,23 @@ alter table PROCESSEDDEPLETIONSCORE
       on delete restrict on update restrict;
 
 alter table PROCESSEDDEPLETIONSCORE
+   add constraint FK_PROCESSE_REFERENCE_GENE foreign key (ENSG)
+      references GENE (ENSG)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDDEPLETIONSCORE
    add constraint FK_PROCESSED_DEPLETION_CELLLINE foreign key (CELLLINENAME)
       references CELLLINE (CELLLINENAME)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDFUSIONGENE
+   add constraint FK_Fusion_GENE1 foreign key (ENSG1)
+      references GENE (ENSG)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDFUSIONGENE
+   add constraint FK_fusion_GENE2 foreign key (ENSG2)
+      references GENE (ENSG)
       on delete restrict on update restrict;
 
 alter table PROCESSEDFUSIONGENE
@@ -492,6 +537,11 @@ alter table PROCESSEDMETABOLITE
       on delete restrict on update restrict;
 
 alter table PROCESSEDPROLIFTEST
+   add constraint FK_PROCESSE_REFERENCE_DRUG foreign key (DRUGID)
+      references DRUG (DRUGID)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDPROLIFTEST
    add constraint FK_PROCESSE_REFERENCE_CAMPAIGN foreign key (CAMPAIGN)
       references CAMPAIGN (CAMPAIGN)
       on delete restrict on update restrict;
@@ -501,9 +551,19 @@ alter table PROCESSEDPROLIFTEST
       references CELLLINE (CELLLINENAME)
       on delete restrict on update restrict;
 
+alter table PROCESSEDPROLIFTEST
+   add constraint FK_PROCESSE_REFERENCE_LABORATO foreign key (LABORATORY)
+      references LABORATORY (LABORATORY)
+      on delete restrict on update restrict;
+
 alter table PROCESSEDPROTEINEXPRESSION
    add constraint FK_PROCESSE_PROT_CELLLINE foreign key (CELLLINENAME)
       references CELLLINE (CELLLINENAME)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDPROTEINEXPRESSION
+   add constraint FK_PROCESSE_REFERENCE_ANTIBODY foreign key (ANTIBODY)
+      references ANTIBODY (ANTIBODY)
       on delete restrict on update restrict;
 
 alter table PROCESSEDPROTEINMASSSPEC
@@ -511,14 +571,34 @@ alter table PROCESSEDPROTEINMASSSPEC
       references CELLLINE (CELLLINENAME)
       on delete restrict on update restrict;
 
+alter table PROCESSEDPROTEINMASSSPEC
+   add constraint FK_PROCESSE_REFERENCE_UNIPROTA foreign key (UNIPROTID, ACCESSION)
+      references UNIPROTACCESSION (UNIPROTID, ACCESSION)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDRNASEQ
+   add constraint FK_PROCESSEDRNASEQ_GENE foreign key (ENSG)
+      references GENE (ENSG)
+      on delete cascade on update cascade;
+
 alter table PROCESSEDRNASEQ
    add constraint FK_PROCESSE_REFERENCE_RNASEQRU foreign key (RNASEQRUNID)
       references RNASEQRUN (RNASEQRUNID)
       on delete cascade on update cascade;
 
 alter table PROCESSEDRNASEQTRANSCRIPT
+   add constraint FK_RNASEQTRANS_TRANSCRIPTS foreign key (ENST)
+      references TRANSCRIPT (ENST)
+      on delete cascade on update cascade;
+
+alter table PROCESSEDRNASEQTRANSCRIPT
    add constraint FK_RNASEQTRANS_NGSRUN foreign key (RNASEQRUNID)
       references RNASEQRUN (RNASEQRUNID)
+      on delete cascade on update cascade;
+
+alter table PROCESSEDSEQUENCE
+   add constraint FK_PROCESSE_REFERENCE_TRANSCRI foreign key (ENST)
+      references TRANSCRIPT (ENST)
       on delete cascade on update cascade;
 
 alter table PROCESSEDSEQUENCE
@@ -532,12 +612,27 @@ alter table RNASEQRUN
       on delete restrict on update restrict;
 
 alter table RNASEQRUN
+   add constraint FK_RNASEQRU_REFERENCE_NGSPROTO foreign key (NGSPROTOCOLID)
+      references NGSPROTOCOL (NGSPROTOCOLID)
+      on delete restrict on update restrict;
+
+alter table RNASEQRUN
    add constraint FK_RNASEQRU_REFERENCE_RNASEQGR foreign key (RNASEQGROUPID)
       references RNASEQGROUP (RNASEQGROUPID)
+      on delete restrict on update restrict;
+
+alter table RNASEQRUN
+   add constraint FK_RNASEQRU_REFERENCE_LABORATO foreign key (LABORATORY)
+      references LABORATORY (LABORATORY)
       on delete restrict on update restrict;
 
 alter table SIMILARITY
    add constraint FK_SIMILARI_REFERENCE_CELLLINE foreign key (CELLLINENAME)
       references CELLLINE (CELLLINENAME)
+      on delete cascade on update cascade;
+
+alter table SIMILARITY
+   add constraint FK_SIMILARI_REFERENCE_SIMILARI foreign key (SIMILARITYTYPE)
+      references SIMILARITYTYPE (SIMILARITYTYPE)
       on delete cascade on update cascade;
 
