@@ -1,3 +1,5 @@
+set search_path = cellline,public;
+
 alter table CELLLINE2GENESIGNATURE
    add constraint FK_CELLLINE_REFERENCE_GENESIGN foreign key (SIGNATURE)
       references GENESIGNATURE (SIGNATURE)
@@ -45,7 +47,7 @@ alter table PROCESSEDPROLIFTEST
 alter table PROCESSEDPROTEINEXPRESSION
    add constraint FK_PROCESSE_REFERENCE_ANTIBODY foreign key (ANTIBODY)
       references ANTIBODY (ANTIBODY)
-      on delete restrict on update restrictoinfo_21Q4.hg38=# alter table PROCESSEDPROTEINMASSSPEC
+      on delete restrict on update restrict;
 alter table PROCESSEDPROTEINMASSSPEC
   add constraint FK_PROCESSE_REFERENCE_UNIPROTA foreign key (UNIPROTID, ACCESSION)
       references UNIPROTACCESSION (UNIPROTID, ACCESSION)
