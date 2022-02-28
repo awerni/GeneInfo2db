@@ -138,3 +138,12 @@ INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllin
 INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('SW982_SOFT_TISSUE', 'SW 982', 'BI');
 INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('TK10_KIDNEY', 'TK-10', 'BI');
 INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('TT_OESOPHAGUS', 'T.T_eso', 'BI');
+INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('CACO2_LARGE_INTESTINE', 'Caco2', 'Paper');
+INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('HELA_CERVIX', 'HeLaS3', 'Paper');
+INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('HEPG2_LIVER', 'HepG2', 'Paper');
+INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('JURKAT_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'Jurkat E6.1', 'Paper');
+INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('LNCAPCLONEFGC_PROSTATE', 'LNCaP', 'Paper');
+INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('MIAPACA2_PANCREAS', 'MiaPaca-2', 'Paper');
+INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('PANC0813_PANCREAS', 'Panc-08-13', 'Paper');
+INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('PANC1_PANCREAS', 'Panc-1', 'Paper');
+INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('SUIT2_PANCREAS', 'Suit-2', 'Paper');
