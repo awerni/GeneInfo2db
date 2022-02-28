@@ -37,8 +37,8 @@ refseq_info <- tibble::tribble(
 )
 
 # ------figshare (depmap) and direct links -----------
-DEPMAP_API_PATH <- 16924132 # 21Q3 = 15160110
-DEPMAP_VERSION  <- "21q4"
+DEPMAP_API_PATH <- 19139906 # 21Q4 = 16924132 # 21Q3 = 15160110
+DEPMAP_VERSION  <- "22q1"
 depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", DEPMAP_API_PATH)) %>%
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
