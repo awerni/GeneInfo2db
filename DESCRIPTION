@@ -1,6 +1,6 @@
 Package: GeneInfo2db
 Title: Imports gene and omics data into a PostgreSQL database
-Version: 0.1.3
+Version: 0.1.4
 Authors@R: person("Andreas", "Wernitznig", email = "awernitz@broadinstitute.org",
                   role = c("aut", "cre"))
 Description: Fills the bioinfo database with gene information and omics data from depmap.org 
