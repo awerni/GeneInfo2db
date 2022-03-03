@@ -1,6 +1,6 @@
 /*==============================================================*/
-/* DBMS name:      PostgreSQL 9.x                               */
-/* Created on:     28/02/2022 3:01:47 pm                        */
+/* DBMS name:      PGSQL9                                       */
+/* Created on:     03/03/2022 1:38:34 pm                        */
 /*==============================================================*/
 
 
@@ -90,6 +90,16 @@ create table CELLLINEPANEL (
    CELLLINEPANELDESCRIPTION TEXT                 null,
    SPECIES              TEXT                 null,
    constraint PK_CELLLINEPANEL primary key (CELLLINEPANEL)
+);
+
+/*==============================================================*/
+/* Table: DEPENDENCYSCREEN                                      */
+/*==============================================================*/
+create table DEPENDENCYSCREEN (
+   DEPENDENCYSCREEN     TEXT                 not null,
+   DEPENDENCYSCREENDESCRIPTION TEXT                 null,
+   LIBRARYVERSION       TEXT                 null,
+   constraint PK_DEPENDENCYSCREEN primary key (DEPENDENCYSCREEN)
 );
 
 /*==============================================================*/
@@ -257,12 +267,42 @@ create table PROCESSEDFUSIONGENE (
 );
 
 /*==============================================================*/
+/* Table: PROCESSEDGENEDEPENDENCY                               */
+/*==============================================================*/
+create table PROCESSEDGENEDEPENDENCY (
+   ENSG                 TEXT                 not null,
+   CELLLINENAME         TEXT                 not null,
+   DEPENDENCYSCREEN     TEXT                 not null,
+   LOG10FC              FLOAT4               null,
+   constraint PK_PROCESSEDGENEDEPENDENCY primary key (CELLLINENAME, ENSG, DEPENDENCYSCREEN)
+);
+
+/*==============================================================*/
 /* Table: PROCESSEDMETABOLITE                                   */
 /*==============================================================*/
 create table PROCESSEDMETABOLITE (
    METABOLITE           TEXT                 null,
    CELLLINENAME         TEXT                 null,
    SCORE                FLOAT4               null
+);
+
+/*==============================================================*/
+/* Table: PROCESSEDPARALOGDEPENDENCY                            */
+/*==============================================================*/
+create table PROCESSEDPARALOGDEPENDENCY (
+   CELLLINENAME         TEXT                 not null,
+   ENSG1                TEXT                 not null,
+   ENSG2                TEXT                 not null,
+   DEPENDENCYSCREEN     TEXT                 not null,
+   STRONG               FLOAT4               null,
+   SENSITIVE_LETHALITY  FLOAT4               null,
+   SENSITIVE_RECOVERY   FLOAT4               null,
+   PVALUE_STRONG        FLOAT4               null,
+   PVALUE_SENSITIVE_LETHALITY FLOAT4               null,
+   FDR_STRONG           FLOAT4               null,
+   FDR_SENSITIVE_LETHALITY FLOAT4               null,
+   LOG10FC              FLOAT4               null,
+   constraint PK_PROCESSEDPARALOGDEPENDENCY primary key (CELLLINENAME, ENSG1, ENSG2, DEPENDENCYSCREEN)
 );
 
 /*==============================================================*/
@@ -526,6 +566,21 @@ alter table PROCESSEDFUSIONGENE
       references CELLLINE (CELLLINENAME)
       on delete restrict on update restrict;
 
+alter table PROCESSEDGENEDEPENDENCY
+   add constraint FK_PROCESSE_REFERENCE_DEPENDEN foreign key (DEPENDENCYSCREEN)
+      references DEPENDENCYSCREEN (DEPENDENCYSCREEN)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDGENEDEPENDENCY
+   add constraint FK_PROCESSE_REFERENCE_GENE foreign key (ENSG)
+      references GENE (ENSG)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDGENEDEPENDENCY
+   add constraint FK_PROCESSE_REFERENCE_CELLLINE foreign key (CELLLINENAME)
+      references CELLLINE (CELLLINENAME)
+      on delete restrict on update restrict;
+
 alter table PROCESSEDMETABOLITE
    add constraint FK_PROCESSE_CELLLINE2_CELLLINE foreign key (CELLLINENAME)
       references CELLLINE (CELLLINENAME)
@@ -534,6 +589,26 @@ alter table PROCESSEDMETABOLITE
 alter table PROCESSEDMETABOLITE
    add constraint FK_PROCESSE_METABOLIT_METABOLI foreign key (METABOLITE)
       references METABOLITE (METABOLITE)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDPARALOGDEPENDENCY
+   add constraint FK_PROCESSE_REFERENCE_DEPENDEN foreign key (DEPENDENCYSCREEN)
+      references DEPENDENCYSCREEN (DEPENDENCYSCREEN)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDPARALOGDEPENDENCY
+   add constraint FK_PROCESSEPARALOG_GENE2 foreign key (ENSG1)
+      references GENE (ENSG)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDPARALOGDEPENDENCY
+   add constraint FK_PROCESSEPARALOG_GENE foreign key (ENSG2)
+      references GENE (ENSG)
+      on delete restrict on update restrict;
+
+alter table PROCESSEDPARALOGDEPENDENCY
+   add constraint FK_PROCESSE_REFERENCE_CELLLINE foreign key (CELLLINENAME)
+      references CELLLINE (CELLLINENAME)
       on delete restrict on update restrict;
 
 alter table PROCESSEDPROLIFTEST
