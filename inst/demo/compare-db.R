@@ -1,7 +1,5 @@
 library(GeneInfo2db)
 
-
-
 sql <- "
 SELECT *, pg_size_pretty(total_bytes) AS total
     , pg_size_pretty(index_bytes) AS index
@@ -25,7 +23,7 @@ dbNew <- getPostgresqlConnection()
 dbNewSummary <- dbGetQuery(dbNew, statement = sql)
 
 oldUser <- "reader"
-oldName <- "bioinfo_21Q1.hg38"
+oldName <- "bioinfo_21Q4i.hg38"
 oldPassword <- ""
 oldDb <-
   getPostgresqlConnection(user = oldUser,
@@ -65,3 +63,4 @@ size_diff = round((total_bytes - old_total_bytes) / ((
     old_total_bytes,
     size_diff
   )
+
