@@ -224,14 +224,14 @@ SELECT prs.rnaseqrunid, celllinename, prs.enst, prs.log2tpm, prs.counts FROM cel
 
 ---
 
-DROP MATERIALIZED VIEW IF EXISTS cellline.hallmarkscore;
+--DROP MATERIALIZED VIEW IF EXISTS cellline.hallmarkscore;
 
-CREATE MATERIALIZED VIEW cellline.hallmarkscore AS
-WITH hallmark AS (SELECT gene_set, species, unnest(ensg_array) AS ensg FROM msigdb WHERE gene_set LIKE 'HALLMARK%'),
-     expr AS (SELECT celllinename, ensg, log2tpm FROM cellline.processedrnaseqview WHERE ensg IN (SELECT distinct ensg FROM hallmark)),
-     stats AS (SELECT ensg, avg(log2tpm) AS log2tpm_mean, stddev(log2tpm) AS log2tpm_stddev FROM expr GROUP BY ensg HAVING stddev(log2tpm) > 0)
-SELECT gene_set, celllinename, sum(log2tpm) AS log2tpm_sum, sum((log2tpm - log2tpm_mean)/log2tpm_stddev) AS z_score_sum
-  FROM expr e INNER JOIN hallmark h ON e.ensg = h.ensg INNER JOIN stats s ON e.ensg = s.ensg GROUP BY gene_set, celllinename;
+--CREATE MATERIALIZED VIEW cellline.hallmarkscore AS
+--WITH hallmark AS (SELECT gene_set, species, unnest(ensg_array) AS ensg FROM msigdb WHERE gene_set LIKE 'HALLMARK%'),
+--     expr AS (SELECT celllinename, ensg, log2tpm FROM cellline.processedrnaseqview WHERE ensg IN (SELECT distinct ensg FROM hallmark)),
+--     stats AS (SELECT ensg, avg(log2tpm) AS log2tpm_mean, stddev(log2tpm) AS log2tpm_stddev FROM expr GROUP BY ensg HAVING stddev(log2tpm) > 0)
+--SELECT gene_set, celllinename, sum(log2tpm) AS log2tpm_sum, sum((log2tpm - log2tpm_mean)/log2tpm_stddev) AS z_score_sum
+--  FROM expr e INNER JOIN hallmark h ON e.ensg = h.ensg INNER JOIN stats s ON e.ensg = s.ensg GROUP BY gene_set, celllinename;
 
 ---
 
