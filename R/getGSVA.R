@@ -21,12 +21,12 @@ getGSVA <- function() {
   RPostgres::dbDisconnect(con)
   # ---------------------------
   
-  gsva_result <- gsva(hallmark_expr_matrix, gs) %>%
+  gsva_result <- GSVA::gsva(hallmark_expr_matrix, gs) %>%
     as.data.frame() %>%
     rownames_to_column("gene_set") %>%
     pivot_longer(!gene_set, names_to = "celllinename", values_to = "gsva")
   
-  ssgsea_result <- gsva(hallmark_expr_matrix, gs, method = "ssgsea") %>%
+  ssgsea_result <- GSVA::gsva(hallmark_expr_matrix, gs, method = "ssgsea") %>%
     as.data.frame() %>%
     rownames_to_column("gene_set") %>%
     pivot_longer(!gene_set, names_to = "celllinename", values_to = "ssgsea")
