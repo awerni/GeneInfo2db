@@ -1,6 +1,6 @@
 /*==============================================================*/
-/* DBMS name:      PGSQL9                                       */
-/* Created on:     03/03/2022 1:38:34 pm                        */
+/* DBMS name:      PostgreSQL 9.x                               */
+/* Created on:     21/04/2022 12:00:35 am                       */
 /*==============================================================*/
 
 
@@ -133,6 +133,17 @@ create table FUSIONDESCRIPTION (
    PROCESSEDFUSION      INT4                 not null,
    FUSIONTYPE           TEXT                 not null,
    constraint PK_FUSIONDESCRIPTION primary key (PROCESSEDFUSION, FUSIONTYPE)
+);
+
+/*==============================================================*/
+/* Table: HALLMARKSCORE                                         */
+/*==============================================================*/
+create table HALLMARKSCORE (
+   GENE_SET             TEXT                 not null,
+   CELLLINENAME         TEXT                 not null,
+   GSVA                 FLOAT4               null,
+   SSGSEA               FLOAT4               null,
+   constraint PK_HALLMARKSCORE primary key (GENE_SET, CELLLINENAME)
 );
 
 /*==============================================================*/
@@ -474,6 +485,11 @@ alter table FUSIONDESCRIPTION
 alter table FUSIONDESCRIPTION
    add constraint FK_FUSIONDE_REFERENCE_FUSIONTY foreign key (FUSIONTYPE)
       references FUSIONTYPE (FUSIONTYPE)
+      on delete restrict on update restrict;
+
+alter table HALLMARKSCORE
+   add constraint FK_HALLMARK_REFERENCE_CELLLINE foreign key (CELLLINENAME)
+      references CELLLINE (CELLLINENAME)
       on delete restrict on update restrict;
 
 alter table HLATYPE
