@@ -8,8 +8,8 @@ getGeneSet <- function() {
   )
   
   geneassignment <- get_gene_translation(gene_df$geneid) %>%
-    select(-geneid) %>%
-    mutate(genesetname = "essential genes")
+    dplyr::select(-geneid) %>%
+    dplyr::mutate(genesetname = "essential genes")
   
   list(
     public.geneset = geneset,
