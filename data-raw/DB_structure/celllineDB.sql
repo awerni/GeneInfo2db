@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      PostgreSQL 9.x                               */
-/* Created on:     21/04/2022 12:00:35 am                       */
+/* Created on:     05/05/2022 12:46:21 pm                       */
 /*==============================================================*/
 
 
@@ -99,6 +99,7 @@ create table DEPENDENCYSCREEN (
    DEPENDENCYSCREEN     TEXT                 not null,
    DEPENDENCYSCREENDESCRIPTION TEXT                 null,
    LIBRARYVERSION       TEXT                 null,
+   ISDEFAULT            BOOL                 null,
    constraint PK_DEPENDENCYSCREEN primary key (DEPENDENCYSCREEN)
 );
 
