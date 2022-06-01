@@ -1,4 +1,4 @@
-getGSVA <- function() {
+getCelllineGSVA <- function() {
   # ----------------------------
   con <- getPostgresqlConnection()
   

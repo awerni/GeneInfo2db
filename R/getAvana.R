@@ -1,5 +1,5 @@
-getAvana <- function() {
-  # ceres <- get_CRISPR_screen(
+getCelllineAvana <- function() {
+  # ceres <- getCellline_CRISPR_screen(
   #   screen_name = 'Avana', 
   #   screen_desc = 'Broad Institute DepMap Avana CRISPR Screen',
   #   file_essentials = "common_essentials",
@@ -9,7 +9,7 @@ getAvana <- function() {
   #   file_dependency = "Achilles_gene_dependency_CERES"
   # )
   
-  chronos <- get_CRISPR_screen_chronos(
+  chronos <- getCellline_CRISPR_screen_chronos(
     screen_name = 'Avana', 
     screen_desc = 'Broad Institute DepMap Avana CRISPR Screen',
     file_effect = "Achilles_gene_effect",

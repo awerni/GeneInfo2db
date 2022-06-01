@@ -1,4 +1,4 @@
-getRNAseq <- function(.splits = 20) {
+getCelllineRNAseq <- function(.splits = 20) {
   con <- getPostgresqlConnection()
   
   gene <- dplyr::tbl(con, "gene") %>%
@@ -70,7 +70,7 @@ getRNAseq <- function(.splits = 20) {
     for (n in allSplits) {
       
       freeMemory <- gsub(grep("free memory", system("vmstat -s -S M", intern = TRUE), value = TRUE), pattern = " |(free memory)", replacement = "")
-      log_trace("getRNAseq - split {file_n} - Free memory: {freeMemory}")
+      log_trace("getCelllineRNAseq - split {file_n} - Free memory: {freeMemory}")
       expr_counts_long_set <- expr_counts_long %>% filter(rnaseqrunid %in% n)
       expr_TPM_long_set <- expr_TPM_long %>% filter(rnaseqrunid %in% n)
       

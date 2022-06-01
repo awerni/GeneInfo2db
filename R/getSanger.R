@@ -1,5 +1,5 @@
-getSanger <- function() {
-  # ceres <- get_CRISPR_screen(
+getCelllineSanger <- function() {
+  # ceres <- getCellline_CRISPR_screen(
   #   screen_name = 'Sanger',
   #   screen_desc = 'Sanger CRISPR Screen',
   #   file_essentials = "essential_genes@sanger-ceres",
@@ -9,7 +9,7 @@ getSanger <- function() {
   #   file_dependency = "gene_dependency@sanger-ceres"
   # )
   
-  chronos <- get_CRISPR_screen_chronos(
+  chronos <- getCellline_CRISPR_screen_chronos(
     screen_name = 'Sanger',
     screen_desc = 'Sanger CRISPR Screen',
     file_effect = "gene_effect@sanger-crispr-project-score",

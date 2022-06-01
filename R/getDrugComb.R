@@ -1,4 +1,4 @@
-getDrugComb <- function() {
+getCelllineDrugComb <- function() {
   
   con <- getPostgresqlConnection()
   drug <- dplyr::tbl(con, dbplyr::in_schema("public", "drug"))  %>%

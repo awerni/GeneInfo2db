@@ -1,4 +1,4 @@
-get_CRISPR_screen_chronos <- function(
+getCellline_CRISPR_screen_chronos <- function(
   screen_name,
   screen_desc,
   file_effect,
