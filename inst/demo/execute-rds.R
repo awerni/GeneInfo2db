@@ -52,54 +52,54 @@ read_rds("uniprot") %>% writeDatabase()
 getCelllineAnnotation() %>% save_data("getCelllineAnnotation")
 read_rds("getCelllineAnnotation") %>% writeDatabase()
 
-getMicrosatelliteStability() %>% save_data("getMicrosatelliteStability")
-read_rds("getMicrosatelliteStability") %>% writeDatabase()
+getCelllineMicrosatelliteStability() %>% save_data("getCelllineMicrosatelliteStability")
+read_rds("getCelllineMicrosatelliteStability") %>% writeDatabase()
 
 # --------- gene expression ------
-getRNAseq() %>% save_data("getRNAseq")
-read_rds("getRNAseq") %>% writeDatabase()
+getCelllineRNAseq() %>% save_data("getCelllineRNAseq")
+read_rds("getCelllineRNAseq") %>% writeDatabase()
 
 # --------- mutations -------------
-getMutations() %>% save_data("getMutations")
+getCelllineMutations() %>% save_data("getCelllineMutations")
 
-read_rds("getMutations.rds") %>% writeDatabase()
+read_rds("getCelllineMutations.rds") %>% writeDatabase()
 invisible(replicate(10, gc()))
-modifyCanonicalTranscript()
+modifyCelllineCanonicalTranscript()
 
 
 # --------- copy numbers -----------------
-getCopynumber() %>% save_data("getCopynumber")
+getCelllineCopynumber() %>% save_data("getCelllineCopynumber")
 invisible(replicate(10, gc()))
-read_rds("getCopynumber.rds") %>% writeDatabase()
+read_rds("getCelllineCopynumber.rds") %>% writeDatabase()
 
 
 # --------- protein expression -----
-getProteomicsRPPA() %>% save_data("getProteomicsRPPA")
-read_rds("getProteomicsRPPA") %>% writeDatabase()
-getProteomicsMassSpec() %>% save_data("getProteomicsMassSpec")
-read_rds("getProteomicsMassSpec") %>% writeDatabase()
+getCelllineProteomicsRPPA() %>% save_data("getCelllineProteomicsRPPA")
+read_rds("getCelllineProteomicsRPPA") %>% writeDatabase()
+getCelllineProteomicsMassSpec() %>% save_data("getCelllineProteomicsMassSpec")
+read_rds("getCelllineProteomicsMassSpec") %>% writeDatabase()
 invisible(replicate(10, gc()))
 
 # --------- depletion screens ------------
-getAvana() %>% save_data("getAvana")
-read_rds("getAvana") %>% writeDatabase()
-getSanger() %>% save_data("getSanger")
+getCelllineAvana() %>% save_data("getCelllineAvana")
+read_rds("getCelllineAvana") %>% writeDatabase()
+getCelllineSanger() %>% save_data("getCelllineSanger")
 
-read_rds("getSanger") %>% writeDatabase()
+read_rds("getCelllineSanger") %>% writeDatabase()
 
-#getDrive() 
+#getCelllineDrive() 
 
 # --------- Prism drug screen ------------
-getPrism() %>% save_data("getPrism")
-read_rds("getPrism") %>% writeDatabase()
+getCelllinePrism() %>% save_data("getCelllinePrism")
+read_rds("getCelllinePrism") %>% writeDatabase()
 
 # --------- metabolites ------------
-getMetabolomics() %>% save_data("getMetabolomics")
-read_rds("getMetabolomics") %>% writeDatabase()
+getCelllineMetabolomics() %>% save_data("getCelllineMetabolomics")
+read_rds("getCelllineMetabolomics") %>% writeDatabase()
 
 # ---------- metastatic map --------
-getMetMap() %>% save_data("getMetMap")
-read_rds("getMetMap") %>% writeDatabase()
+getCelllineMetMap() %>% save_data("getCelllineMetMap")
+read_rds("getCelllineMetMap") %>% writeDatabase()
 
 # ---------- MSigDB ----------------
 getMSigDB() %>% save_data("getMSigDB")
@@ -107,19 +107,19 @@ read_rds("getMSigDB") %>% writeDatabase()
 
 
 # --------- gene expression signatures --------
-createSigMPAS() %>%  save_data("createSigMPAS")
-read_rds("createSigMPAS") %>% writeDatabase()
+createCelllineSigMPAS() %>%  save_data("createCelllineSigMPAS")
+read_rds("createCelllineSigMPAS") %>% writeDatabase()
 
-createSigRAS()  %>% save_data("createSigRAS")
-read_rds("createSigRAS") %>% writeDatabase()
-
-
-createSigTP53()  %>% save_data("createSigTP53")
-read_rds("createSigTP53") %>% writeDatabase()
+createCelllineSigRAS()  %>% save_data("createCelllineSigRAS")
+read_rds("createCelllineSigRAS") %>% writeDatabase()
 
 
-createSigIFN()  %>% save_data("createSigIFN")
-read_rds("createSigIFN") %>% writeDatabase()
+createCelllineSigTP53()  %>% save_data("createCelllineSigTP53")
+read_rds("createCelllineSigTP53") %>% writeDatabase()
+
+
+createCelllineSigIFN()  %>% save_data("createCelllineSigIFN")
+read_rds("createCelllineSigIFN") %>% writeDatabase()
 
 # ------- refresh Views -----------
 createDatabase("refreshView")

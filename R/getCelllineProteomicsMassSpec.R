@@ -1,4 +1,4 @@
-getProteomicsMassSpec <- function() {
+getCelllineProteomicsMassSpec <- function() {
 
   con <- getPostgresqlConnection()
 

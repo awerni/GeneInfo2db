@@ -1,5 +1,5 @@
 # https://doi.org/10.1016/j.cell.2018.03.035
-createSigRAS <- function() {
+createCelllineSigRAS <- function() {
   
   con <- getPostgresqlConnection()
   

@@ -1,4 +1,4 @@
-getProteomicsRPPA <- function() {
+getCelllineProteomicsRPPA <- function() {
   
   con <- getPostgresqlConnection()
   

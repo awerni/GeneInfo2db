@@ -1,4 +1,4 @@
-modifyCanonicalTranscript <- function() {
+modifyCelllineCanonicalTranscript <- function() {
   con <- getPostgresqlConnection()
   
   sql <- paste0("SELECT ensg, enst, iscanonical FROM transcript ",

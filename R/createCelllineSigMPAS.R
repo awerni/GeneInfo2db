@@ -4,7 +4,7 @@
 # we are using log2-scaled values as expression input to the z-score 
 # normalization.
 
-createSigMPAS <- function() {
+createCelllineSigMPAS <- function() {
 
   sig_MPAS <- c("CCND1", "DUSP4", "DUSP6", "EPHA2", "EPHA4", "ETV4", "ETV5", "PHLDA1", "SPRY2", "SPRY4")
 

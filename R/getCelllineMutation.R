@@ -1,4 +1,4 @@
-getMutations <- function() {
+getCelllineMutations <- function() {
   con <- getPostgresqlConnection()
   
   transcript <- dplyr::tbl(con, "transcript") %>%

@@ -1,4 +1,4 @@
-getMicrosatelliteStability <- function() {
+getCelllineMicrosatelliteStability <- function() {
 
   con <- getPostgresqlConnection()
 

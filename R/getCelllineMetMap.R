@@ -1,4 +1,4 @@
-getMetMap <- function() {
+getCelllineMetMap <- function() {
   con <- getPostgresqlConnection()
   
   cellline <- dplyr::tbl(con, dbplyr::in_schema("cellline", "cellline"))  %>%

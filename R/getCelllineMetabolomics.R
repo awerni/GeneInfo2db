@@ -1,4 +1,4 @@
-getMetabolomics <- function() {
+getCelllineMetabolomics <- function() {
 
   con <- getPostgresqlConnection()
 

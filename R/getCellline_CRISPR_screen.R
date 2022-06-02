@@ -1,4 +1,4 @@
-get_CRISPR_screen <- function(screen_name, screen_desc, file_essentials,
+getCellline_CRISPR_screen <- function(screen_name, screen_desc, file_essentials,
                               file_nonessentials, file_effect,
                               file_effect_unscaled, file_dependency,
                               splits = 50) {
