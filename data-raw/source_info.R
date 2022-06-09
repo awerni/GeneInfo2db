@@ -152,6 +152,73 @@ gmt.files <- tibble::tribble(
   "h.all.v7.4.entrez.gmt", "h", "hallmark", "hallmark"
 )
 
+TCGA_study <- tibble::tribble(
+  ~project, ~tumortype,
+  "LAML", "acute myeloid leukemia",
+  "ACC",  "adrenocortical carcinoma",
+  "BLCA", "bladder urothelial carcinoma",
+  "LGG",  "brain lower grade glioma",
+  "BRCA", "breast invasive carcinoma",
+  "CESC", "cervical squamous cell carcinoma and endocervical adenocarcinoma",
+  "CHOL", "cholangiocarcinoma",
+  "LCML", "chronic myelogenous leukemia",
+  "COAD", "colon adenocarcinoma",
+  "CNTL", "controls",
+  "ESCA", "esophageal carcinoma",
+  "FPPP", "ffpe pilot phase II",
+  "GBM",  "glioblastoma multiforme",
+  "HNSC", "head and neck squamous cell carcinoma",
+  "KICH", "kidney chromophobe",
+  "KIRC", "kidney renal clear cell carcinoma",
+  "KIRP", "kidney renal papillary cell carcinoma",
+  "LIHC", "liver hepatocellular carcinoma",
+  "LUAD", "lung adenocarcinoma",
+  "LUSC", "lung squamous cell carcinoma",
+  "DLBC", "lymphoid neoplasm diffuse large b-cell lymphoma",
+  "MESO", "mesothelioma",
+  "MISC", "miscellaneous",
+  "OV",   "ovarian serous cystadenocarcinoma",
+  "PAAD", "pancreatic adenocarcinoma",
+  "PCPG", "pheochromocytoma and paraganglioma",
+  "PRAD", "prostate adenocarcinoma",
+  "READ", "rectum adenocarcinoma",
+  "SARC", "sarcoma",
+  "SKCM", "skin cutaneous melanoma",
+  "STAD", "stomach adenocarcinoma",
+  "TGCT", "testicular germ cell tumors",
+  "THYM", "thymoma",
+  "THCA", "thyroid carcinoma",
+  "UCS",  "uterine carcinosarcoma",
+  "UCEC", "uterine corpus endometrial carcinoma",
+  "UVM",  "uveal melanoma"
+)
+
+TCGA_sample_type <- tibble::tribble(
+  ~code, ~tissue_definition,
+  "01", "Primary Solid Tumor",
+  "02", "Recurrent Solid Tumor",
+  "03", "Primary Blood Derived Cancer - Peripheral Blood",
+  "04", "Recurrent Blood Derived Cancer - Bone Marrow",
+  "05", "Additional - New Primary",
+  "06", "Metastatic",
+  "07", "Additional Metastatic",
+  "08", "Human Tumor Original Cells",
+  "09", "Primary Blood Derived Cancer - Bone Marrow",
+  "10", "Blood Derived Normal",
+  "11", "Solid Tissue Normal",
+  "12", "Buccal Cell Normal",
+  "13", "EBV Immortalized Normal",
+  "14", "Bone Marrow Normal",
+  "15", "sample type 15",
+  "16", "sample type 16",
+  "20", "Control Analyte",
+  "40", "Recurrent Blood Derived Cancer - Peripheral Blood",
+  "50", "Cell Lines",
+  "60", "Primary Xenograft Tissue",
+  "61", "Cell Line Derived Xenograft Tissue",
+  "99", "sample type 99"
+)
+
 # -----------------
 save(db_info, gene_info, refseq_info, db_compara, download_file_info,
-     gmt.files, file_version, file = "data/source_info.rdata")
+     gmt.files, TCGA_study, TCGA_sample_type, file_version, file = "data/source_info.rdata")
