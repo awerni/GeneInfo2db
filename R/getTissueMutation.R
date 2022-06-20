@@ -1,4 +1,4 @@
-getTissueMutation <- function(nCores = parallel::detectCores() / 2) {
+getTissueMutation <- function(nCores = 1) {
   
   project <- TCGAbiolinks::getGDCprojects()$project_id
   project <- grep("TCGA", project, value = TRUE)
@@ -35,7 +35,7 @@ getTissueMutation <- function(nCores = parallel::detectCores() / 2) {
     res <- parallel::parLapply(cl, project, getData)
     parallel::stopCluster(cl)    
   } else {
-    res <- lapply(project, getData)
+    res <- pbapply::pblapply(project, getData)
   }
   
   list(
