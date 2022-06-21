@@ -15,19 +15,27 @@ getTissueMutation <- function() {
     
     TCGAbiolinks::GDCdownload(query)
     maf <- TCGAbiolinks::GDCprepare(query)
-    maf %>%
+    res <- maf %>%
       dplyr::mutate(
         TISSUENAME = substr(Tumor_Sample_Barcode, 1, 15),
-        DNAzygosity = t_alt_count / t_depth
+        DNAzygosity = t_alt_count / t_depth,
+        AAMmutation = ifelse(Variant_Classification == "Silent", "wt", HGVSp_Short)
       ) %>%
+      filter(!grepl(pattern = "(Flank)|(UTR)", Variant_Classification)) %>%
       dplyr::select(
         TISSUENAME,
         ENST = Transcript_ID,
         DNAmutation = HGVSc,
-        AAMmutation = HGVSp_Short,
+        AAMmutation,
         DNAzygosity
-      ) %>% 
-      mutate(AAMmutation = gsub(pattern = ".*=$", replacement = "wt", AAMmutation))
+      )
+    res %>% group_by(TISSUENAME, ENST) %>% summarise(
+      DNAmutation = paste(DNAmutation, collapse = ";"),
+      AAMmutation = paste(AAMmutation, collapse = ";"),
+      DNAzygosity = max(DNAzygosity),
+      .groups = "drop"
+    ) %>% 
+    as.data.frame()
   }
   
   res <- lapply(project, getData)
