@@ -101,8 +101,8 @@ getTCGAAnnotation <- function() {
   )
   
   tissue <- tissuesample %>%
-    # filter(Short_Letter_Code != "NB") %>% ????????????
     rename(stage = ajcc_pathologic_stage) %>%
+    filter(tissue_definition != "Blood Derived Normal") %>% 
     mutate(
       tumortype_adjacent = ifelse(grepl("Normal", tissue_definition), tumortype, NA),
       tumortype = ifelse(grepl("Normal", tissue_definition), "normal", tumortype),

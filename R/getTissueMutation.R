@@ -1,10 +1,9 @@
-getTissueMutation <- function(nCores = 1) {
+getTissueMutation <- function() {
   
   project <- TCGAbiolinks::getGDCprojects()$project_id
   project <- grep("TCGA", project, value = TRUE)
   
   getData <- function(p) {
-    library(dplyr)
     query <- TCGAbiolinks::GDCquery(
       project = p, 
       data.category = "Simple Nucleotide Variation", 
@@ -27,16 +26,11 @@ getTissueMutation <- function(nCores = 1) {
         DNAmutation = HGVSc,
         AAMmutation = HGVSp_Short,
         DNAzygosity
-      )
+      ) %>% 
+      mutate(gsub(pattern = ".*=$", replacement = "wt", AAMmutation))
   }
   
-  if(nCores > 1) {
-    cl <- parallel::makeCluster(nCores)
-    res <- parallel::parLapply(cl, project, getData)
-    parallel::stopCluster(cl)    
-  } else {
-    res <- pbapply::pblapply(project, getData)
-  }
+  res <- lapply(project, getData)
   
   list(
     tiff.processedSequence = dplyr::bind_rows(res)
