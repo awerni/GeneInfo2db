@@ -27,7 +27,7 @@ getTissueMutation <- function() {
         AAMmutation = HGVSp_Short,
         DNAzygosity
       ) %>% 
-      mutate(gsub(pattern = ".*=$", replacement = "wt", AAMmutation))
+      mutate(AAMmutation = gsub(pattern = ".*=$", replacement = "wt", AAMmutation))
   }
   
   res <- lapply(project, getData)
