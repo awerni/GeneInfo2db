@@ -3,37 +3,52 @@ getTissueProcessedRNASeq <- function() {
   human_projects <- recount3::available_projects()
   human_projects <- human_projects %>% filter(file_source %in% c("gtex", "tcga"))
   
-  # At least for now, only TCGA is supported
-  human_projects <- human_projects %>% filter(file_source %in% c("tcga"))
-  
   result <- lapply(
       1:nrow(human_projects),
       processProcessedRNASeqExperiment,
-      human_projects = human_projects,
-      id_column = "tcga.tcga_barcode"
+      human_projects = human_projects
     )
   
   RNAseqGroup <- data.frame(
-    RNAseqGroupID = 1,
-    RNAseqName = "TCGA",
+    RNAseqGroupID = 1:2,
+    RNAseqName = c("TCGA", "GTEX"),
     RdataFilePath = NA,
     processingPipeline = ""
   ) 
   
   list(
-    tissue.processedRNASeq = result %>% lapply("[[", "tissue.processedRNASeq"),
-    tissue.RNAseqRun = result %>% lapply("[[", "tissue.RNAseqRun"),
+    tissue.processedRNASeq = result %>% lapply("[[", "tissue.processedRNASeq") %>% bind_rows(),
+    tissue.RNAseqRun = result %>% lapply("[[", "tissue.RNAseqRun") %>% bind_rows(),
     tissue.RNAseqGroup = RNAseqGroup
   )
   
 }
 
 
-processProcessedRNASeqExperiment <- function(id, human_projects, id_column = "tcga.tcga_barcode") {
+processProcessedRNASeqExperiment <- function(id, human_projects) {
   
   library(S4Vectors) # without this it fails on recount3 1.4.0
   # TODO: only tcga is supported!
   proj <- human_projects[id,]
+  
+  if(proj$file_source == "tcga") {
+    
+    id_column = "tcga.tcga_barcode"
+    get_tissue_id <- function(x) substr(x, 1, 15)
+    get_tissue_run <- function(x) substr(x[,id_column], 16, 16)
+    
+  } else if(proj$file_source == "gtex") {
+    
+    id_column = "gtex.sampid"
+    get_tissue_id <- function(x) x
+    get_tissue_run <- function(x) as.numeric(gsub(rownames(x), pattern = ".*\\.", replacement = ""))
+    
+  } else {
+    stop("Other file source is not supported")
+  }
+  
+  
+  
   message("Processing: ", id, " ", proj$project, " ", proj$file_source)
   
   rse_gene <- recount3::create_rse(proj)
@@ -43,12 +58,16 @@ processProcessedRNASeqExperiment <- function(id, human_projects, id_column = "tc
   rse_gene <- rse_gene[!(duplicated(ensg) | duplicated(ensg, fromLast = TRUE)), ]
   
   # Remove duplicated tissuenames
-  col_ids <- SummarizedExperiment::colData(rse_gene)[[id_column]]
+  col_data <- SummarizedExperiment::colData(rse_gene)
+  col_ids <- col_data[[id_column]]
+  
+  run_id <- get_tissue_run(col_data)
+  
   unique_ids <- tibble(col_id = col_ids) %>%
     mutate(
       id = row_number(),
-      sample = substr(col_ids, 16, 16),
-      clean_id = substr(col_id, 1, 15)
+      sample = run_id,
+      clean_id = get_tissue_id(col_id)
     ) %>%
     group_by(clean_id) %>%
     filter(max(sample) == sample) %>%
@@ -74,11 +93,17 @@ processProcessedRNASeqExperiment <- function(id, human_projects, id_column = "tc
   
   col_data <- SummarizedExperiment::colData(rse_gene)
   
+  
+  RNAseqGroupID <- case_when(
+    proj$file_source == "tcga" ~ 1,
+    proj$file_source == "gtex" ~ 2 
+  )
+  
   RNAseqRun <- data.frame(
     RNAseqRunID = rownames(col_data),
-    tissuename = substring(col_data[, id_column], 1, 15),
+    tissuename = get_tissue_id(col_data[, id_column]),
     laboratory = "recount3",
-    RNAseqGroupID = 1,
+    RNAseqGroupID = RNAseqGroupID,
     cellbatchID = NA,
     directory = "",
     isXenograft = FALSE,
