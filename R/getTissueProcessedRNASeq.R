@@ -1,7 +1,3 @@
-library(dplyr)
-
-## Find all available human projects
-
 getTissueProcessedRNASeq <- function() {
   
   human_projects <- recount3::available_projects()
@@ -35,10 +31,12 @@ getTissueProcessedRNASeq <- function() {
 
 processProcessedRNASeqExperiment <- function(id, human_projects, id_column = "tcga.tcga_barcode") {
   
+  library(S4Vectors) # without this it fails on recount3 1.4.0
   # TODO: only tcga is supported!
   proj <- human_projects[id,]
   message("Processing: ", id, " ", proj$project, " ", proj$file_source)
-  rse_gene <- recount3::create_rse()
+  
+  rse_gene <- recount3::create_rse(proj)
   
   # Remove duplicated genes
   ensg <- substr(SummarizedExperiment::rowData(rse_gene)[,"gene_id"], 1, 15)
@@ -64,7 +62,7 @@ processProcessedRNASeqExperiment <- function(id, human_projects, id_column = "tc
   
   to_data_frame <- function(dt, name = "counts") {
     as.data.frame.table(dt, responseName = name) %>%
-      rename(ENSG = Var1, RNAseqRunID = Var2) %>%
+      dplyr::rename(ENSG = Var1, RNAseqRunID = Var2) %>%
       mutate(ENSG =  substr(ENSG, 1, 15))
   }
   
