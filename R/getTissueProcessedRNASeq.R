@@ -62,8 +62,6 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
     stop("Other file source is not supported")
   }
   
-  
-  
   message("Processing: ", id, " ", proj$project, " ", proj$file_source)
   
   withr::with_package("S4Vectors", {
@@ -89,11 +87,21 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
   rse_gene <- rse_gene[,unique_ids]
   
   # Calculate counts
-  SummarizedExperiment::assay(rse_gene, "counts") <- recount3::transform_counts(rse_gene)
-  
-  # TODO: sum duplicates after extracting 15 digits of ensg 
+  raw_count <- SummarizedExperiment::assay(rse_gene, "raw_counts")
   ensg <- substr(SummarizedExperiment::rowData(rse_gene)[,"gene_id"], 1, 15)
-  rse_gene <- rse_gene[!(duplicated(ensg) | duplicated(ensg, fromLast = TRUE)), ]
+  
+  rse_gene_clean <- rse_gene[!duplicated(ensg),]
+
+  duplicated_counts <- raw_count[duplicated(ensg),,drop = FALSE]
+  duplicated_ensg <- ensg[duplicated(ensg)]
+  duplicated_counts <- rowsum(duplicated_counts, duplicated_ensg)
+  
+  clean_ensg <- substr(rownames(assay(rse_gene_clean, "raw_counts")), 1, 15)
+  idxes <- sapply(rownames(duplicated_counts), function(x) which(x == clean_ensg))
+  assay(rse_gene_clean, "raw_counts")[idxes,] <- assay(rse_gene_clean, "raw_counts")[idxes,] + duplicated_counts
+  
+  
+  SummarizedExperiment::assay(rse_gene, "counts") <- recount3::transform_counts(rse_gene)
   
   to_data_frame <- function(dt, name = "counts") {
     as.data.frame.table(dt, responseName = name) %>%
@@ -245,7 +253,7 @@ getTissueGTEXAnno <- function(rse_gene) {
   )) %>% distinct()
   
   stopifnot("Found duplicated patient name" =
-              !isTRUE(anyDuplicated(patient_anno$PATIENTNAME)))
+              (anyDuplicated(patient_anno$PATIENTNAME) == 0))
   
   list(
     tissue.tissue = as.data.frame(tissue_anno),
