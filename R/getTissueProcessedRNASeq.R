@@ -26,11 +26,19 @@ getTissueProcessedRNASeq <- function(projects) {
       human_projects = human_projects
     )
   
-  list(
+  result <- list(
     tissue.processedRNASeq = result %>% lapply("[[", "tissue.processedRNASeq") %>% bind_rows(),
     tissue.RNAseqRun = result %>% lapply("[[", "tissue.RNAseqRun") %>% bind_rows(),
+    tissue.tissue = result %>% lapply("[[", "tissue.tissue") %>% bind_rows(),
+    tissue.patient = result %>% lapply("[[", "tissue.patient") %>% bind_rows(),
   )
   
+  if(NROW(result$tissue.tissue) == 0) {
+    result$tissue.tissue <- NULL
+    result$tissue.patient <- NULL
+  }
+  
+  result
 }
 
 
@@ -121,10 +129,18 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
     sourceID = col_data[, id_column]
   )
   
-  list(
+  result <- list(
     tissue.processedRNASeq = processedRNASeq,
     tissue.RNAseqRun = RNAseqRun
   )
+  
+  if(proj$file_source == "gtex") {
+    anno <- getTissueGTEXAnno(rse_gene)
+    result$tissue.tissue <- anno$tissue.tissue
+    result$tissue.patient <- anno$tissue.patient
+  }
+  
+  result
   
 }
 
@@ -232,8 +248,8 @@ getTissueGTEXAnno <- function(rse_gene) {
               !isTRUE(anyDuplicated(patient_anno$PATIENTNAME)))
   
   list(
-    tissue.tissue = tissue_anno,
-    tissue.patient = patient_anno
+    tissue.tissue = as.data.frame(tissue_anno),
+    tissue.patient = as.data.frame(patient_anno)
   )
   
 }
