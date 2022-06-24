@@ -96,12 +96,9 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
   duplicated_ensg <- ensg[duplicated(ensg)]
   duplicated_counts <- rowsum(duplicated_counts, duplicated_ensg)
   
-  clean_ensg <- substr(rownames(assay(rse_gene_clean, "raw_counts")), 1, 15)
+  clean_ensg <- substr(rownames(SummarizedExperiment::assay(rse_gene_clean, "raw_counts")), 1, 15)
   idxes <- sapply(rownames(duplicated_counts), function(x) which(x == clean_ensg))
-  assay(rse_gene_clean, "raw_counts")[idxes,] <- assay(rse_gene_clean, "raw_counts")[idxes,] + duplicated_counts
-  
-  
-  SummarizedExperiment::assay(rse_gene, "counts") <- recount3::transform_counts(rse_gene)
+  SummarizedExperiment::assay(rse_gene_clean, "raw_counts")[idxes,] <- SummarizedExperiment::assay(rse_gene_clean, "raw_counts")[idxes,] + duplicated_counts
   
   to_data_frame <- function(dt, name = "counts") {
     as.data.frame.table(dt, responseName = name) %>%
@@ -109,7 +106,9 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
       mutate(ENSG =  substr(ENSG, 1, 15))
   }
   
-  counts <- to_data_frame(SummarizedExperiment::assay(rse_gene, "counts"))
+  counts <- to_data_frame(SummarizedExperiment::assay(rse_gene, "raw_counts"))
+  
+  SummarizedExperiment::assay(rse_gene, "counts") <- recount3::transform_counts(rse_gene)
   log2tpm <- to_data_frame(recount::getTPM(rse_gene), name = "tpm") %>%
     mutate(log2tpm = log2(tpm)) %>% select(-tpm)
   
