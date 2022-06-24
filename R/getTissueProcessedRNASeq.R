@@ -23,14 +23,14 @@ getTissueProcessedRNASeq <- function(projects) {
   result <- lapply(
       1:nrow(projects),
       processProcessedRNASeqExperiment,
-      human_projects = human_projects
+      human_projects = projects
     )
   
   result <- list(
     tissue.processedRNASeq = result %>% lapply("[[", "tissue.processedRNASeq") %>% bind_rows(),
     tissue.RNAseqRun = result %>% lapply("[[", "tissue.RNAseqRun") %>% bind_rows(),
     tissue.tissue = result %>% lapply("[[", "tissue.tissue") %>% bind_rows(),
-    tissue.patient = result %>% lapply("[[", "tissue.patient") %>% bind_rows(),
+    tissue.patient = result %>% lapply("[[", "tissue.patient") %>% bind_rows()
   )
   
   if(NROW(result$tissue.tissue) == 0) {
