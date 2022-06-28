@@ -90,13 +90,17 @@ getTissueProjectCopyNumber <- function(project) {
   anno_data <- SummarizedExperiment::colData(data_gene)
   data_gene <- data_gene[,substr(rownames(anno_data), 14, 15) == "01"]
   
-  abs_copy_number <- as.data.frame.table(SummarizedExperiment::assay(data_gene, "copy_number"),
+  copy_raw <- SummarizedExperiment::assay(data_gene, "copy_number")
+  rownames(copy_raw) <- substr(rownames(copy_raw),1,15)
+  copy_raw <- copy_raw[!duplicated(rownames(copy_raw)), ]
+  
+  abs_copy_number <- as.data.frame.table(copy_raw,
                                          responseName = "totalAbsCopyNumber") %>%
     dplyr::rename(ENSG = Var1, tissuename = Var2) %>%
     mutate(ENSG =  substr(ENSG, 1, 15),
            tissuename = substr(tissuename, 1, 15)) %>%
     filter(!is.na(ENSG))
   
-  result <- dplyr::full_join(relative_copy_number, abs_copy_number, by = c("tissuename", "ensg"))
+  result <- dplyr::full_join(relative_copy_number, abs_copy_number, by = c("tissuename", "ENSG"))
   result
 }
