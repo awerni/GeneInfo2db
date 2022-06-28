@@ -3,7 +3,7 @@ getTCGApancancerData <- function(tissuename) {
   tissuename_to_patientname <-
     data.frame(tissuename = tissuename) %>%
     mutate(patientname = substr(tissuename, 1, 12)) %>%
-    tissuename_to_patientname %>% filter(!grepl("1.$", tissuename))
+    filter(!grepl("1.$", tissuename))
   
   # ------------------------------------------------------------------------------
   # immune environments
@@ -50,11 +50,11 @@ getTCGApancancerData <- function(tissuename) {
   ding2018 <- readxl::read_excel(file_ding2018, skip = 2, col_types = c("text", "numeric", "skip"))
   
   microsatellite_stability <- ding2018 %>%
-    select(patientname = `Participant Barcode`, msisensor_score = `MSIsensor score`) %>%
+    select(patientname = `Participant Barcode`, microsatellite_stability_score = `MSIsensor score`) %>%
     # classify into MSS and MSI based on Ding 2018
-    mutate(microsatellite_stability = if_else(msisensor_score < 4, "MSS", "MSI")) %>%
+    mutate(microsatellite_stability_class = if_else(microsatellite_stability_score < 4, "MSS", "MSI")) %>%
     inner_join(tissuename_to_patientname, by = "patientname") %>%
-    select(tissuename, patientname, microsatellite_stability, msisensor_score)
+    select(tissuename, patientname, microsatellite_stability_class, microsatellite_stability_score)
   
   # SANITY CHECK:
   # 286 patients have a 1-to-n mapping between patientname and tissuename
@@ -94,8 +94,8 @@ getTCGApancancerData <- function(tissuename) {
   # ------------------------------------------------------------------------------
   
   ### download 
-  url <- "https://www.cell.com/cms/10.1016/j.cell.2018.03.022/attachment/a2f5572a-9732-4fd0-a72e-71c14de55169/mmc6.xls"
-  file_hoadley2018 <- "hoadley_supplemental_table_s6.xls"
+  url <- "https://www.cell.com/cms/10.1016/j.cell.2018.03.022/attachment/e4d26bc1-9b6d-47ed-ae46-79b633443c59/mmc6.xlsx"
+  file_hoadley2018 <- "hoadley_supplemental_table_s6.xlsx"
   if (!file.exists(file_hoadley2018)) {
     download.file(url, destfile = file_hoadley2018, method = "wget", quiet = TRUE)
   }
@@ -108,12 +108,12 @@ getTCGApancancerData <- function(tissuename) {
                                            "C24: LAML", "C25: Pan-SCC (Chr 11 amp)", "C26: LIHC", "C27: Pan-SCC (HPV)", "C28: Pan-Kidney"))
   
   ### process
-  hoadley2018 <- read_xlsx(file_hoadley2018, na = "NA", skip = 1)
+  hoadley2018 <- readxl::read_xlsx(file_hoadley2018, na = "NA", skip = 1)
   iCluster <- hoadley2018 %>%
     rename(patientname = `Sample ID`) %>%
     left_join(iClusterNames, by = "iCluster") %>%
     select(-iCluster) %>%
-    rename(iCluster = iClusterName) %>%
+    rename(icluster = iClusterName) %>%
     inner_join(tissuename_to_patientname, by = "patientname")
   
   # SANITY CHECK:
@@ -145,7 +145,7 @@ getTCGApancancerData <- function(tissuename) {
   # 
   # ### process
   # # the downloaded file contains some typos, which are corrected below
-  # xCellTypes <- read_excel(file_xCell2) %>%
+  # xCellTypes <- readxl::read_excel(file_xCell2) %>%
   #   rename(celltype_short = `Cell types`, celltype = `Full name`) %>%
   #   mutate(celltype = gsub("Multipotent rogenitors", "Multipotent progenitors", celltype)) %>%
   #   mutate(celltype = gsub("Xonventional dendritic cells", "Conventional dendritic cells", celltype)) %>%
@@ -166,14 +166,14 @@ getTCGApancancerData <- function(tissuename) {
   # ------------------------------------------------------------------------------
   
   ### download
-  url <- "https://www.cell.com/cms/10.1016/j.celrep.2018.03.086/attachment/17876b53-062e-48ee-b5ba-a0c0f2409098/mmc2.xlsx"
+  url <- "https://www.cell.com/cms/10.1016/j.celrep.2018.03.086/attachment/fe9b9105-6e45-4ae4-bd6a-0ab0820fbf7f/mmc2.xlsx"
   file_saltz2018 <- "saltz2018_supplemental_table1.xlsx"
   if (!file.exists(file_saltz2018)) {
     download.file(url, destfile = file_saltz2018, method = "wget", quiet = TRUE)
   }
   
   ### process
-  saltz2018 <- read_excel(file_saltz2018)
+  saltz2018 <- readxl::read_excel(file_saltz2018)
   
   digital_pathology <- saltz2018 %>%
     select(patientname = ParticipantBarcode, TIL_pattern = Global_Pattern) %>%
@@ -201,7 +201,7 @@ getTCGApancancerData <- function(tissuename) {
   if (!file.exists(file_raynaud2018)) {
     download.file(url, destfile = file_raynaud2018, method = "wget", quiet = FALSE)
   }
-  raynaud2018 <- read_xlsx(file_raynaud2018)
+  raynaud2018 <- readxl::read_xlsx(file_raynaud2018)
   
   clones_and_phylo_tree <- raynaud2018 %>%
     select(sample_name, `number of clones`, `Tree score`) %>%
@@ -213,17 +213,19 @@ getTCGApancancerData <- function(tissuename) {
   # tumor purity
   # ------------------------------------------------------------------------------
   
-  url <- "https://media.nature.com/original/nature-assets/ncomms/2015/151204/ncomms9971/extref/ncomms9971-s2.xlsx"
+  url <- "https://static-content.springer.com/esm/art%3A10.1038%2Fncomms9971/MediaObjects/41467_2015_BFncomms9971_MOESM1236_ESM.xlsx"
   file_aran2015 <- "aran2015_supplement_table2.xlsx" 
   if (!file.exists(file_aran2015)) {
     download.file(url, destfile = file_aran2015, method = "wget", quiet = FALSE)
   }
-  aran2015 <- read_xlsx(file_aran2015, skip = 3, na = "NaN")
+  aran2015 <- readxl::read_xlsx(file_aran2015, skip = 3, na = "NaN")
   
   tumor_purity <- aran2015 %>%
     mutate(tissuename = substring(`Sample ID`, 1, 15)) %>%
     filter(!is.na(CPE)) %>%
-    select(tissuename, CPE)
+    select(tissuename, CPE) %>%
+    group_by(tissuename) %>%
+    summarise(tumorpurity = mean(CPE))
   
   # ------------------------------------------------------------------------------
   # ------- read metabolics data ----------------
@@ -231,21 +233,21 @@ getTCGApancancerData <- function(tissuename) {
   # ------------------------------------------------------------------------------
   
   files <- dir(path = "Metabolics", pattern = "*_metabolicsignatures.csv")
-  all_data <- NULL
+  metabolics_raw <- NULL
   
   for (f in files) {
-    a <- read_csv(paste0("Metabolics/", f)) %>%
-      rename(patientname = X1)
-    all_data <- bind_rows(all_data, a)
+    a <- readr::read_csv(paste0("Metabolics/", f)) %>%
+      rename(patientname = 1)
+    metabolics_raw <- bind_rows(metabolics_raw, a)
   }
   
-  all_data_long <- all_data %>%
+  metabolics_raw_long <- metabolics_raw %>%
     gather(metabolic_pathway, score, -patientname) %>%
     mutate(metabolic_pathway = gsub("REACTOME_", "", metabolic_pathway)) %>%
     mutate(metabolic_pathway = gsub("_", " ", tolower(metabolic_pathway))) %>%
     mutate(metabolic_pathway = gsub("rna", "RNA", metabolic_pathway))
   
-  metabolics_data <- all_data_long %>%
+  metabolics_data <- metabolics_raw_long %>%
     select(patientname, metabolic_pathway, score) %>%
     inner_join(tissuename_to_patientname, by = "patientname")
   
@@ -262,13 +264,13 @@ getTCGApancancerData <- function(tissuename) {
   # signaling pathways
   # ------------------------------------------------------------------------------
   
-  url <- "https://www.cell.com/cms/10.1016/j.cell.2018.03.035/attachment/df428b16-a198-4049-8962-04af160a059b/mmc4.xlsx"
+  url <- "https://www.cell.com/cms/10.1016/j.cell.2018.03.035/attachment/4c206a11-2a3e-461a-8707-d60a47ca5750/mmc4.xlsx"
   file_sanches_vega2018 <- "sanches_vega2018_supplemental_table4.xlsx"
   if (!file.exists(file_sanches_vega2018)) {
     download.file(url, destfile = file_sanches_vega2018, method = "wget", quiet = TRUE)
   }
   
-  sanches_vega2018 <- read_xlsx(file_sanches_vega2018, sheet = 3, na = "NA") %>%
+  sanches_vega2018 <- readxl::read_xlsx(file_sanches_vega2018, sheet = 3, na = "NA") %>%
     rename(tissuename = SAMPLE_BARCODE) %>%
     rename(cell_cycle = `Cell Cycle`, rtk_ras = `RTK RAS`, tgf_beta = `TGF-Beta`) %>%
     rename_all(tolower) %>%
@@ -283,16 +285,6 @@ getTCGApancancerData <- function(tissuename) {
   
   pancancer <- list(gi_mol_subtype, microsatellite_stability, immune_environment, 
                     iCluster, digital_pathology, clones_and_phylo_tree, tumor_purity) %>%
-    reduce(full_join) %>%
-    mutate(sql = paste0("UPDATE tissue.tissue SET microsatellite_stability_score = ", valNum(msisensor_score), 
-                        ", microsatellite_stability_class = ", valStr(microsatellite_stability),
-                        ", immune_environment = ", valStr(immune_environment),
-                        ", gi_mol_subgroup = ", valStr(gi_mol_subtype),
-                        ", icluster = ", valStr(iCluster),
-                        ", TIL_pattern = ", valStr(TIL_pattern),
-                        ", tumorpurity = ", valNum(CPE),
-                        ", number_of_clones = ", valNum(number_of_clones),
-                        ", clone_tree_score = ", valNum(clone_tree_score),
-                        " WHERE tissuename = '", tissuename, "'"))
+    reduce(full_join)
   
 }
