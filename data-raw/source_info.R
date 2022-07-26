@@ -37,8 +37,9 @@ refseq_info <- tibble::tribble(
 )
 
 # ------figshare (depmap) and direct links -----------
-DEPMAP_API_PATH <- 19139906 # 21Q4 = 16924132 # 21Q3 = 15160110
-DEPMAP_VERSION  <- "22q1"
+
+DEPMAP_API_PATH <- 19700056 # 22Q1 = 19139906 # 21Q4 = 16924132 # 21Q3 = 15160110
+DEPMAP_VERSION  <- "22q2"
 depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", DEPMAP_API_PATH)) %>%
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
@@ -107,7 +108,6 @@ drugcomb_info <- tibble::tribble(
   ~data_name, ~url, ~data_file,
   "drugcomb", "https://drugcomb.fimm.fi/jing/summary_v_1_5_update_with_drugIDs.csv", "summary_v_1_5_update_with_drugIDs.csv"
 )
-
 
 download_file_info <- depmap_info %>%
   bind_rows(drive_info) %>%
