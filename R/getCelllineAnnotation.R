@@ -35,8 +35,6 @@ getCelllineAnnotation <- function() {
   no <- names(no[no>1])
   sample_info <- sample_info %>% filter(!CCLE_Name %in% no)
 
-
-
   cl_anno <- sample_info %>%
     dplyr::left_join(cell_model_passport1, by = "CCLE_Name") %>%
     dplyr::mutate(species = "human",
@@ -47,8 +45,7 @@ getCelllineAnnotation <- function() {
                   histology_subtype = gsub("_", " ", gsub("_cell", "-cell", na_if(lineage_sub_subtype, ""))),
                   cell_model_passport = coalesce(cell_model_passport2, na_if(Sanger_Model_ID, "")),
                   cellosaurus = na_if(RRID, ""),
-                  growth_type = tolower(na_if(culture_type, "")),
-                  age_at_surgery = as.character(ifelse(age < 1, round(age, 2), round(age))),
+                  growth_type = gsub("[32]d: ", "", tolower(na_if(default_growth_pattern, ""))),
                   metastatic_site = gsub("_", " ", ifelse(primary_or_metastasis == "Metastasis", sample_collection_site, NA)),
                   morphology = ifelse(organ == "fibroblast", organ, NA),
                   organ = ifelse(organ == "fibroblast", gsub("fibroblast ", "", histology_type), organ),
@@ -56,6 +53,7 @@ getCelllineAnnotation <- function() {
                   comment = na_if(depmap_public_comments, ""),
                   public = TRUE) %>%
     dplyr::rename(celllinename = CCLE_Name,
+                  age_at_surgery = age,
                   cosmicid = COSMICID,
                   depmap = DepMap_ID) %>%
     dplyr::select(celllinename, species, organ, tumortype, histology_type, histology_subtype,
