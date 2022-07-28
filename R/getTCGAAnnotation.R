@@ -93,12 +93,14 @@ getTCGAAnnotation <- function() {
       days_to_last_known_alive,
       days_to_death
     ) %>% mutate(
-    PERSON_NEOPLASM_CANCER_STATUS = NA,
-    DEATH_CLASSIFICATION = NA,
-    TREATMENT = NA,
-    HEIGHT = NA,
-    WEIGHT = NA
-  )
+      vital_status = na_if(vital_status, "Not Reported"),
+      vital_status = ifelse(vital_status == "Alive", TRUE, FALSE),
+      person_neoplasm_cancer_status = NA,
+      death_classification = NA,
+      treatment = NA,
+      height = NA,
+      weight = NA
+    )
   
   tissue <- tissuesample %>%
     rename(stage = ajcc_pathologic_stage) %>%
@@ -121,37 +123,38 @@ getTCGAAnnotation <- function() {
       grade
     ) %>%
     mutate(
-      TISSUE_SUBTYPE    = NA,
-      METASTATIC_SITE   = NA,
-      HISTOLOGY_TYPE    = NA,
-      HISTOLOGY_SUBTYPE = NA,
-      AGE_AT_SURGERY    = NA,
-      SAMPLE_DESCRIPTION = NA,
-      COMMENT            = NA,
-      DNASEQUENCED       = NA,
-      TUMORPURITY        = NA,
-      TDPID              = NA,
-      MICROSATELLITE_STABILITY_SCORE  = NA,
-      MICROSATELLITE_STABILITY_CLASS  = NA,
-      IMMUNE_ENVIRONMENT = NA,
-      GI_MOL_SUBGROUP    = NA,
-      ICLUSTER           = NA,
-      TIL_PATTERN        = NA,
-      NUMBER_OF_CLONES      = NA,
-      CLONE_TREE_SCORE      = NA,
-      RNA_INTEGRITY_NUMBER  = NA,
-      MINUTES_ISCHEMIA      = NA,
-      AUTOLYSIS_SCORE       = NA,
-      CONSMOLSUBTYPE        = NA,
-      LOSSOFY               = NA
+      tissue_subtype    = NA,
+      metastatic_site   = NA,
+      histology_type    = NA,
+      histology_subtype = NA,
+      age_at_surgery    = NA,
+      sample_description = NA,
+      comment            = NA,
+      dnasequenced       = NA,
+      tumorpurity        = NA,
+      microsatellite_stability_score  = NA,
+      microsatellite_stability_class  = NA,
+      immune_environment = NA,
+      gi_mol_subgroup    = NA,
+      icluster           = NA,
+      til_pattern        = NA,
+      number_of_clones      = NA,
+      clone_tree_score      = NA,
+      rna_integrity_number  = NA,
+      minutes_ischemia      = NA,
+      autolysis_score       = NA,
+      consmolsubtype        = NA,
+      lossofy               = NA
     )
 
+  tumortype <- data.frame(
+    tumortype = unique(x$tissue.tissue$tumortype),
+    tumortypedesc = NA
+  )
+
   res <- list(
+    tissue.tumortype = tumortype,
     tissue.patient = patient, 
     tissue.tissue = tissue
   )
 }
-
-
-
-
