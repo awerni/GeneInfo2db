@@ -1,5 +1,5 @@
 # https://www.nature.com/articles/s41591-018-0302-5
-createSigIFN <- function() {
+createCelllineSigIFN <- function() {
   
   con <- getPostgresqlConnection()
   

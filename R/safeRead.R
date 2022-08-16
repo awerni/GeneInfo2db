@@ -64,15 +64,15 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
       logger::log_trace("Removing old instance of {filename} - sizes do not match.")
       file.remove(filename)
     } else {
-      log_trace("File is already in cache and it's good to go.")
+      logger::log_trace("File is already in cache and it's good to go.")
       return(list(status = 0, .retries = .retries))
     }
   }
   
-  log_trace("File {filename} not available local cache. Downloading from {url} using safeDownloadFile().")
+  logger::log_trace("File {filename} not available local cache. Downloading from {url} using safeDownloadFile().")
   
   status <- tryCatch(download.file(url, filename), error = function(err) {
-    log_error("Cannot download the {url}.")
+    logger::log_error("Cannot download the {url}.")
     if(file.exists(filename)) unlink(filename)
     err
   })
@@ -82,7 +82,7 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
     if(.retries == 0) {
       stop(status)
     } else {
-      log_trace("Cannot download file - Retrying {url} - number of retries left {.retries - 1}")
+      logger::log_trace("Cannot download file - Retrying {url} - number of retries left {.retries - 1}")
       Sys.sleep(.waitTime)
       res <- safeDownloadFile(url, filename, .retries - 1, .waitTime)
       return(res)
@@ -120,7 +120,7 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
 safeReadFile <- function(url, filename = NULL, read_fnc = readr::read_tsv, .retries = 20, .waitTime = 20, ...) {
   
   if(is.null(filename)) {
-    log_trace("filename in safeReadFile is NULL using basename(url): {basename(url)}")
+    logger::log_trace("filename in safeReadFile is NULL using basename(url): {basename(url)}")
     filename <- basename(url)
     filename <- useLocalFileRepo(filename)
   }
@@ -138,10 +138,10 @@ safeReadFile <- function(url, filename = NULL, read_fnc = readr::read_tsv, .retr
     read_fnc(filename, ...)
     , error = function(e) {
       if(file.exists(filename)) {
-        log_error("{filename} cannot be read. Removing it.")
+        logger::log_error("{filename} cannot be read. Removing it.")
         unlink(filename)
       } else {
-        log_error("{filename} does not exists.")
+        logger::log_error("{filename} does not exists.")
       }
       e
     }
@@ -153,7 +153,7 @@ safeReadFile <- function(url, filename = NULL, read_fnc = readr::read_tsv, .retr
     if(.retries == 0) {
       stop(res)
     } else {
-      log_trace("Problem with downloaded file - Retrying {url} - number of retries left {.retries - 1}")
+      logger::log_trace("Problem with downloaded file - Retrying {url} - number of retries left {.retries - 1}")
       Sys.sleep(.waitTime)
       res <- safeReadFile(url, read_fnc = read_fnc, .retries = .retries - 1, .waitTime = .waitTime, ...)
     }
@@ -184,16 +184,16 @@ guessingReadingFunction <- function(filepath) {
   } else {
     l <- readLines(filepath, n = 1)
     if (grepl("\t", l)) {
-      log_trace("Using readr::read_tsv to read {filepath}")
+      logger::log_trace("Using readr::read_tsv to read {filepath}")
       readr::read_tsv(filepath, na = c("", "NA"), guess_max = 2000)
     } else if (grepl(",", l)) {
-      log_trace("Using readr::read_csv to read {filepath}")
+      logger::log_trace("Using readr::read_csv to read {filepath}")
       readr::read_csv(filepath, na = c("", "NA"), guess_max = 2000)
     } else if (grepl(";", l)) {
-      log_trace("Using readr::read_delim with delim = ';' to read {filepath}")
+      logger::log_trace("Using readr::read_delim with delim = ';' to read {filepath}")
       readr::read_delim(filepath, delim = ";", na = c("", "NA"), guess_max = 2000)
     } else {
-      log_trace("Using readr::read_csv2 to read {filepath}")
+      logger::log_trace("Using readr::read_csv2 to read {filepath}")
       readr::read_csv2(filepath, na = c("", "NA"), guess_max = 2000)
     }
   }

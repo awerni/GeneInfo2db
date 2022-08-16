@@ -1,4 +1,4 @@
-getDrive <- function() {
+getCelllineDrive <- function() {
   con <- getPostgresqlConnection()
   
   cellline <- dplyr::tbl(con, dbplyr::in_schema("cellline", "cellline"))  %>%

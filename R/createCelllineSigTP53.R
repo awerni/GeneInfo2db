@@ -1,5 +1,5 @@
 # https://elifesciences.org/articles/06498
-createSigTP53 <- function() {
+createCelllineSigTP53 <- function() {
 
   con <- getPostgresqlConnection()
   

@@ -1,4 +1,4 @@
-getCopynumber <- function() {
+getCelllineCopynumber <- function() {
   con <- getPostgresqlConnection()
   
   gene <- dplyr::tbl(con, "gene") %>%

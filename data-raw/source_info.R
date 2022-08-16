@@ -37,8 +37,9 @@ refseq_info <- tibble::tribble(
 )
 
 # ------figshare (depmap) and direct links -----------
-DEPMAP_API_PATH <- 19139906 # 21Q4 = 16924132 # 21Q3 = 15160110
-DEPMAP_VERSION  <- "22q1"
+
+DEPMAP_API_PATH <- 19700056 # 22Q1 = 19139906 # 21Q4 = 16924132 # 21Q3 = 15160110
+DEPMAP_VERSION  <- "22q2"
 depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", DEPMAP_API_PATH)) %>%
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
@@ -108,7 +109,6 @@ drugcomb_info <- tibble::tribble(
   "drugcomb", "https://drugcomb.fimm.fi/jing/summary_v_1_5_update_with_drugIDs.csv", "summary_v_1_5_update_with_drugIDs.csv"
 )
 
-
 download_file_info <- depmap_info %>%
   bind_rows(drive_info) %>%
   bind_rows(sanger_info) %>%
@@ -122,6 +122,57 @@ file_version <- tibble::tribble(
   "metabolomics", "CCLE_metabolomics_20190502",
   "Proteomics", "CCLE_RPPA_20181003"
 )
+
+additional_TCGA_antibodies <- tibble::tribble(
+  ~antibody, ~validation_status, ~vendor, ~catalog_number, ~antibody_coarse,
+  "AMPKa", "Caution", "CST", "2532", "AMPKALPHAPT172",
+  "A-Raf", "Valid", "CST", "4432", "ARAF",
+  "ARID1A", "Caution", "Sigma-Aldrich", "HPA005456", "ARID1A",
+  "Axl", "Valid", "CST", "8661", "AXL",
+  "Bcl2A1", "Valid", "Abnova", "PAB8528", "BCL2A1",
+  "Bim (C34C5)", "Valid", "CST", "2933", "BIM",
+  "BRD4", "Valid", "CST", "13440", "BRD4",
+  "CA9 (CAIX)", "Caution", "CST", "5649", "CA9",
+  "c-Abl", "Valid", "CST", "2862", "CABL",
+  "Caspase 3 (cleaved asp175)", "Caution", "CST", "9661", "CASPASE3",
+  "CD26", "Valid", "Abcam", "ab28340", "CD26",
+  "Cdc2 (phospho Y15)", "Caution", "CST", "4539", "CDK1PY15",
+  "CDKN2A/p16INK4a", "Caution", "CST", "92803", "P16INK4A",
+  "Chk1 (phospho S296)", "Valid", "Abcam", "ab79758", "CHK1PS296",
+  "COG3", "Valid", "ProteinTech", "11130-1-AP", "COG3",
+  "C-Raf", "Caution", "Millipore", "04-739", "CRAF",
+  "DUSP4/MKP2", "Valid", "CST", "5149", "DUSP4",
+  "E2F1", "Valid", "CST", "3742", "E2F1",
+  "ENY2", "Caution", "GeneTex", "GTX629542", "ENY2",
+  "GATA6", "Valid", "CST", "5851", "GATA6",
+  "GCN5L2", "Valid", "CST", "3305", "GCN5L2",
+  "Glycogen Synthase", "Valid", "CST", "3886", "GYS",
+  "Glycogen Synthase (phospho S641)", "Valid", "CST", "3891", "GYSPS641",
+  "Hif-1-alpha", "Caution", "CST", "36169", "HIF1ALPHA",
+  "IGF1R (phospho Y1135/Y1136)", "Valid", "CST", "3024", "IGF1RPY1135Y1136",
+  "IRF-1", "Valid", "CST", "8478", "IRF1",
+  "JAB1", "Caution", "Santa Cruz", "sc-13157", "JAB1",
+  "KEAP1", "Valid", "CST", "8047", "KEAP1",
+  "LDHA", "Caution", "CST", "3582", "LDHA",
+  "MACC1", "Valid", "CST", "86290", "MACC1",
+  "Myosin IIa", "Caution", "CST", "3403", "MYOSINIIA",
+  "NAPSIN-A", "Caution", "Epitomics/Abcam", "5795-1/ab129189", "NAPSINA",
+  "NRF2", "Caution", "CST", "12721", "NRF2",
+  "p70/S6K1", "Valid", "Epitomics/Abcam", "1494-1/ab32529", "P70S6K1",
+  "PARP", "Valid", "CST", "9532", "PARP1",
+  "PD-1", "Valid", "GeneTex", "GTX128436", "PDCD1",
+  "PD-L1", "Caution", "CST", "13684", "PDL1",
+  "PKM2", "Caution", "CST", "4053", "PKM2",
+  "PYGB", "Valid", "Sigma-Aldrich", "SAB2900066", "PYGB",
+  "PYGM", "Caution", "Novus", "H00005837-M10", "PYGM",
+  "Rab11", "Caution", "CST", "3539", "RAB11",
+  "S6 Ribosomal Protein", "Valid", "CST", "2317", "S6",
+  "SLC1A5", "Caution", "Sigma-Aldrich", "HPA035240", "SLC1A5",
+  "Synaptophysin", "Caution", "CST", "36406", "SYNAPTOPHYSIN",
+  "VHL-EPPK1", "Caution", "BD Biosciences", "556347", "EPPK1",
+  "XPG", "Caution", "Proteintech Group", "11331-1-AP", "ERCC5"
+)
+
 
 # -------------MSigDB --------------------
 
@@ -152,6 +203,73 @@ gmt.files <- tibble::tribble(
   "h.all.v7.4.entrez.gmt", "h", "hallmark", "hallmark"
 )
 
+TCGA_study <- tibble::tribble(
+  ~project, ~tumortype,
+  "LAML", "acute myeloid leukemia",
+  "ACC",  "adrenocortical carcinoma",
+  "BLCA", "bladder urothelial carcinoma",
+  "LGG",  "brain lower grade glioma",
+  "BRCA", "breast invasive carcinoma",
+  "CESC", "cervical squamous cell carcinoma and endocervical adenocarcinoma",
+  "CHOL", "cholangiocarcinoma",
+  "LCML", "chronic myelogenous leukemia",
+  "COAD", "colon adenocarcinoma",
+  "CNTL", "controls",
+  "ESCA", "esophageal carcinoma",
+  "FPPP", "ffpe pilot phase II",
+  "GBM",  "glioblastoma multiforme",
+  "HNSC", "head and neck squamous cell carcinoma",
+  "KICH", "kidney chromophobe",
+  "KIRC", "kidney renal clear cell carcinoma",
+  "KIRP", "kidney renal papillary cell carcinoma",
+  "LIHC", "liver hepatocellular carcinoma",
+  "LUAD", "lung adenocarcinoma",
+  "LUSC", "lung squamous cell carcinoma",
+  "DLBC", "lymphoid neoplasm diffuse large b-cell lymphoma",
+  "MESO", "mesothelioma",
+  "MISC", "miscellaneous",
+  "OV",   "ovarian serous cystadenocarcinoma",
+  "PAAD", "pancreatic adenocarcinoma",
+  "PCPG", "pheochromocytoma and paraganglioma",
+  "PRAD", "prostate adenocarcinoma",
+  "READ", "rectum adenocarcinoma",
+  "SARC", "sarcoma",
+  "SKCM", "skin cutaneous melanoma",
+  "STAD", "stomach adenocarcinoma",
+  "TGCT", "testicular germ cell tumors",
+  "THYM", "thymoma",
+  "THCA", "thyroid carcinoma",
+  "UCS",  "uterine carcinosarcoma",
+  "UCEC", "uterine corpus endometrial carcinoma",
+  "UVM",  "uveal melanoma"
+)
+
+TCGA_sample_type <- tibble::tribble(
+  ~code, ~tissue_definition,
+  "01", "Primary Solid Tumor",
+  "02", "Recurrent Solid Tumor",
+  "03", "Primary Blood Derived Cancer - Peripheral Blood",
+  "04", "Recurrent Blood Derived Cancer - Bone Marrow",
+  "05", "Additional - New Primary",
+  "06", "Metastatic",
+  "07", "Additional Metastatic",
+  "08", "Human Tumor Original Cells",
+  "09", "Primary Blood Derived Cancer - Bone Marrow",
+  "10", "Blood Derived Normal",
+  "11", "Solid Tissue Normal",
+  "12", "Buccal Cell Normal",
+  "13", "EBV Immortalized Normal",
+  "14", "Bone Marrow Normal",
+  "15", "sample type 15",
+  "16", "sample type 16",
+  "20", "Control Analyte",
+  "40", "Recurrent Blood Derived Cancer - Peripheral Blood",
+  "50", "Cell Lines",
+  "60", "Primary Xenograft Tissue",
+  "61", "Cell Line Derived Xenograft Tissue",
+  "99", "sample type 99"
+)
+
 # -----------------
 save(db_info, gene_info, refseq_info, db_compara, download_file_info,
-     gmt.files, file_version, file = "data/source_info.rdata")
+     gmt.files, TCGA_study, TCGA_sample_type, file_version, file = "data/source_info.rdata")

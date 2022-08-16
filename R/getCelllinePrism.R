@@ -1,4 +1,4 @@
-getPrism <- function() {
+getCelllinePrism <- function() {
 
   con <- getPostgresqlConnection()
 
