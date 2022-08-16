@@ -1,14 +1,14 @@
 getTissueProcessedRNASeqProjects <- function() {
   human_projects <- recount3::available_projects()
-  human_projects %>% filter(file_source %in% c("gtex", "tcga"))
+  human_projects %>% dplyr::filter(file_source %in% c("gtex", "tcga"))
 }
 
 getTissueRNAseqGroup <- function() {
   RNAseqGroup <- data.frame(
-    RNAseqGroupID = 1:2,
-    RNAseqName = c("TCGA", "GTEX"),
-    RdataFilePath = NA,
-    processingPipeline = ""
+    rnaseqgroupid = 1:2,
+    rnaseqname = c("TCGA", "GTEX"),
+    rdatafilepath = NA,
+    processingpipeline = "recount3"
   ) 
   
   list(
@@ -27,10 +27,10 @@ getTissueProcessedRNASeq <- function(projects) {
     )
   
   result <- list(
-    tissue.processedRNASeq = result %>% lapply("[[", "tissue.processedRNASeq") %>% bind_rows(),
-    tissue.RNAseqRun = result %>% lapply("[[", "tissue.RNAseqRun") %>% bind_rows(),
-    tissue.tissue = result %>% lapply("[[", "tissue.tissue") %>% bind_rows(),
-    tissue.patient = result %>% lapply("[[", "tissue.patient") %>% bind_rows()
+    tissue.patient = result %>% lapply("[[", "tissue.patient") %>% bind_rows() %>% distinct(),
+    tissue.tissue = result %>% lapply("[[", "tissue.tissue") %>% bind_rows() %>% distinct(),
+    tissue.rnaseqrun = result %>% lapply("[[", "tissue.rnaseqrun") %>% bind_rows(),
+    tissue.processedrnaseq = result %>% lapply("[[", "tissue.processedrnaseq") %>% bind_rows()
   )
   
   if(NROW(result$tissue.tissue) == 0) {
@@ -51,15 +51,19 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
     id_column = "tcga.tcga_barcode"
     get_tissue_id <- function(x) substr(x, 1, 15)
     get_tissue_run <- function(x) substr(x[,id_column], 16, 16)
+    get_rnaset_run <- function(x) x
+    filter_bad_qc <- function(x) x
     
   } else if(proj$file_source == "gtex") {
     
     id_column = "gtex.sampid"
-    get_tissue_id <- function(x) x
+    get_tissue_id <- function(x) substr(x, 1, nchar(x) - 9)
     get_tissue_run <- function(x) as.numeric(gsub(rownames(x), pattern = ".*\\.", replacement = ""))
+    get_rnaset_run <- function(x) gsub("\\.[0-9]$", "", gsub(".*-", "", x))
+    filter_bad_qc <- function(x) x %>% dplyr::filter(gtex.smafrze != "EXCLUDE")
     
   } else {
-    stop("Other file source is not supported")
+    stop("other file source is not supported")
   }
   
   message("Processing: ", id, " ", proj$project, " ", proj$file_source)
@@ -68,54 +72,76 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
     rse_gene <- recount3::create_rse(proj)  
   })
   
-  # Remove duplicated tissuenames
-  col_data <- SummarizedExperiment::colData(rse_gene)
+  # Remove bad GTEX samples
+  
+  col_data <- SummarizedExperiment::colData(rse_gene) %>%
+    as.data.frame() %>%
+    filter_bad_qc()
+  
+  #col_data <- SummarizedExperiment::colData(rse_gene)
   col_ids <- col_data[[id_column]]
   
   run_id <- get_tissue_run(col_data)
   
   unique_ids <- tibble(col_id = col_ids) %>%
-    mutate(
+    dplyr::mutate(
       id = row_number(),
       sample = run_id,
       clean_id = get_tissue_id(col_id)
     ) %>%
     group_by(clean_id) %>%
-    filter(max(sample) == sample) %>%
+    dplyr::filter(max(sample) == sample) %>%
     dplyr::pull(id)
   
-  rse_gene <- rse_gene[,unique_ids]
+  rse_gene <- rse_gene[, unique_ids]
+  rse_gene@colData@rownames <- get_rnaset_run(rse_gene@colData@rownames)
+  rse_gene@colData@listData$external_id <- get_rnaset_run(rse_gene@colData@listData$external_id)
   
   # Calculate counts
-  raw_count <- SummarizedExperiment::assay(rse_gene, "raw_counts")
+  #raw_count <- SummarizedExperiment::assay(rse_gene, "raw_counts")
   ensg <- substr(SummarizedExperiment::rowData(rse_gene)[,"gene_id"], 1, 15)
+  dupl_ensg <- ensg[duplicated(ensg)]
   
-  rse_gene_clean <- rse_gene[!duplicated(ensg),]
-
-  duplicated_counts <- raw_count[duplicated(ensg),,drop = FALSE]
-  duplicated_ensg <- ensg[duplicated(ensg)]
-  duplicated_counts <- rowsum(duplicated_counts, duplicated_ensg)
-  
-  clean_ensg <- substr(rownames(SummarizedExperiment::assay(rse_gene_clean, "raw_counts")), 1, 15)
-  idxes <- sapply(rownames(duplicated_counts), function(x) which(x == clean_ensg))
-  SummarizedExperiment::assay(rse_gene_clean, "raw_counts")[idxes,] <- SummarizedExperiment::assay(rse_gene_clean, "raw_counts")[idxes,] + duplicated_counts
-  
+  # rse_gene_clean <- rse_gene[!duplicated(ensg),] <------------ WRONG !!
+  # 
+  # duplicated_counts <- raw_count[duplicated(ensg),, drop = FALSE]
+  # duplicated_ensg <- ensg[duplicated(ensg)]
+  # duplicated_counts <- rowsum(duplicated_counts, duplicated_ensg)
+  # 
+  # clean_ensg <- substr(rownames(SummarizedExperiment::assay(rse_gene_clean, "raw_counts")), 1, 15)
+  # idxes <- sapply(rownames(duplicated_counts), function(x) which(x == clean_ensg))
+  # SummarizedExperiment::assay(rse_gene_clean, "raw_counts")[idxes,] <- SummarizedExperiment::assay(rse_gene_clean, "raw_counts")[idxes,] + duplicated_counts
+   
   to_data_frame <- function(dt, name = "counts") {
     as.data.frame.table(dt, responseName = name) %>%
-      dplyr::rename(ENSG = Var1, RNAseqRunID = Var2) %>%
-      mutate(ENSG =  substr(ENSG, 1, 15))
+      dplyr::rename(ensg = Var1, rnaseqrunid = Var2) %>%
+      dplyr::mutate(ensg =  substr(ensg, 1, 15))
   }
   
   counts <- to_data_frame(SummarizedExperiment::assay(rse_gene, "raw_counts"))
   
   SummarizedExperiment::assay(rse_gene, "counts") <- recount3::transform_counts(rse_gene)
   log2tpm <- to_data_frame(recount::getTPM(rse_gene), name = "tpm") %>%
-    mutate(log2tpm = log2(tpm)) %>% select(-tpm)
+    dplyr::mutate(log2tpm = log2(tpm + 1)) %>% select(-tpm)
   
-  processedRNASeq <- counts %>% mutate(log2tpm = log2tpm$log2tpm)
+  col_data <- SummarizedExperiment::colData(rse_gene) %>%
+    as.data.frame() %>%
+    filter_bad_qc()
+
+  processedRNASeq <- counts %>% 
+    dplyr::mutate(log2tpm = log2tpm$log2tpm, rnaseqrunid = as.character(rnaseqrunid)) %>%
+    dplyr::filter(rnaseqrunid %in% rownames(col_data))
   
-  col_data <- SummarizedExperiment::colData(rse_gene)
+  processedRNASeq_clean <- processedRNASeq %>%
+    dplyr::filter(!ensg %in% dupl_ensg)
   
+  processedRNASeq_dupl <- processedRNASeq %>%
+    dplyr::filter(ensg %in% dupl_ensg) %>%
+    group_by(ensg, rnaseqrunid) %>%
+    summarise(log2tpm = sum(log2tpm), counts = sum(counts), .groups = "drop")
+  
+  processedRNASeq <- processedRNASeq_clean %>%
+    bind_rows(processedRNASeq_dupl)
   
   RNAseqGroupID <- case_when(
     proj$file_source == "tcga" ~ 1,
@@ -123,28 +149,31 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
   )
   
   RNAseqRun <- data.frame(
-    RNAseqRunID = rownames(col_data),
+    rnaseqrunid = rownames(col_data),
     tissuename = get_tissue_id(col_data[, id_column]),
     laboratory = "recount3",
-    RNAseqGroupID = RNAseqGroupID,
-    cellbatchID = NA,
+    rnaseqgroupid = RNAseqGroupID,
+    cellbatchid = NA,
     directory = "",
-    isXenograft = FALSE,
+    isxenograft = FALSE,
     publish = TRUE,
     comment = "",
     canonical = TRUE,
-    sourceID = col_data[, id_column]
+    sourceid = col_data[, id_column]
   )
   
   result <- list(
-    tissue.processedRNASeq = processedRNASeq,
-    tissue.RNAseqRun = RNAseqRun
+    tissue.rnaseqrun = RNAseqRun,
+    tissue.processedrnaseq = processedRNASeq
   )
   
-  if(proj$file_source == "gtex") {
+  if (proj$file_source == "gtex") {
     anno <- getTissueGTEXAnno(rse_gene)
-    result$tissue.tissue <- anno$tissue.tissue
-    result$tissue.patient <- anno$tissue.patient
+    result2 <- list(
+      tissue.patient = anno$tissue.patient,
+      tissue.tissue = anno$tissue.tissue
+    )
+    result <- c(result2, result)
   }
   
   result
@@ -177,82 +206,84 @@ getTissueGTEXAnno <- function(rse_gene) {
   # GTEX codes:
   # https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/GetListOfAllObjects.cgi?study_id=phs000424.v8.p2&object_type=variable
   anno_all <- anno %>%
-    left_join(autolysis_score, by = "gtex.smatsscr") %>%
-    left_join(hardy_scale, by = "gtex.dthhrdy") %>%
-    mutate(
+    dplyr::left_join(autolysis_score, by = "gtex.smatsscr") %>%
+    dplyr::left_join(hardy_scale, by = "gtex.dthhrdy") %>%
+    dplyr::mutate(
       gender = ifelse(gtex.sex == 1, "male", "female"),
       days_to_birth = stringr::str_split(gtex.age, "-") %>% purrr::map(function(x)
         - round(mean(as.numeric(
           x
-        )) * 365.25)) %>% unlist()
-    ) %>%
-    select(
-      tissuename = gtex.sampid,
+        )) * 365.25)) %>% unlist(),
+      tissuename = substr(gtex.sampid, 1, nchar(gtex.sampid) - 9)
+    ) %>% 
+    filter(gtex.smafrze != "EXCLUDE") %>%
+    dplyr::select(
+      tissuename,
       organ = gtex.smts,
       tissue_subtype = gtex.smtsd,
       RNA_integrity_number = gtex.smrin,
       minutes_ischemia = gtex.smtsisch,
       patientname = gtex.subjid,
+      comment = gtex.smpthnts,
       autolysis_score,
       gender,
       days_to_birth,
       death_classification
-    )
+    ) 
   
   tissue_anno <- with(anno_all, tibble(
-    TISSUENAME           = anno_all$tissuename,
-    VENDORNAME           = "GTEX",
-    SPECIES              = "human",
-    ORGAN                = anno_all$organ,
-    TUMORTYPE            = "normal",
-    PATIENTNAME          = anno_all$patientname,
-    TUMORTYPE_ADJACENT   = NA,
-    TISSUE_SUBTYPE       = tissue_subtype,
-    METASTATIC_SITE      = NA,
-    HISTOLOGY_TYPE       = NA,
-    HISTOLOGY_SUBTYPE    = NA,
-    AGE_AT_SURGERY       = NA,
-    STAGE                = NA,
-    GRADE                = NA,
-    SAMPLE_DESCRIPTION   = NA,
-    COMMENT              = NA,
-    DNASEQUENCED         = NA,
-    TUMORPURITY          = NA,
-    TDPID                = NA,
-    MICROSATELLITE_STABILITY_SCORE = NA,
-    MICROSATELLITE_STABILITY_CLASS = NA,
-    IMMUNE_ENVIRONMENT   = NA,
-    GI_MOL_SUBGROUP      = NA,
-    ICLUSTER             = NA,
-    TIL_PATTERN          = NA,
-    NUMBER_OF_CLONES     = NA,
-    CLONE_TREE_SCORE     = NA,
-    RNA_INTEGRITY_NUMBER = RNA_integrity_number,
-    MINUTES_ISCHEMIA     = minutes_ischemia,
-    AUTOLYSIS_SCORE      = autolysis_score,
-    CONSMOLSUBTYPE       = NA,
-    LOSSOFY              = NA
+    tissuename           = tissuename,
+    vendorname           = "GTEX",
+    species              = "human",
+    organ                = organ,
+    tumortype            = "normal",
+    patientname          = patientname,
+    tumortype_adjacent   = NA,
+    tissue_subtype       = tissue_subtype,
+    metastatic_site      = NA,
+    histology_type       = NA,
+    histology_subtype    = NA,
+    age_at_surgery       = NA,
+    stage                = NA,
+    grade                = NA,
+    sample_description   = NA,
+    comment              = comment,
+    dnasequenced         = NA,
+    tumorpurity          = NA,
+    microsatellite_stability_score = NA,
+    microsatellite_stability_class = NA,
+    immune_environment   = NA,
+    gi_mol_subgroup      = NA,
+    icluster             = NA,
+    til_pattern          = NA,
+    number_of_clones     = NA,
+    clone_tree_score     = NA,
+    rna_integrity_number = RNA_integrity_number,
+    minutes_ischemia     = minutes_ischemia,
+    autolysis_score      = autolysis_score,
+    consmolsubtype       = NA,
+    lossofy              = NA
   ))
   
   patient_anno <- with(anno_all, tibble(
-    PATIENTNAME              = patientname,
-    VITAL_STATUS             = FALSE,
-    DAYS_TO_BIRTH            = days_to_birth,
-    GENDER                   = gender,
-    HEIGHT                   = NA,
-    WEIGHT                   = NA,
-    RACE                     = NA,
-    ETHNICITY                = NA,
-    DAYS_TO_LAST_FOLLOWUP    = NA,
-    DAYS_TO_LAST_KNOWN_ALIVE = NA,
-    DAYS_TO_DEATH            = NA,
-    PERSON_NEOPLASM_CANCER_STATUS = NA,
-    DEATH_CLASSIFICATION     = death_classification,
-    TREATMENT                = NA,
+    patientname              = patientname,
+    vital_status             = FALSE,
+    days_to_birth            = days_to_birth,
+    gender                   = gender,
+    height                   = NA,
+    weight                   = NA,
+    race                     = NA,
+    ethnicity                = NA,
+    days_to_last_followup    = NA,
+    days_to_last_known_alive = NA,
+    days_to_death            = NA,
+    person_neoplasm_cancer_status = NA,
+    death_classification     = death_classification,
+    treatment                = NA,
   )) %>% distinct()
   
-  stopifnot("Found duplicated patient name" =
-              (anyDuplicated(patient_anno$PATIENTNAME) == 0))
+  stopifnot("found duplicated patient name" =
+              (anyDuplicated(patient_anno$patientname) == 0))
   
   list(
     tissue.tissue = as.data.frame(tissue_anno),
