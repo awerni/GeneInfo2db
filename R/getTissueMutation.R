@@ -1,5 +1,20 @@
 getTissueMutation <- function() {
   
+  con <- getPostgresqlConnection()
+  
+  transcript <- dplyr::tbl(con, dbplyr::in_schema("public", "transcript"))  %>%
+    select(enst, ensg) %>%
+    dplyr::filter(grepl("ENST", enst)) %>%
+    dplyr::collect()
+  
+  tissue <- dplyr::tbl(con, dbplyr::in_schema("tissue", "tissue"))  %>%
+    select(tissuename) %>%
+    dplyr::collect()
+  
+  RPostgres::dbDisconnect(con)
+  
+  # ---------------
+  
   project <- TCGAbiolinks::getGDCprojects()$project_id
   project <- grep("TCGA", project, value = TRUE)
   
@@ -17,31 +32,33 @@ getTissueMutation <- function() {
     maf <- TCGAbiolinks::GDCprepare(query)
     res <- maf %>%
       dplyr::mutate(
-        TISSUENAME = substr(Tumor_Sample_Barcode, 1, 15),
-        DNAzygosity = t_alt_count / t_depth,
-        AAMmutation = ifelse(Variant_Classification == "Silent", "wt", HGVSp_Short)
+        tissuename = substr(Tumor_Sample_Barcode, 1, 15),
+        dnazygosity = t_alt_count / t_depth,
+        aammutation = ifelse(Variant_Classification == "Silent", "wt", HGVSp_Short)
       ) %>%
       filter(!grepl(pattern = "(Flank)|(UTR)", Variant_Classification)) %>%
       dplyr::select(
-        TISSUENAME,
-        ENST = Transcript_ID,
-        DNAmutation = HGVSc,
-        AAMmutation,
-        DNAzygosity
+        tissuename,
+        enst = Transcript_ID,
+        dnamutation = HGVSc,
+        aammutation,
+        dnazygosity
       )
-    res %>% group_by(TISSUENAME, ENST) %>% summarise(
-      DNAmutation = paste(DNAmutation, collapse = ";"),
-      AAMmutation = paste(AAMmutation, collapse = ";"),
-      DNAzygosity = max(DNAzygosity),
+    res %>% group_by(tissuename, enst) %>% summarise(
+      dnamutation = paste(dnamutation, collapse = ";"),
+      aamutation = paste(aammutation, collapse = ";"),
+      dnazygosity = max(dnazygosity),
       .groups = "drop"
-    ) %>% 
+    ) %>%
     as.data.frame()
   }
   
-  res <- lapply(project, getData)
+  mut <- lapply(project, getData) %>%
+    dplyr::bind_rows() %>%
+    filter(enst %in% transcript$enst) %>%
+    filter(tissuename %in% tissue$tissuename)
   
   list(
-    tiff.processedSequence = dplyr::bind_rows(res)
+    tissue.processedsequence = mut
   )
-  
 }
