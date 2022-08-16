@@ -78,9 +78,9 @@ getTCGApancancerData <- function(tissuename) {
   liu2018 <- readxl::read_excel(file_liu2018, skip = 1)
   
   gi_mol_subtype <- liu2018 %>%
-    select(patientname = `TCGA Participant Barcode`, gi_mol_subtype = Molecular_Subtype) %>%
+    select(patientname = `TCGA Participant Barcode`, gi_mol_subgroup = Molecular_Subtype) %>%
     inner_join(tissuename_to_patientname, by = "patientname") %>%
-    select(tissuename, patientname, gi_mol_subtype)
+    select(tissuename, patientname, gi_mol_subgroup)
   
   # SANITY CHECK:
   # 3 patients have a 1-to-2 mapping between patientname and tissuename
@@ -176,9 +176,9 @@ getTCGApancancerData <- function(tissuename) {
   saltz2018 <- readxl::read_excel(file_saltz2018)
   
   digital_pathology <- saltz2018 %>%
-    select(patientname = ParticipantBarcode, TIL_pattern = Global_Pattern) %>%
+    select(patientname = ParticipantBarcode, til_pattern = Global_Pattern) %>%
     inner_join(tissuename_to_patientname, by = "patientname") %>%
-    select(tissuename, patientname, TIL_pattern)
+    select(tissuename, patientname, til_pattern)
   
   # SANITY CHECK:
   # 196 patients have a 1-to-n mapping between patientname and tissuename
@@ -189,7 +189,7 @@ getTCGApancancerData <- function(tissuename) {
   
   ## distribution of categories
   # digital_pathology %>%
-  #   count(TIL_pattern)
+  #   count(til_pattern)
   
   
   # ------------------------------------------------------------------------------
