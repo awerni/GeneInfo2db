@@ -69,8 +69,7 @@ getTCGAAnnotation <- function() {
       left_join(TCGA_study, by = "project") %>%
       left_join(TCGA_sample_type, by = "code") %>%
       left_join(subtypes, by = c("patientname" = "pan.samplesID")) %>%
-      mutate(vendorname = "TCGA",
-             species = "human")
+      mutate(vendorname = "TCGA", species = "human")
     
     list(
       clin = clin,
@@ -102,6 +101,8 @@ getTCGAAnnotation <- function() {
       weight = NA
     )
   
+  pancancer_data <- getTCGApancancerData(tissuesample$tissuename)
+  
   tissue <- tissuesample %>%
     rename(stage = ajcc_pathologic_stage) %>%
     filter(tissue_definition != "Blood Derived Normal") %>% 
@@ -123,32 +124,24 @@ getTCGAAnnotation <- function() {
       grade
     ) %>%
     mutate(
-      tissue_subtype    = NA,
-      metastatic_site   = NA,
-      histology_type    = NA,
-      histology_subtype = NA,
-      age_at_surgery    = NA,
-      sample_description = NA,
-      comment            = NA,
-      dnasequenced       = NA,
-      tumorpurity        = NA,
-      microsatellite_stability_score  = NA,
-      microsatellite_stability_class  = NA,
-      immune_environment = NA,
-      gi_mol_subgroup    = NA,
-      icluster           = NA,
-      til_pattern        = NA,
-      number_of_clones      = NA,
-      clone_tree_score      = NA,
-      rna_integrity_number  = NA,
-      minutes_ischemia      = NA,
-      autolysis_score       = NA,
-      consmolsubtype        = NA,
-      lossofy               = NA
-    )
+      tissue_subtype       = as.character(NA),
+      metastatic_site      = as.character(NA),
+      histology_type       = as.character(NA),
+      histology_subtype    = as.character(NA),
+      age_at_surgery       = as.character(NA),
+      sample_description   = as.character(NA),
+      comment              = as.character(NA),
+      dnasequenced         = NA,
+      rna_integrity_number = as.numeric(NA),
+      minutes_ischemia     = as.integer(NA),
+      autolysis_score      = as.character(NA),
+      consmolsubtype       = as.character(NA),
+      lossofy              = NA
+    ) %>%
+    left_join(pancancer_data, by = c("tissuename", "patientname"))
 
   tumortype <- data.frame(
-    tumortype = unique(x$tissue.tissue$tumortype),
+    tumortype = unique(tissue$tumortype),
     tumortypedesc = NA
   )
 
