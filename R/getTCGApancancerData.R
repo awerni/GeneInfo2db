@@ -2,8 +2,8 @@ getTCGApancancerData <- function(tissuename) {
   
   tissuename_to_patientname <-
     data.frame(tissuename = tissuename) %>%
-    mutate(patientname = substr(tissuename, 1, 12)) %>%
-    filter(!grepl("1.$", tissuename))
+    dplyr::mutate(patientname = substr(tissuename, 1, 12)) %>%
+    dplyr::filter(!grepl("1.$", tissuename))
   
   # ------------------------------------------------------------------------------
   # immune environments
@@ -25,15 +25,15 @@ getTCGApancancerData <- function(tissuename) {
   thorsson2018 <- readxl::read_excel(file_thorsson2018, na = "NA")
   
   immune_environment <- thorsson2018 %>% 
-    left_join(mapper, by = "Immune Subtype") %>%
-    select(patientname = `TCGA Participant Barcode`, immune_environment) %>%
-    inner_join(tissuename_to_patientname, by = "patientname")
+    dplyr::left_join(mapper, by = "Immune Subtype") %>%
+    dplyr::select(patientname = `TCGA Participant Barcode`, immune_environment) %>%
+    dplyr::inner_join(tissuename_to_patientname, by = "patientname")
   
   # SANITY CHECK:
   # 292 patients have a 1-to-n mapping between patientname and tissuename
   immune_environment %>%
     count(patientname) %>%
-    rename(mapping = n) %>%
+    dplyr::rename(mapping = n) %>%
     count(mapping)
   
   # ------------------------------------------------------------------------------
@@ -50,17 +50,17 @@ getTCGApancancerData <- function(tissuename) {
   ding2018 <- readxl::read_excel(file_ding2018, skip = 2, col_types = c("text", "numeric", "skip"))
   
   microsatellite_stability <- ding2018 %>%
-    select(patientname = `Participant Barcode`, microsatellite_stability_score = `MSIsensor score`) %>%
+    dplyr::select(patientname = `Participant Barcode`, microsatellite_stability_score = `MSIsensor score`) %>%
     # classify into MSS and MSI based on Ding 2018
-    mutate(microsatellite_stability_class = if_else(microsatellite_stability_score < 4, "MSS", "MSI")) %>%
-    inner_join(tissuename_to_patientname, by = "patientname") %>%
-    select(tissuename, patientname, microsatellite_stability_class, microsatellite_stability_score)
+    dplyr::mutate(microsatellite_stability_class = if_else(microsatellite_stability_score < 4, "MSS", "MSI")) %>%
+    dplyr::inner_join(tissuename_to_patientname, by = "patientname") %>%
+    dplyr::select(tissuename, patientname, microsatellite_stability_class, microsatellite_stability_score)
   
   # SANITY CHECK:
   # 286 patients have a 1-to-n mapping between patientname and tissuename
   microsatellite_stability %>%
     count(patientname) %>%
-    rename(mapping = n) %>%
+    dplyr::rename(mapping = n) %>%
     count(mapping)
   
   # ------------------------------------------------------------------------------
@@ -78,9 +78,9 @@ getTCGApancancerData <- function(tissuename) {
   liu2018 <- readxl::read_excel(file_liu2018, skip = 1)
   
   gi_mol_subtype <- liu2018 %>%
-    select(patientname = `TCGA Participant Barcode`, gi_mol_subgroup = Molecular_Subtype) %>%
-    inner_join(tissuename_to_patientname, by = "patientname") %>%
-    select(tissuename, patientname, gi_mol_subgroup)
+    dplyr::select(patientname = `TCGA Participant Barcode`, gi_mol_subgroup = Molecular_Subtype) %>%
+    dplyr::inner_join(tissuename_to_patientname, by = "patientname") %>%
+    dplyr::select(tissuename, patientname, gi_mol_subgroup)
   
   # SANITY CHECK:
   # 3 patients have a 1-to-2 mapping between patientname and tissuename
@@ -110,11 +110,11 @@ getTCGApancancerData <- function(tissuename) {
   ### process
   hoadley2018 <- readxl::read_xlsx(file_hoadley2018, na = "NA", skip = 1)
   iCluster <- hoadley2018 %>%
-    rename(patientname = `Sample ID`) %>%
-    left_join(iClusterNames, by = "iCluster") %>%
-    select(-iCluster) %>%
-    rename(icluster = iClusterName) %>%
-    inner_join(tissuename_to_patientname, by = "patientname")
+    dplyr::rename(patientname = `Sample ID`) %>%
+    dplyr::left_join(iClusterNames, by = "iCluster") %>%
+    dplyr::select(-iCluster) %>%
+    dplyr::rename(icluster = iClusterName) %>%
+    dplyr::inner_join(tissuename_to_patientname, by = "patientname")
   
   # SANITY CHECK:
   # 275 patients have a 1-to-n mapping between patientname and tissuename
@@ -122,44 +122,6 @@ getTCGApancancerData <- function(tissuename) {
     count(patientname) %>%
     rename(mapping = n) %>%
     count(mapping)
-  
-  # ------------------------------------------------------------------------------
-  # xCell immune cell deconvolution
-  # ------------------------------------------------------------------------------
-  
-  # -------> xCell was recalculated based on Aran's git repository: https://github.com/dviraran/xCell
-  # ---- find the scripts in signature ------
-  
-  # ### download
-  # url <- "https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-017-1349-1/MediaObjects/13059_2017_1349_MOESM6_ESM.tsv"
-  # file_xCell <-"xcell_TCGA.tsv"
-  # if (!file.exists(file_xCell)) {
-  #   download.file(url, destfile = file_xCell, method = "wget", quiet = TRUE)
-  # }
-  # 
-  # url <- "https://static-content.springer.com/esm/art%3A10.1186%2Fs13059-017-1349-1/MediaObjects/13059_2017_1349_MOESM1_ESM.xlsx"
-  # file_xCell2 <-"xcell_celltypes.xlsx"
-  # if (!file.exists(file_xCell2)) {
-  #   download.file(url, destfile = file_xCell2, method = "wget", quiet = TRUE)
-  # }
-  # 
-  # ### process
-  # # the downloaded file contains some typos, which are corrected below
-  # xCellTypes <- readxl::read_excel(file_xCell2) %>%
-  #   rename(celltype_short = `Cell types`, celltype = `Full name`) %>%
-  #   mutate(celltype = gsub("Multipotent rogenitors", "Multipotent progenitors", celltype)) %>%
-  #   mutate(celltype = gsub("Xonventional dendritic cells", "Conventional dendritic cells", celltype)) %>%
-  #   mutate(celltype_short = gsub(" muscle cells", " muscle", celltype_short))
-  # 
-  # xCell <- read_tsv(file_xCell)
-  # 
-  # xCellData <- xCell %>%
-  #   rename(celltype_short = X1) %>%
-  #   gather(tissuename, score, -celltype_short) %>%
-  #   mutate(tissuename = gsub("\\.", "-", tissuename)) %>%
-  #   filter(grepl("TCGA", tissuename)) %>%
-  #   inner_join(xCellTypes, by = "celltype_short") %>%
-  #   select(tissuename, celltype, score)
   
   # ------------------------------------------------------------------------------
   # Digital Pathology
@@ -176,9 +138,9 @@ getTCGApancancerData <- function(tissuename) {
   saltz2018 <- readxl::read_excel(file_saltz2018)
   
   digital_pathology <- saltz2018 %>%
-    select(patientname = ParticipantBarcode, til_pattern = Global_Pattern) %>%
-    inner_join(tissuename_to_patientname, by = "patientname") %>%
-    select(tissuename, patientname, til_pattern)
+    dplyr::select(patientname = ParticipantBarcode, til_pattern = Global_Pattern) %>%
+    dplyr::inner_join(tissuename_to_patientname, by = "patientname") %>%
+    dplyr::select(tissuename, patientname, til_pattern)
   
   # SANITY CHECK:
   # 196 patients have a 1-to-n mapping between patientname and tissuename
@@ -204,10 +166,10 @@ getTCGApancancerData <- function(tissuename) {
   raynaud2018 <- readxl::read_xlsx(file_raynaud2018)
   
   clones_and_phylo_tree <- raynaud2018 %>%
-    select(sample_name, `number of clones`, `Tree score`) %>%
-    rename(tissuename = sample_name, number_of_clones = `number of clones`, clone_tree_score = `Tree score`) %>%
-    mutate_if(is.numeric, function(x) round(x, 3)) %>%
-    inner_join(tissuename_to_patientname, by = "tissuename")
+    dplyr::select(sample_name, `number of clones`, `Tree score`) %>%
+    dplyr::rename(tissuename = sample_name, number_of_clones = `number of clones`, clone_tree_score = `Tree score`) %>%
+    dplyr::mutate_if(is.numeric, function(x) round(x, 3)) %>%
+    dplyr::inner_join(tissuename_to_patientname, by = "tissuename")
   
   # ------------------------------------------------------------------------------
   # tumor purity
@@ -221,44 +183,11 @@ getTCGApancancerData <- function(tissuename) {
   aran2015 <- readxl::read_xlsx(file_aran2015, skip = 3, na = "NaN")
   
   tumor_purity <- aran2015 %>%
-    mutate(tissuename = substring(`Sample ID`, 1, 15)) %>%
-    filter(!is.na(CPE)) %>%
-    select(tissuename, CPE) %>%
-    group_by(tissuename) %>%
-    summarise(tumorpurity = mean(CPE))
-  
-  # ------------------------------------------------------------------------------
-  # ------- read metabolics data ----------------
-  # (taken from shiny app described in https://doi.org/10.1186/s12943-018-0895-9)
-  # ------------------------------------------------------------------------------
-  
-  files <- dir(path = "Metabolics", pattern = "*_metabolicsignatures.csv")
-  metabolics_raw <- NULL
-  
-  for (f in files) {
-    a <- readr::read_csv(paste0("Metabolics/", f)) %>%
-      rename(patientname = 1)
-    metabolics_raw <- bind_rows(metabolics_raw, a)
-  }
-  
-  metabolics_raw_long <- metabolics_raw %>%
-    gather(metabolic_pathway, score, -patientname) %>%
-    mutate(metabolic_pathway = gsub("REACTOME_", "", metabolic_pathway)) %>%
-    mutate(metabolic_pathway = gsub("_", " ", tolower(metabolic_pathway))) %>%
-    mutate(metabolic_pathway = gsub("rna", "RNA", metabolic_pathway))
-  
-  metabolics_data <- metabolics_raw_long %>%
-    select(patientname, metabolic_pathway, score) %>%
-    inner_join(tissuename_to_patientname, by = "patientname")
-  
-  # SANITY CHECK:
-  # 60 patients have a 1-to-n mapping between patientname and tissuename
-  metabolics_data %>%
-    count(patientname) %>%
-    rename(mapping = n) %>%
-    count(mapping)
-  
-  metabolics_data <- metabolics_data %>% select(tissuename, metabolic_pathway, score)
+    dplyr::mutate(tissuename = substring(`Sample ID`, 1, 15)) %>%
+    dplyr::filter(!is.na(CPE)) %>%
+    dplyr::select(tissuename, CPE) %>%
+    dplyr::group_by(tissuename) %>%
+    dplyr::summarise(tumorpurity = mean(CPE))
   
   # ------------------------------------------------------------------------------
   # signaling pathways
@@ -271,10 +200,10 @@ getTCGApancancerData <- function(tissuename) {
   }
   
   sanches_vega2018 <- readxl::read_xlsx(file_sanches_vega2018, sheet = 3, na = "NA") %>%
-    rename(tissuename = SAMPLE_BARCODE) %>%
-    rename(cell_cycle = `Cell Cycle`, rtk_ras = `RTK RAS`, tgf_beta = `TGF-Beta`) %>%
-    rename_all(tolower) %>%
-    mutate_if(is.numeric, as.logical)
+    dplyr::rename(tissuename = SAMPLE_BARCODE) %>%
+    dplyr::rename(cell_cycle = `Cell Cycle`, rtk_ras = `RTK RAS`, tgf_beta = `TGF-Beta`) %>%
+    dplyr::rename_all(tolower) %>%
+    dplyr::mutate_if(is.numeric, as.logical)
   
   # ------------------------------------------------------------------------------
   # combine pan cancer data

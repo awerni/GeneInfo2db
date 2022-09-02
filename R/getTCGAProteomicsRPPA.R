@@ -3,14 +3,14 @@ getTCGAProteomicsRPPA <- function() {
   con <- getPostgresqlConnection()
   
   tissue <- dplyr::tbl(con, dbplyr::in_schema("tissue", "tissue"))  %>%
-    select(tissuename) %>%
+    dplyr::select(tissuename) %>%
     dplyr::collect()
   
   antibody <-
     dplyr::tbl(con, dbplyr::in_schema("public", "antibody"))  %>%
     dplyr::collect() %>%
-    mutate(antibody_coarse = toupper(gsub("[-()_ ]", "", antibody))) %>%
-    mutate(antibody_coarse = ifelse(
+    dplyr::mutate(antibody_coarse = toupper(gsub("[-()_ ]", "", antibody))) %>%
+    dplyr::mutate(antibody_coarse = ifelse(
       grepl("^[0-9]", antibody_coarse),
       paste0("X", antibody_coarse),
       antibody_coarse
@@ -30,8 +30,8 @@ getTCGAProteomicsRPPA <- function() {
   
   ### process
   rppa_ab <- readxl::read_excel(file_rppa, sheet = 17, skip = 6) %>%
-    mutate(antibody_coarse = toupper(gsub("[-()_ ]", "", `Ab Name Reported on Dataset`))) %>%
-    mutate(antibody_coarse = ifelse(
+    dplyr::mutate(antibody_coarse = toupper(gsub("[-()_ ]", "", `Ab Name Reported on Dataset`))) %>%
+    dplyr::mutate(antibody_coarse = ifelse(
       grepl("^[0-9]", antibody_coarse),
       paste0("X", antibody_coarse),
       antibody_coarse
@@ -39,7 +39,7 @@ getTCGAProteomicsRPPA <- function() {
   
   antibody_mapping <- additional_TCGA_antibodies %>%
     bind_rows(antibody) %>%
-    select(antibody, antibody_coarse)
+    dplyr::select(antibody, antibody_coarse)
   
   url <- "https://tcpaportal.org/tcpa/download/TCGA-PANCAN32-L4.zip"
   temp <- tempfile()
@@ -48,16 +48,16 @@ getTCGAProteomicsRPPA <- function() {
   unlink(temp)
   
   ab_data_long <- data %>% 
-    select(-Cancer_Type, -Sample_Type) %>%
-    pivot_longer(!Sample_ID, names_to = "antibody_coarse", values_to = "score") %>%
-    filter(!is.na(score)) %>%
-    mutate(tissuename = substring(Sample_ID, 1, 15)) %>%
-    select(-Sample_ID) %>%
-    filter(tissuename %in% tissue$tissuename) %>%
-    mutate(antibody_coarse = toupper(gsub("[-()_ ]", "", antibody_coarse))) %>%
-    left_join(antibody_mapping, by = "antibody_coarse") %>%
-    filter(!is.na(antibody)) %>%
-    select(-antibody_coarse)
+    dplyr::select(-Cancer_Type, -Sample_Type) %>%
+    tidyr::pivot_longer(!Sample_ID, names_to = "antibody_coarse", values_to = "score") %>%
+    dplyr::filter(!is.na(score)) %>%
+    dplyr::mutate(tissuename = substring(Sample_ID, 1, 15)) %>%
+    dplyr::select(-Sample_ID) %>%
+    dplyr::filter(tissuename %in% tissue$tissuename) %>%
+    dplyr::mutate(antibody_coarse = toupper(gsub("[-()_ ]", "", antibody_coarse))) %>%
+    dplyr::left_join(antibody_mapping, by = "antibody_coarse") %>%
+    dplyr::filter(!is.na(antibody)) %>%
+    dplyr::select(-antibody_coarse)
   
   list(
     public.antibody = additional_TCGA_antibodies %>% select(-antibody_coarse),
