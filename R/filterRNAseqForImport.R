@@ -5,12 +5,12 @@ filterForRNAseqImport <- function(db_tables) {
   ti <- dplyr::tbl(con, dbplyr::in_schema("tissue", "tissue"))  %>%
     dplyr::select(tissuename) %>%
     dplyr::collect() %>%
-    pull(tissuename)
+    dplyr::pull(tissuename)
   
   pa <- dplyr::tbl(con, dbplyr::in_schema("tissue", "patient"))  %>%
     dplyr::select(patientname) %>%
     dplyr::collect() %>%
-    pull(patientname)
+    dplyr::pull(patientname)
   
   e <-  dplyr::tbl(con, dbplyr::in_schema("public", "gene"))  %>%
     dplyr::select(ensg) %>%
