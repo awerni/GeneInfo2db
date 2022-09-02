@@ -3,12 +3,12 @@ getTissueMutation <- function() {
   con <- getPostgresqlConnection()
   
   transcript <- dplyr::tbl(con, dbplyr::in_schema("public", "transcript"))  %>%
-    select(enst, ensg) %>%
+    dplyr::select(enst, ensg) %>%
     dplyr::filter(grepl("ENST", enst)) %>%
     dplyr::collect()
   
   tissue <- dplyr::tbl(con, dbplyr::in_schema("tissue", "tissue"))  %>%
-    select(tissuename) %>%
+    dplyr::select(tissuename) %>%
     dplyr::collect()
   
   RPostgres::dbDisconnect(con)
