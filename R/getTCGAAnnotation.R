@@ -104,15 +104,15 @@ getTCGAAnnotation <- function() {
   pancancer_data <- getTCGApancancerData(tissuesample$tissuename)
   
   tissue <- tissuesample %>%
-    rename(stage = ajcc_pathologic_stage) %>%
-    filter(tissue_definition != "Blood Derived Normal") %>% 
-    mutate(
+    dplyr::rename(stage = ajcc_pathologic_stage) %>%
+    dplyr::filter(tissue_definition != "Blood Derived Normal") %>% 
+    dplyr::mutate(
       tumortype_adjacent = ifelse(grepl("Normal", tissue_definition), tumortype, NA),
       tumortype = ifelse(grepl("Normal", tissue_definition), "normal", tumortype),
       grade = paste(ajcc_pathologic_t, ajcc_pathologic_n, ajcc_pathologic_m),
       stage = gsub("Stage ", "", stage)
     ) %>%
-    select(
+    dplyr::select(
       tissuename,
       vendorname,
       species,
@@ -123,7 +123,7 @@ getTCGAAnnotation <- function() {
       stage,
       grade
     ) %>%
-    mutate(
+    dplyr::mutate(
       tissue_subtype       = as.character(NA),
       metastatic_site      = as.character(NA),
       histology_type       = as.character(NA),
@@ -136,9 +136,18 @@ getTCGAAnnotation <- function() {
       minutes_ischemia     = as.integer(NA),
       autolysis_score      = as.character(NA),
       consmolsubtype       = as.character(NA),
+      gi_mol_subgroup      = as.character(NA),
+      microsatellite_stability_class = as.character(NA),
+      microsatellite_stability_score = as.numeric(NA),
+      immune_environment   = as.character(NA),
+      icluster             = as.character(NA),
+      til_pattern          = as.character(NA),
+      number_of_clones     = as.numeric(NA),
+      clone_tree_score     = as.numeric(NA),
+      tumorpurity          = as.numeric(NA),
       lossofy              = NA
     ) %>%
-    left_join(pancancer_data, by = c("tissuename", "patientname"))
+    dplyr::rows_patch(pancancer_data, by = c("tissuename", "patientname"))
 
   tumortype <- data.frame(
     tumortype = unique(tissue$tumortype),
