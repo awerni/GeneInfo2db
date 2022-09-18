@@ -1,8 +1,8 @@
-getTCGApancancerData <- function(tissuename) {
+getTCGApancancerData <- function(ti) {
   
   tissuename_to_patientname <-
-    data.frame(tissuename = tissuename) %>%
-    dplyr::mutate(patientname = substr(tissuename, 1, 12)) %>%
+    data.frame(tissuename = ti) %>%
+    dplyr::mutate(patientname = stringr::str_sub(tissuename, 1, 12)) %>%
     dplyr::filter(!grepl("1.$", tissuename))
   
   # ------------------------------------------------------------------------------
@@ -183,27 +183,28 @@ getTCGApancancerData <- function(tissuename) {
   aran2015 <- readxl::read_xlsx(file_aran2015, skip = 3, na = "NaN")
   
   tumor_purity <- aran2015 %>%
-    dplyr::mutate(tissuename = substring(`Sample ID`, 1, 15)) %>%
+    dplyr::mutate(tissuename = stringr::str_sub(`Sample ID`, 1, 15)) %>%
     dplyr::filter(!is.na(CPE)) %>%
     dplyr::select(tissuename, CPE) %>%
     dplyr::group_by(tissuename) %>%
     dplyr::summarise(tumorpurity = mean(CPE))
   
   # ------------------------------------------------------------------------------
-  # signaling pathways
+  # Breast Cancer PAM50
   # ------------------------------------------------------------------------------
   
-  url <- "https://www.cell.com/cms/10.1016/j.cell.2018.03.035/attachment/4c206a11-2a3e-461a-8707-d60a47ca5750/mmc4.xlsx"
-  file_sanches_vega2018 <- "sanches_vega2018_supplemental_table4.xlsx"
-  if (!file.exists(file_sanches_vega2018)) {
-    download.file(url, destfile = file_sanches_vega2018, method = "wget", quiet = TRUE)
+  url <- "https://www.cell.com/cms/10.1016/j.xgen.2021.100067/attachment/0bf9c5c0-10e4-4b1d-9f78-99940947ba42/mmc2.xlsx"
+  file_thennavan2021 <- "thennavan2021_mmc2.xlsx"
+  if (!file.exists(file_thennavan2021)) {
+    download.file(url, destfile = file_thennavan2021, method = "curl", quiet = TRUE)
   }
   
-  sanches_vega2018 <- readxl::read_xlsx(file_sanches_vega2018, sheet = 3, na = "NA") %>%
-    dplyr::rename(tissuename = SAMPLE_BARCODE) %>%
-    dplyr::rename(cell_cycle = `Cell Cycle`, rtk_ras = `RTK RAS`, tgf_beta = `TGF-Beta`) %>%
-    dplyr::rename_all(tolower) %>%
-    dplyr::mutate_if(is.numeric, as.logical)
+  thennavan2021 <- readxl::read_xlsx(file_thennavan2021, na = "NA")
+
+  breast_hist_subtype <- thennavan2021 %>%
+    mutate(tissuename = stringr::str_sub(CLID, 1, 15)) %>%
+    rename(histology_subtype = `PAM50 and Claudin-low (CLOW) Molecular Subtype`) %>%
+    select(tissuename, histology_subtype)
   
   # ------------------------------------------------------------------------------
   # combine pan cancer data
@@ -213,7 +214,9 @@ getTCGApancancerData <- function(tissuename) {
   valStr <- function(x) ifelse(is.na(x), "NULL", paste0("'", x, "'"))
   
   pancancer <- list(gi_mol_subtype, microsatellite_stability, immune_environment, 
-                    iCluster, digital_pathology, clones_and_phylo_tree, tumor_purity) %>%
-    reduce(full_join)
+                    iCluster, digital_pathology, clones_and_phylo_tree, tumor_purity,
+                    breast_hist_subtype) %>%
+    reduce(full_join) %>%
+    filter(tissuename %in% ti)
   
 }
