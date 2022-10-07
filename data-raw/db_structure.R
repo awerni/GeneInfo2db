@@ -41,6 +41,7 @@ alternative_celllinename <- read_file("alternative_celllinenames.sql")
 setSearchPath_ti <- "set search_path = tissue,public;"
 tissueDB <-  paste(setSearchPath_ti, read_file("tissueDB.sql"), collapse = ";") 
 recreateTissueSchema <- read_file("recreateTissueSchema.sql")
+renewTissuePanels <- read_file("renewTissuePanels.sql")
 
 # ------------ tissue glue ---------
 db_glue_file <- c("viewTissue.sql",
@@ -57,6 +58,6 @@ refreshView_ti <- read_file("refreshMaterializedViewsTissue.sql")
 save(
   recreateAnnotationSchema, geneAnnotation, db_glue_anno,
   recreateCelllineSchema, celllineDB, db_glue_cl, refreshView_cl, alternative_celllinename,
-  recreateTissueSchema, tissueDB, db_glue_ti, refreshView_ti,
+  recreateTissueSchema, tissueDB, renewTissuePanels, db_glue_ti, refreshView_ti,
   file = "data/db_schema.rdata"
 )
