@@ -21,10 +21,10 @@ getTissueProcessedRNASeq <- function(projects) {
   stopifnot(NROW(projects) > 0)
   
   result <- lapply(
-      1:nrow(projects),
-      processProcessedRNASeqExperiment,
-      human_projects = projects
-    )
+    1:nrow(projects),
+    processProcessedRNASeqExperiment,
+    human_projects = projects
+  )
   
   result <- list(
     tissue.patient = result %>% lapply("[[", "tissue.patient") %>% bind_rows() %>% distinct(),
@@ -59,7 +59,7 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
     id_column = "gtex.sampid"
     get_tissue_id <- function(x) substr(x, 1, nchar(x) - 9)
     get_tissue_run <- function(x) as.numeric(gsub(rownames(x), pattern = ".*\\.", replacement = ""))
-    get_rnaset_run <- function(x) gsub("\\.[0-9]$", "", gsub(".*-", "", x))
+    get_rnaset_run <- function(x) gsub(".*-", "", x) #gsub("\\.[0-9]$", "", gsub(".*-", "", x))
     filter_bad_qc <- function(x) x %>% dplyr::filter(gtex.smafrze != "EXCLUDE")
     
   } else {
@@ -167,15 +167,16 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
     tissue.processedrnaseq = processedRNASeq
   )
   
-  if (proj$file_source == "gtex") {
-    anno <- getTissueGTEXAnno(rse_gene)
+  if (proj$file_source == "gtex") anno <- getTissueGTEXAnno(rse_gene)
+  if (proj$file_source == "tcga") anno <- getTissueTCGAAnno(rse_gene)
+  
+  if (proj$file_source %in% c("tcga", "gtex")) {
     result2 <- list(
       tissue.patient = anno$tissue.patient,
       tissue.tissue = anno$tissue.tissue
     )
     result <- c(result2, result)
   }
-  
   result
   
 }
@@ -279,6 +280,109 @@ getTissueGTEXAnno <- function(rse_gene) {
     days_to_death            = NA,
     person_neoplasm_cancer_status = NA,
     death_classification     = death_classification,
+    treatment                = NA,
+  )) %>% distinct()
+  
+  stopifnot("found duplicated patient name" =
+              (anyDuplicated(patient_anno$patientname) == 0))
+  
+  list(
+    tissue.tissue = as.data.frame(tissue_anno),
+    tissue.patient = as.data.frame(patient_anno)
+  )
+  
+}
+
+getTissueTCGAAnno <- function(rse_gene) {
+  anno <- SummarizedExperiment::colData(rse_gene)
+  
+  anno <- anno[, grep(colnames(anno), value = TRUE, pattern = "^tcga")] %>%
+    as.data.frame()
+  
+  anno_all <- anno %>%
+    dplyr::mutate(
+      tissuename = substr(tcga.tcga_barcode, 1, 15),
+      patientname = substr(tissuename, 1, 12),
+      tcga.gdc_cases.project.name = tolower(tcga.gdc_cases.project.name),
+      tumortype = ifelse(tcga.gdc_cases.samples.sample_type_id >= 10, "normal", tcga.gdc_cases.project.name),
+      tumortype_adjacent = ifelse(tcga.gdc_cases.samples.sample_type_id >= 10, tcga.gdc_cases.project.name, NA),
+      stage = gsub("Stage ", "", tcga.cgc_case_pathologic_stage),
+      days_to_last_known_alive = NA,
+      height                   = NA,
+      weight                   = NA,
+      tissue_subtype = NA,
+      comment = NA,
+    ) %>% 
+    dplyr::select(
+      tissuename,
+      organ = tcga.gdc_cases.project.primary_site,
+      tumortype = tumortype,
+      tumortype_adjacent = tumortype_adjacent,
+      histology_type = tcga.cgc_case_histological_diagnosis,
+      tissue_subtype,
+      patientname,
+      comment,
+      gender = tcga.gdc_cases.demographic.gender,
+      days_to_birth = tcga.gdc_cases.diagnoses.days_to_birth,
+      days_to_last_followup    = tcga.gdc_cases.diagnoses.days_to_last_follow_up,
+      days_to_last_known_alive,
+      days_to_death            = tcga.gdc_cases.diagnoses.days_to_death,
+      height,
+      weight,
+      stage                    = stage,
+      race                     = tcga.gdc_cases.demographic.race,
+      ethnicity                = tcga.gdc_cases.demographic.ethnicity,
+      vital_status             = tcga.gdc_cases.diagnoses.vital_status
+    ) 
+  
+  tissue_anno <- with(anno_all, tibble(
+    tissuename           = tissuename,
+    vendorname           = "TCGA",
+    species              = "human",
+    organ                = organ,
+    tumortype            = tumortype,
+    patientname          = patientname,
+    tumortype_adjacent   = tumortype_adjacent,
+    tissue_subtype       = tissue_subtype,
+    metastatic_site      = NA,
+    histology_type       = histology_type,
+    histology_subtype    = NA,
+    age_at_surgery       = NA,
+    stage                = stage,
+    grade                = NA,
+    sample_description   = NA,
+    comment              = NA,
+    dnasequenced         = NA,
+    tumorpurity          = NA,
+    microsatellite_stability_score = NA,
+    microsatellite_stability_class = NA,
+    immune_environment   = NA,
+    gi_mol_subgroup      = NA,
+    icluster             = NA,
+    til_pattern          = NA,
+    number_of_clones     = NA,
+    clone_tree_score     = NA,
+    rna_integrity_number = NA,
+    minutes_ischemia     = NA,
+    autolysis_score      = NA,
+    consmolsubtype       = NA,
+    lossofy              = NA
+  ))
+  
+  patient_anno <- with(anno_all, tibble(
+    patientname              = patientname,
+    vital_status             = vital_status,
+    days_to_birth            = days_to_birth,
+    gender                   = gender,
+    height                   = height,
+    weight                   = weight,
+    race                     = race,
+    ethnicity                = ethnicity,
+    days_to_last_followup    = days_to_last_followup,
+    days_to_last_known_alive = days_to_last_known_alive,
+    days_to_death            = days_to_death,
+    person_neoplasm_cancer_status = NA,
+    death_classification     = NA,
     treatment                = NA,
   )) %>% distinct()
   
