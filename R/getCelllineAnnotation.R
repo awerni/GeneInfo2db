@@ -10,52 +10,56 @@
 #' @examples
 getCelllineAnnotation <- function() {
 
-  cell_model_passport <- safeReadFile("https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz", read_fnc = readr::read_csv) %>%
+  cell_model_passport <- safeReadFile(
+      "https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz",
+      read_fnc = readr::read_csv
+    ) %>%
     dplyr::filter(model_type == "Cell Line")
 
   cell_model_passport1 <- cell_model_passport %>%
-    dplyr::select(CCLE_Name = CCLE_ID, cell_model_passport2 = model_id)
+    dplyr::select(CCLEName = CCLE_ID, cell_model_passport2 = model_id)
 
-  sample_info <- getFileData("sample_info") %>%
-    dplyr::mutate(CCLE_Name = ifelse(is.na(CCLE_Name) | CCLE_Name == "", cell_line_name, CCLE_Name)) %>%
-    dplyr::mutate(CCLE_Name = dplyr::coalesce(CCLE_Name, stripped_cell_line_name))
+  cell_model_passport2 <- cell_model_passport %>%
+    dplyr::select(cell_model_passport = model_id, tumortype = cancer_type)
 
-  if(anyNA(sample_info$CCLE_Name)) {
-    print(sample_info[is.na(sample_info$CCLE_Name),])
-    stop("sample_info$CCLE_Name should not contain NA!")
+  sample_info <- getFileData("Model") %>%
+    dplyr::mutate(CCLEName = ifelse(is.na(CCLEName) | CCLEName == "", CellLineName, CCLEName)) %>%
+    dplyr::mutate(CCLEName = dplyr::coalesce(CCLEName, StrippedCellLineName))
+
+  if(anyNA(sample_info$CCLEName)) {
+    print(sample_info[is.na(sample_info$CCLEName),])
+    stop("sample_info$CCLEName should not contain NA!")
   }
 
   if ("Alias" %in% colnames(sample_info)) {
-    sample_info = sample_info %>% rename(alias = Alias)
+    sample_info <- sample_info %>% dplyr::rename(alias = Alias)
   }
 
-  #sample_info <- sample_info %>% distinct()
-
-  no <- table(sample_info$CCLE_Name)
+  no <- table(sample_info$CCLEName)
   no <- names(no[no>1])
-  sample_info <- sample_info %>% filter(!CCLE_Name %in% no)
+  sample_info <- sample_info %>% filter(!CCLEName %in% no)
 
   cl_anno <- sample_info %>%
-    dplyr::left_join(cell_model_passport1, by = "CCLE_Name") %>%
+    dplyr::left_join(cell_model_passport1, by = "CCLEName") %>%
     dplyr::mutate(species = "human",
-                  gender = tolower(sex),
-                  organ = gsub("_", " ", na_if(lineage, "")),
-                  tumortype = tolower(gsub("_", " ", na_if(primary_disease, ""))),
-                  histology_type = gsub("_", " ", na_if(lineage_subtype, "")),
-                  histology_subtype = gsub("_", " ", gsub("_cell", "-cell", na_if(lineage_sub_subtype, ""))),
-                  cell_model_passport = coalesce(cell_model_passport2, na_if(Sanger_Model_ID, "")),
+                  gender = tolower(Sex),
+                  organ = tolower(gsub("_", " ", na_if(OncotreeLineage, ""))),
+                  tumortype = tolower(gsub("_", " ", na_if(OncotreePrimaryDisease, ""))),
+                  histology_type = tolower(gsub("_", " ", na_if(OncotreeSubtype, ""))),
+                  histology_subtype = tolower(gsub("_", " ", gsub("_cell", "-cell", na_if(MolecularSubtype, "")))),
+                  cell_model_passport = dplyr::coalesce(cell_model_passport2, na_if(SangerModelID, "")),
                   cellosaurus = na_if(RRID, ""),
-                  growth_type = gsub("[32]d: ", "", tolower(na_if(default_growth_pattern, ""))),
-                  metastatic_site = gsub("_", " ", ifelse(primary_or_metastasis == "Metastasis", sample_collection_site, NA)),
-                  morphology = ifelse(organ == "fibroblast", organ, NA),
+                  growth_type = gsub("[32]d: ", "", tolower(na_if(GrowthPattern, ""))),
+                  metastatic_site = tolower(gsub("_", " ", ifelse(PrimaryOrMetastasis == "Metastatic", SampleCollectionSite, NA))),
+                  morphology = tolower(ifelse(organ == "fibroblast", organ, NA)),
                   organ = ifelse(organ == "fibroblast", gsub("fibroblast ", "", histology_type), organ),
                   tumortype = ifelse(tumortype == "fibroblast", NA, tumortype),
-                  comment = na_if(depmap_public_comments, ""),
+                  comment = dplyr::na_if(PublicComments, ""),
                   public = TRUE) %>%
-    dplyr::rename(celllinename = CCLE_Name,
-                  age_at_surgery = age,
+    dplyr::rename(celllinename = CCLEName,
+                  age_at_surgery = Age,
                   cosmicid = COSMICID,
-                  depmap = DepMap_ID) %>%
+                  depmap = ModelID) %>%
     dplyr::select(celllinename, species, organ, tumortype, histology_type, histology_subtype,
                   growth_type, morphology, metastatic_site, cosmicid, gender, age_at_surgery, depmap,
                   cellosaurus, cell_model_passport, comment, public)
@@ -69,14 +73,14 @@ getCelllineAnnotation <- function() {
     dplyr::filter(celllinename %in% cl_anno$celllinename)
 
   depmap1 <- sample_info %>%
-    dplyr::select(celllinename = `CCLE_Name`, alternative_celllinename = alias) %>%
+    dplyr::select(celllinename = `CCLEName`, alternative_celllinename = CellLineName) %>%
     dplyr::filter(!is.na(alternative_celllinename) & alternative_celllinename != "") %>%
     dplyr::mutate(alternative_celllinename = stringr::str_split(alternative_celllinename, ", ")) %>%
     tidyr::unnest(alternative_celllinename) %>%
     dplyr::mutate(source = "depmap_alias")
 
   depmap2 <- sample_info %>%
-    dplyr::select(celllinename = CCLE_Name, alternative_celllinename = stripped_cell_line_name) %>%
+    dplyr::select(celllinename = CCLEName, alternative_celllinename = StrippedCellLineName) %>%
     dplyr::mutate(source = "depmap_stripped_name") %>%
     dplyr::filter(celllinename %in% cl_anno$celllinename)
 
