@@ -18,7 +18,7 @@ getTCGApancancerData <- function(ti) {
   
   ### mapping
   mapper <- tibble(`Immune Subtype` = paste0("C", 1:6), 
-                   immune_environment = c("C1 wound healing", "C2 IFN-γ dominant", "C3 inflammatory", 
+                   immune_environment = c("C1 wound healing", "C2 IFN-γ dominant", "C3 inflammatory",
                                           "C4 lymphocyte depleted", "C5 immunologically quiet", "C6 TGF-β dominant"))
   
   ### process
