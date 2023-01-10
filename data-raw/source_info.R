@@ -38,29 +38,39 @@ refseq_info <- tibble::tribble(
 
 # ------figshare (depmap) and direct links -----------
 
-DEPMAP_API_PATH <- 19700056 # 22Q1 = 19139906 # 21Q4 = 16924132 # 21Q3 = 15160110
-DEPMAP_VERSION  <- "22q2"
-depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", DEPMAP_API_PATH)) %>%
+FIGSHARE_ID <- 21637199 # 22Q2 = 19700056 22Q1 = 19139906 # 21Q4 = 16924132 # 21Q3 = 15160110
+DEPMAP_VERSION  <- "22q4"
+depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", FIGSHARE_ID)) %>%
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
   filter(
     data_file %in% c(
-      "sample_info",
+      "Model",
+      "OmicsExpressionProteinCodingGenesTPMLogp1",
+      "OmicsExpressionTranscriptsExpectedCountProfile",
+      "OmicsExpressionGenesExpectedCountProfile",
+      "CRISPRGeneDependency",
+      "CRISPRGeneEffect",
+      "AchillesCommonEssentialControls",
+      "AchillesNonessentialControls",
+      "OmicsCNGene",
+      "OmicsFusionFiltered",
+      "OmicsSomaticMutations"
+    )
+  )
+
+FIGSHARE_ID_OLD <- 19700056 # 
+DEPMAP_VERSION_OLD  <- "22q2"
+depmap_info_old <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", FIGSHARE_ID_OLD)) %>%
+  mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
+  select(data_name,  url = download_url, data_file) %>%
+  filter(
+    data_file %in% c(
       "CCLE_expression_full",
       "CCLE_RNAseq_reads",
       "CCLE_RNAseq_transcripts",
       "CCLE_gene_cn",
-      "CCLE_mutations",
-      "Achilles_gene_dependency",
-      "Achilles_gene_effect",
-      "Achilles_gene_effect_unscaled",
-      "Achilles_gene_dependency_CERES",
-      "Achilles_gene_effect_CERES",
-      "Achilles_gene_effect_unscaled_CERES",
-      "Achilles_common_essentials_CERES", # to decide if needed, there's
-      # no nonessentials like this above
-      "nonessentials",
-      "common_essentials"
+      "CCLE_mutations"
     )
   )
 
@@ -70,10 +80,10 @@ drive_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/6025238/f
   filter(grepl("(D2_DRIVE_gene_dep_scores)", data_file)) %>%
   mutate(data_file = "gene_effect")
 
-prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/9393293/files") %>%
+prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/20564034/files") %>%
   mutate(data_name = "prism", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
-  filter(data_file %in% c("secondary-screen-dose-response-curve-parameters"))
+  filter(data_file %in% c("prism-repurposing-20q2-secondary-screen-dose-response-curve-parameters"))
 
 sanger_info_chronos <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732/files") %>%
   mutate(data_name = "sanger-crispr-project-score", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) %>%
@@ -106,10 +116,11 @@ other_info <- tibble::tribble(
 
 drugcomb_info <- tibble::tribble(
   ~data_name, ~url, ~data_file,
-  "drugcomb", "https://drugcomb.fimm.fi/jing/summary_v_1_5_update_with_drugIDs.csv", "summary_v_1_5_update_with_drugIDs.csv"
+  "drugcomb", " ", "summary_v_1_5_update_with_drugIDs.csv"
 )
 
 download_file_info <- depmap_info %>%
+  bind_rows(depmap_info_old) %>%
   bind_rows(drive_info) %>%
   bind_rows(sanger_info) %>%
   bind_rows(prism_info) %>%
@@ -119,6 +130,7 @@ download_file_info <- depmap_info %>%
 file_version <- tibble::tribble(
   ~description, ~information,
   "Depmap Version", paste("public", DEPMAP_VERSION),
+  "Depmap Version Omics", paste("public", DEPMAP_VERSION_OLD),
   "metabolomics", "CCLE_metabolomics_20190502",
   "Proteomics", "CCLE_RPPA_20181003"
 )
