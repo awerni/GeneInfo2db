@@ -44,7 +44,7 @@ getUniprot <- function() {
   ftp_path <- "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/"
   file_uniprot2 <-"HUMAN_9606_idmapping_selected.tab.gz"
   url3 <- paste0(ftp_path, file_uniprot2)
-  
+
   id_map <- safeReadFile(url3, col_names = FALSE) %>%
     dplyr::select(accession = X1, uniprotid = X2, geneid = X3, ensg = X19, enst = X20, ensp = X21)
 
@@ -70,6 +70,7 @@ getUniprot <- function() {
     dplyr::filter(!is.na(ensg)) %>%
     dplyr::mutate(ensg = strsplit(ensg, "; ")) %>%
     tidyr::unnest(cols = c(ensg)) %>%
+    dplyr::mutate(ensg = gsub("\\..*", "", ensg)) %>%
     dplyr::filter(ensg %in% allENSG$ensg)
 
   list(public.uniprot = uniprot_anno,
