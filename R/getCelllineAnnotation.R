@@ -37,7 +37,7 @@ getCelllineAnnotation <- function() {
 
   no <- table(sample_info$CCLEName)
   no <- names(no[no>1])
-  sample_info <- sample_info %>% filter(!CCLEName %in% no)
+  sample_info <- sample_info %>% dplyr::filter(!CCLEName %in% no)
 
   cl_anno <- sample_info %>%
     dplyr::left_join(cell_model_passport1, by = "CCLEName") %>%
