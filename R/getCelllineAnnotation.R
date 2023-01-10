@@ -37,14 +37,20 @@ getCelllineAnnotation <- function() {
 
   no <- table(sample_info$CCLEName)
   no <- names(no[no>1])
+
+  tumor_types <- mskcc.oncotree::get_tumor_types() %>%
+    select(oncotree_name, oncotree_main_type)
+
   sample_info <- sample_info %>% dplyr::filter(!CCLEName %in% no)
 
   cl_anno <- sample_info %>%
     dplyr::left_join(cell_model_passport1, by = "CCLEName") %>%
+    dplyr::left_join(tumor_types, by = c("OncotreePrimaryDisease" = "oncotree_name")) %>%
     dplyr::mutate(species = "human",
                   gender = tolower(Sex),
                   organ = tolower(gsub("_", " ", na_if(OncotreeLineage, ""))),
-                  tumortype = tolower(gsub("_", " ", na_if(OncotreePrimaryDisease, ""))),
+                  tumortype = tolower(oncotree_main_type),
+                  tissue_subtype = tolower(gsub("_", " ", na_if(OncotreePrimaryDisease, ""))),
                   histology_type = tolower(gsub("_", " ", na_if(OncotreeSubtype, ""))),
                   histology_subtype = tolower(gsub("_", " ", gsub("_cell", "-cell", na_if(MolecularSubtype, "")))),
                   cell_model_passport = dplyr::coalesce(cell_model_passport2, na_if(SangerModelID, "")),
@@ -52,8 +58,8 @@ getCelllineAnnotation <- function() {
                   growth_type = gsub("[32]d: ", "", tolower(na_if(GrowthPattern, ""))),
                   metastatic_site = tolower(gsub("_", " ", ifelse(PrimaryOrMetastasis == "Metastatic", SampleCollectionSite, NA))),
                   morphology = tolower(ifelse(organ == "fibroblast", organ, NA)),
-                  organ = ifelse(organ == "fibroblast", gsub("fibroblast ", "", histology_type), organ),
-                  tumortype = ifelse(tumortype == "fibroblast", NA, tumortype),
+                  organ = ifelse(grepl("fibroblast", organ), gsub("fibroblast, ", "", histology_type), organ),
+                  tumortype = ifelse(grepl("(matched normal|immortalized)", histology_type), "normal", tumortype),
                   comment = dplyr::na_if(PublicComments, ""),
                   public = TRUE) %>%
     dplyr::rename(celllinename = CCLEName,
