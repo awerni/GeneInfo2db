@@ -17,71 +17,71 @@ getTCGAAnnotation <- function() {
   data <- lapply(project, function(p) {
     print(paste("processing", p))
     clin <- TCGAbiolinks::GDCquery_clinic(p, "Clinical") %>%
-      rename(
+      dplyr::rename(
         patientname = submitter_id,
         days_to_last_followup = days_to_last_follow_up,
         days_to_last_known_alive = days_to_last_known_disease_status,
         organ = tissue_or_organ_of_origin,
       ) %>%
       mutate(project = gsub("^TCGA-", "", p))
-    
+
     query1 <- TCGAbiolinks::GDCquery(
       project = p,
       data.category = "Transcriptome Profiling",
       data.type = "miRNA Expression Quantification",
       legacy = FALSE
     )
-    
+
     query2 <- TCGAbiolinks::GDCquery(
       project = p,
       data.category = "Transcriptome Profiling",
       data.type = "Gene Expression Quantification",
       legacy = FALSE
     )
-    
+
     query3 <- TCGAbiolinks::GDCquery(
       project = p,
       data.category = "Copy Number Variation",
       data.type = "Gene Level Copy Number",
       legacy = FALSE
     )
-    
+
     query4 <- TCGAbiolinks::GDCquery(
       project = p,
       data.category = "Simple Nucleotide Variation",
       data.type = "Raw Simple Somatic Mutation",
       legacy = FALSE
     )
-    
+
     getTissuename <-
       function(q)
         substr(q$results[[1]]$cases, 1, 15) %>% unique()
-    
+
     t1 <- getTissuename(query1)
     t2 <- getTissuename(query2)
     t3 <- getTissuename(query3)
     t4 <- getTissuename(query4)
-    
+
     tissuesample <- data.frame(tissuename = unique(c(t1, t2, t3, t4))) %>%
       mutate(patientname = substr(tissuename, 1, 12),
              code = substr(tissuename, 14, 15)) %>%
-      left_join(clin, by = "patientname") %>%
-      left_join(TCGA_study, by = "project") %>%
-      left_join(TCGA_sample_type, by = "code") %>%
-      left_join(subtypes, by = c("patientname" = "pan.samplesID")) %>%
-      mutate(vendorname = "TCGA", species = "human")
-    
+      dplyr::left_join(clin, by = "patientname") %>%
+      dplyr::left_join(TCGA_study, by = "project") %>%
+      dplyr::left_join(TCGA_sample_type, by = "code") %>%
+      dplyr::left_join(subtypes, by = c("patientname" = "pan.samplesID")) %>%
+      dplyr::mutate(vendorname = "TCGA", species = "human")
+
     list(
       clin = clin,
       tissuesample = tissuesample
     )
   })
-  
+
   clin <- lapply(data, "[[", "clin") %>% bind_rows()
   tissuesample <- lapply(data, "[[", "tissuesample") %>% bind_rows()
-  
+
   patient <- clin %>%
-    select(
+    dplyr::select(
       patientname,
       vital_status,
       days_to_birth,
@@ -100,12 +100,12 @@ getTCGAAnnotation <- function() {
       height = NA,
       weight = NA
     )
-  
+
   pancancer_data <- getTCGApancancerData(tissuesample$tissuename)
-  
+
   tissue <- tissuesample %>%
     dplyr::rename(stage = ajcc_pathologic_stage) %>%
-    dplyr::filter(tissue_definition != "Blood Derived Normal") %>% 
+    dplyr::filter(tissue_definition != "Blood Derived Normal") %>%
     dplyr::mutate(
       tumortype_adjacent = ifelse(grepl("Normal", tissue_definition), tumortype, NA),
       tumortype = ifelse(grepl("Normal", tissue_definition), "normal", tumortype),
@@ -156,7 +156,7 @@ getTCGAAnnotation <- function() {
 
   res <- list(
     tissue.tumortype = tumortype,
-    tissue.patient = patient, 
+    tissue.patient = patient,
     tissue.tissue = tissue
   )
 }

@@ -1,33 +1,33 @@
 getTissueMutation <- function() {
-  
+
   con <- getPostgresqlConnection()
-  
+
   transcript <- dplyr::tbl(con, dbplyr::in_schema("public", "transcript"))  %>%
     dplyr::select(enst, ensg) %>%
     dplyr::filter(grepl("ENST", enst)) %>%
     dplyr::collect()
-  
+
   tissue <- dplyr::tbl(con, dbplyr::in_schema("tissue", "tissue"))  %>%
     dplyr::select(tissuename) %>%
     dplyr::collect()
-  
+
   RPostgres::dbDisconnect(con)
-  
+
   # ---------------
-  
+
   project <- TCGAbiolinks::getGDCprojects()$project_id
   project <- grep("TCGA", project, value = TRUE)
-  
+
   getData <- function(p) {
     query <- TCGAbiolinks::GDCquery(
-      project = p, 
-      data.category = "Simple Nucleotide Variation", 
-      access = "open", 
-      legacy = FALSE, 
-      data.type = "Masked Somatic Mutation", 
+      project = p,
+      data.category = "Simple Nucleotide Variation",
+      access = "open",
+      legacy = FALSE,
+      data.type = "Masked Somatic Mutation",
       workflow.type = "Aliquot Ensemble Somatic Variant Merging and Masking"
     )
-    
+
     TCGAbiolinks::GDCdownload(query)
     maf <- TCGAbiolinks::GDCprepare(query)
     res <- maf %>%
@@ -36,7 +36,7 @@ getTissueMutation <- function() {
         dnazygosity = t_alt_count / t_depth,
         aammutation = ifelse(Variant_Classification == "Silent", "wt", HGVSp_Short)
       ) %>%
-      filter(!grepl(pattern = "(Flank)|(UTR)", Variant_Classification)) %>%
+      dplyr::filter(!grepl(pattern = "(Flank)|(UTR)", Variant_Classification)) %>%
       dplyr::select(
         tissuename,
         enst = Transcript_ID,
@@ -52,12 +52,12 @@ getTissueMutation <- function() {
     ) %>%
     as.data.frame()
   }
-  
+
   mut <- lapply(project, getData) %>%
     dplyr::bind_rows() %>%
-    filter(enst %in% transcript$enst) %>%
-    filter(tissuename %in% tissue$tissuename)
-  
+    dplyr::filter(enst %in% transcript$enst) %>%
+    dplyr::filter(tissuename %in% tissue$tissuename)
+
   list(
     tissue.processedsequence = mut
   )
