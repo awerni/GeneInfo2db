@@ -11,7 +11,7 @@ getCelllinePrism <- function() {
 
   # -----------------------------------
 
-  dfile <- "secondary-screen-dose-response-curve-parameters"
+  dfile <- "prism-repurposing-20q2-secondary-screen-dose-response-curve-parameters"
   prism_data <- getFileData(dfile)
 
   prism_drugs <- prism_data %>%
