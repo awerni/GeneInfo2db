@@ -23,7 +23,7 @@ dbNew <- getPostgresqlConnection()
 dbNewSummary <- dbGetQuery(dbNew, statement = sql)
 
 oldUser <- "reader"
-oldName <- "bioinfo_21Q4i.hg38"
+oldName <- "bioinfo_22Q1.hg38"
 oldPassword <- ""
 oldDb <-
   getPostgresqlConnection(user = oldUser,
@@ -45,7 +45,7 @@ result <- full_join(
   )
 )
 
-result %>% mutate(row_diff = round((row_estimate - old_row_estimate) / ((
+res <- result %>% mutate(row_diff = round((row_estimate - old_row_estimate) / ((
   row_estimate + old_row_estimate
 ) / 2), 3),
 size_diff = round((total_bytes - old_total_bytes) / ((
