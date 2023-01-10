@@ -2,7 +2,7 @@
 #'
 #' @param table_data a list of data frames
 #' @return nothing
-
+#' @export
 writeDatabase <- function(table_data) {
   con <- getPostgresqlConnection()
   for (myT in names(table_data)) {
