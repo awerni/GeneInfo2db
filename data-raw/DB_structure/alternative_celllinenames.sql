@@ -90,7 +90,7 @@ INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllin
 INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('MS1_LUNG', 'MS-1', 'BI');
 INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('MS1_SKIN', 'MS-1', 'BI');
 INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('NCIH1581_LUNG', 'NCI-H1581', 'BI');
-INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('NCIH2077_LUNG', 'NCI-H2077', 'BI');
+--INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('NCIH2077_LUNG', 'NCI-H2077', 'BI');
 INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('H2369_PLEURA', 'NCI-H2369', 'BI');
 INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('NCIH2373_PLEURA', 'NCI-H2373', 'BI');
 INSERT INTO cellline.alternative_celllinename (celllinename, alternative_celllinename, source) VALUES ('NCIH2461_PLEURA', 'NCI-H2461', 'BI');
