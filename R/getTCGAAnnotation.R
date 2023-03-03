@@ -147,7 +147,8 @@ getTCGAAnnotation <- function() {
       tumorpurity          = as.numeric(NA),
       lossofy              = NA
     ) %>%
-    dplyr::rows_patch(pancancer_data, by = c("tissuename", "patientname"))
+    dplyr::rows_patch(pancancer_data, by = c("tissuename", "patientname"), 
+                      unmatched = "ignore")
 
   tumortype <- data.frame(
     tumortype = unique(tissue$tumortype),
