@@ -2,8 +2,7 @@ getTCGApancancerData <- function(ti) {
 
   tissuename_to_patientname <-
     data.frame(tissuename = ti) %>%
-    dplyr::mutate(patientname = stringr::str_sub(tissuename, 1, 12)) %>%
-    dplyr::filter(!grepl("1.$", tissuename))
+    dplyr::mutate(patientname = stringr::str_sub(tissuename, 1, 12))
 
   # ------------------------------------------------------------------------------
   # immune environments
@@ -187,7 +186,8 @@ getTCGApancancerData <- function(ti) {
     dplyr::filter(!is.na(CPE)) %>%
     dplyr::select(tissuename, CPE) %>%
     dplyr::group_by(tissuename) %>%
-    dplyr::summarise(tumorpurity = mean(CPE))
+    dplyr::summarise(tumorpurity = mean(CPE)) %>%
+    dplyr::inner_join(tissuename_to_patientname, by = "tissuename")
 
   # ------------------------------------------------------------------------------
   # Breast Cancer PAM50
