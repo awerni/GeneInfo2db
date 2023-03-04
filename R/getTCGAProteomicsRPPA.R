@@ -37,6 +37,13 @@ getTCGAProteomicsRPPA <- function() {
       antibody_coarse
     ))
   
+  additional_TCGA_antibodies <- rppa_ab %>%
+    dplyr::filter(!antibody_coarse %in% antibody$antibody_coarse) %>%
+    dplyr::select(antibody = 3, validation_status = `Validation Status*`,
+           vendor = Company, catalog_number = `Catalog #`,
+           antibody_coarse) %>%
+    dplyr::filter(!is.na(antibody))
+  
   antibody_mapping <- additional_TCGA_antibodies %>%
     bind_rows(antibody) %>%
     dplyr::select(antibody, antibody_coarse)
@@ -45,6 +52,7 @@ getTCGAProteomicsRPPA <- function() {
   temp <- tempfile()
   download.file(url, temp)
   data <- read_csv(unz(temp, "tmp/TCGA-PANCAN32-L4.csv"))
+  
   unlink(temp)
   
   ab_data_long <- data %>% 
