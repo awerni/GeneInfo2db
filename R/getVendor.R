@@ -3,5 +3,5 @@ getVendor <- function(vn) {
     vendorname = vn,
     vendorurl = as.character(NA)
   )
-  return(vendor)
+  return(list(tissue.vendor = vendor))
 }
