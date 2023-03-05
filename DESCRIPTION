@@ -4,7 +4,7 @@ Version: 0.1.8
 Authors@R: person("Andreas", "Wernitznig", email = "awernitz@broadinstitute.org",
                   role = c("aut", "cre"))
 Description: Fills the bioinfo database with gene information and omics data from depmap.org
-Depends: R (>= 4.0.0), dplyr, RPostgres, DBI, purrr, tibble, tidyr, magrittr, dbplyr, stringr, GSVA, mskcc.oncotree
+Depends: R (>= 4.0.0), dplyr, RPostgres, DBI, purrr, tibble, tidyr, magrittr, dbplyr, stringr, GSVA, mskcc.oncotree, TCGAbiolinks
 Suggests: recount3, recount, RMariaDB
 License: What license is it under?
 LazyData: true
