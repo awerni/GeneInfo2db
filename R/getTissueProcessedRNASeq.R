@@ -12,7 +12,7 @@ getTissueRNAseqGroup <- function() {
   )
 
   list(
-    tissue.RNAseqGroup = RNAseqGroup
+    tissue.rnaseqgroup = RNAseqGroup
   )
 }
 
