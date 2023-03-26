@@ -4,8 +4,8 @@ Version: 0.1.9
 Authors@R: person("Andreas", "Wernitznig", email = "awernitz@broadinstitute.org",
                   role = c("aut", "cre"))
 Description: Fills the bioinfo database with gene information and omics data from depmap.org
-Depends: R (>= 4.0.0), dplyr, RPostgres, DBI, purrr, tibble, tidyr, magrittr, dbplyr, stringr, GSVA, mskcc.oncotree, TCGAbiolinks
-Suggests: recount3, recount, RMariaDB
+Depends: R (>= 4.0.0), dplyr, RPostgres, DBI, purrr, tibble, tidyr, magrittr, dbplyr, stringr, GSVA, mskcc.oncotree, TCGAbiolinks, RMariaDB
+Suggests: recount3, recount
 License: What license is it under?
 LazyData: true
 URL: https://github.com/broadinstitute/GeneInfo2db
