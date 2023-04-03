@@ -118,9 +118,10 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
       dplyr::mutate(ensg =  substr(ensg, 1, 15))
   }
 
-  counts <- to_data_frame(SummarizedExperiment::assay(rse_gene, "raw_counts"))
-
   SummarizedExperiment::assay(rse_gene, "counts") <- recount3::transform_counts(rse_gene)
+
+  counts <- to_data_frame(SummarizedExperiment::assay(rse_gene, "counts"))
+
   log2tpm <- to_data_frame(recount::getTPM(rse_gene), name = "tpm") %>%
     dplyr::mutate(log2tpm = log2(tpm + 1)) %>% select(-tpm)
 
