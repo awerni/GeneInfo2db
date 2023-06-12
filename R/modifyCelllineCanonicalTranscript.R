@@ -8,7 +8,7 @@ modifyCelllineCanonicalTranscript <- function() {
 
   mut_enst2 <- mut_enst %>%
     dplyr::group_by(ensg, iscanonical) %>%
-    dplyr::summarise(n = n(), .groups = "drop") %>%
+    dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
     tidyr::pivot_wider(ensg, names_from = "iscanonical", values_from = "n", values_fill = 0) %>%
     dplyr::rename(canonical = 2, non_canonical = 3) %>%
     dplyr::filter(canonical == 0 & non_canonical == 1)
