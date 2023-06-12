@@ -17,7 +17,8 @@ getCelllineAnnotation <- function() {
     dplyr::filter(model_type == "Cell Line")
 
   cell_model_passport1 <- cell_model_passport %>%
-    dplyr::select(CCLEName = CCLE_ID, cell_model_passport2 = model_id)
+    dplyr::select(CCLEName = CCLE_ID, cell_model_passport2 = model_id) %>%
+    dplyr::filter(!is.na(CCLEName))
 
   cell_model_passport2 <- cell_model_passport %>%
     dplyr::select(cell_model_passport = model_id, tumortype = cancer_type)
@@ -39,7 +40,8 @@ getCelllineAnnotation <- function() {
   no <- names(no[no>1])
 
   tumor_types <- mskcc.oncotree::get_tumor_types() %>%
-    select(oncotree_name, oncotree_main_type)
+    select(oncotree_name, oncotree_main_type) %>%
+    distinct()
 
   sample_info <- sample_info %>% dplyr::filter(!CCLEName %in% no)
 
@@ -52,7 +54,7 @@ getCelllineAnnotation <- function() {
                   tumortype = tolower(oncotree_main_type),
                   tissue_subtype = tolower(gsub("_", " ", na_if(OncotreePrimaryDisease, ""))),
                   histology_type = tolower(gsub("_", " ", na_if(OncotreeSubtype, ""))),
-                  histology_subtype = tolower(gsub("_", " ", gsub("_cell", "-cell", na_if(MolecularSubtype, "")))),
+                  histology_subtype = tolower(gsub("_", " ", gsub("_cell", "-cell", na_if(LegacyMolecularSubtype, "")))),
                   cell_model_passport = dplyr::coalesce(cell_model_passport2, na_if(SangerModelID, "")),
                   cellosaurus = na_if(RRID, ""),
                   growth_type = gsub("[32]d: ", "", tolower(na_if(GrowthPattern, ""))),
