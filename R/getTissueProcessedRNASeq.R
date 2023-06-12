@@ -78,6 +78,11 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
     as.data.frame() %>%
     filter_bad_qc()
 
+  if (nrow(col_data) == 0) {
+    message("no good quality runs available")
+    return()
+  }
+  
   #col_data <- SummarizedExperiment::colData(rse_gene)
   col_ids <- col_data[[id_column]]
 

@@ -1,3 +1,4 @@
+refresh materialized view tissue.tcgaenst;
 refresh materialized view tissue.cnaltered_ensg;
 refresh materialized view tissue.expressed_ensg;
 refresh materialized view tissue.expressed_ensg_full;
@@ -9,4 +10,3 @@ refresh materialized view tissue.processedrnaseq_array;
 refresh materialized view tissue.processedrnaseq_array_full;
 refresh materialized view tissue.processedrnaseqtranscript_array;
 refresh materialized view tissue.processedrnaseqtranscript_array_full;
-refresh materialized view tissue.tcgaenst;
