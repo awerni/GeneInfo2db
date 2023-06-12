@@ -1,4 +1,4 @@
-modifyTissueCanonicalRNAseqRun() {
+modifyTissueCanonicalRNAseqRun() <- function() {
   con <- getPostgresqlConnection()
   
   sql <- paste0("SELECT * FROM tissue.rnaseqrun WHERE tissuename IN (",
