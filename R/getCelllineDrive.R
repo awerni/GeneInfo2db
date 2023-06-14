@@ -32,7 +32,7 @@ getCelllineDrive <- function() {
     dplyr::mutate(geneid = lapply(str_split(geneid, "&"), as.integer)) %>%
     tidyr::unnest(geneid)
 
-  ensg <- get_gene_translation(unique(gene_effect_long2$geneid))
+  ensg <- getEntrezGene2ENSG(unique(gene_effect_long2$geneid))
 
   gene_effect_long2 <- gene_effect_long2 %>%
     dplyr::inner_join(ensg, by = "geneid") %>%

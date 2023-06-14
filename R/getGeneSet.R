@@ -16,7 +16,7 @@ getGeneSet <- function() {
     "non-essential genes", "human"
   )
 
-  geneassignment <- get_gene_translation(gene_df$geneid) %>%
+  geneassignment <- getEntrezGene2ENSG(gene_df$geneid) %>%
     dplyr::left_join(gene_df, by = "geneid") %>%
     dplyr::select(-geneid)
 

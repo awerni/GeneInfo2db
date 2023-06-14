@@ -28,7 +28,7 @@ getCelllineCopynumber <- function() {
       dplyr::select(-depmap) %>%
       dplyr::mutate(cn = 2*(2^log2cn - 1)) 
 
-    gene2ensg <- get_gene_translation(gene_name$geneid)
+    gene2ensg <- getEntrezGene2ENSG(gene_name$geneid)
 
     CCLE.gene.cn <- CCLE.gene.cn %>%
       dplyr::inner_join(gene2ensg, by = "geneid") %>%
@@ -43,7 +43,7 @@ getCelllineCopynumber <- function() {
       dplyr::mutate(geneid = as.numeric(gsub("(\\(|\\))", "", geneid)))
 
     colnames(CCLE.gene.cn) <- c("depmap", as.character(gene_name$geneid))
-    gene2ensg <- get_gene_translation(gene_name$geneid)
+    gene2ensg <- getEntrezGene2ENSG(gene_name$geneid)
 
     CCLE.gene.cn <- CCLE.gene.cn %>%
       tidyr::pivot_longer(!depmap, names_to = "geneid", values_to = "log2cn") %>%

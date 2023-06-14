@@ -32,7 +32,7 @@ getCellline_CRISPR_screen_chronos <- function(
     dplyr::select(-depmap) %>%
     separate_gene
   
-  ensg <- get_gene_translation(geneid = unique(gene_effect_long_new$geneid))
+  ensg <- getEntrezGene2ENSG(geneid = unique(gene_effect_long_new$geneid))
   
   # ------------
   gene_dependency_long_new <- getFileData(file_dependency)
