@@ -1,3 +1,5 @@
+library(dplyr)
+
 p <- "data-raw/DB_structure/"
 
 read_file <- function(f, keep_crlf = FALSE) {
