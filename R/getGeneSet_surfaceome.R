@@ -11,7 +11,7 @@ getGeneSet_surfaceome <- function() {
 
   # ---------------------------
 
-  TCSA_data <- getFileData('TCSA')
+  TCSA_data <- getFileData("TCSA_ensg.xlsx")
 
   geneset <- tibble::tribble(
     ~genesetname, ~species,
