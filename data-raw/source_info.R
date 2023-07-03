@@ -59,7 +59,7 @@ depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/
     )
   )
 
-FIGSHARE_ID_OLD <- 19700056 # 
+FIGSHARE_ID_OLD <- 19700056 #
 DEPMAP_VERSION_OLD  <- "22q2"
 depmap_info_old <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", FIGSHARE_ID_OLD)) %>%
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
@@ -111,7 +111,8 @@ other_info <- tibble::tribble(
   "total-proteome", "https://gygi.hms.harvard.edu/data/ccle/protein_quant_current_normalized.csv.gz", "protein_quant_current_normalized.csv.gz",
   "uniprot", "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping_selected.tab.gz", "HUMAN_9606_idmapping_selected.tab.gz",
   "metmap", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-020-2969-2/MediaObjects/41586_2020_2969_MOESM7_ESM.xlsx", 'metmap.xlsx',
-  "msi", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", "msi"
+  "msi", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", "msi",
+  "TCSA", "http://fcgportal.org/TCSA/Download/Table%20S2.xlsx", "TCSA_ensg.xlsx"
 )
 
 drugcomb_info <- tibble::tribble(
