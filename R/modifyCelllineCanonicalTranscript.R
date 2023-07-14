@@ -1,25 +1,20 @@
 modifyCelllineCanonicalTranscript <- function() {
   con <- getPostgresqlConnection()
 
-  sql <- paste0("SELECT ensg, enst, iscanonical FROM transcript ",
-                "WHERE enst IN (SELECT distinct enst FROM cellline.processedsequence)")
-
+  sql <- paste0("SELECT ensg, p.enst, iscanonical, count(*)::INT4 AS n FROM transcript t JOIN  ",
+                "cellline.processedsequence p ON t.enst = p.enst GROUP BY ensg, p.enst, iscanonical")
+  
   mut_enst <- DBI::dbGetQuery(con, sql)
 
-  mut_enst2 <- mut_enst %>%
-    dplyr::group_by(ensg, iscanonical) %>%
-    dplyr::summarise(n = dplyr::n(), .groups = "drop") %>%
-    tidyr::pivot_wider(ensg, names_from = "iscanonical", values_from = "n", values_fill = 0) %>%
-    dplyr::rename(canonical = 2, non_canonical = 3) %>%
-    dplyr::filter(canonical == 0 & non_canonical == 1)
-
-  mut_enst3 <- mut_enst %>%
-    dplyr::filter(ensg %in% mut_enst2$ensg) %>%
+  mut_enst2 <- mut_enst |>
+    dplyr::group_by(ensg) |>
+    mutate(share = n/sum(n)) |>
+    filter(share > 0.8 & !iscanonical) |>
     dplyr::mutate(sql1 = paste0("UPDATE transcript SET iscanonical = FALSE WHERE ensg = '", ensg, "'"),
                   sql2 = paste0("UPDATE transcript SET iscanonical = TRUE WHERE enst = '", enst, "'"))
 
-  sapply(mut_enst3$sql1, function(s) DBI::dbExecute(con, s))
-  sapply(mut_enst3$sql2, function(s) DBI::dbExecute(con, s))
+  sapply(mut_enst2$sql1, function(s) DBI::dbExecute(con, s))
+  sapply(mut_enst2$sql2, function(s) DBI::dbExecute(con, s))
 
   RPostgres::dbDisconnect(con)
 
