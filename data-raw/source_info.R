@@ -131,7 +131,8 @@ download_file_info <- depmap_info %>%
 file_version <- tibble::tribble(
   ~description, ~information,
   "Depmap Version", paste("public", DEPMAP_VERSION),
-  "Depmap Version Omics", paste("public", DEPMAP_VERSION_OLD),
+  "Depmap Version DNAseq", paste("public", DEPMAP_VERSION),
+  "CCLE Version Omics", paste("public", DEPMAP_VERSION_OLD),
   "metabolomics", "CCLE_metabolomics_20190502",
   "Proteomics", "CCLE_RPPA_20181003"
 )
