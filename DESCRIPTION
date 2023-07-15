@@ -6,7 +6,7 @@ Authors@R: person("Andreas", "Wernitznig", email = "awernitz@broadinstitute.org"
 Description: Fills the bioinfo database with gene information and omics data from depmap.org
 Depends: R (>= 4.0.0), dplyr, RPostgres, DBI, purrr, tibble, tidyr, magrittr, dbplyr, stringr, GSVA, mskcc.oncotree, TCGAbiolinks, RMariaDB, logger
 Suggests: recount3, recount
-License: What license is it under?
+License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/broadinstitute/GeneInfo2db
 RoxygenNote: 7.2.1
