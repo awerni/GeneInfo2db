@@ -55,7 +55,10 @@ depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/
       "AchillesNonessentialControls",
       "OmicsCNGene",
       "OmicsFusionFiltered",
-      "OmicsSomaticMutations"
+      "OmicsSomaticMutations",
+      "OmicsDefaultModelConditionProfiles",
+      "ModelCondition",
+      "OmicsProfiles"
     )
   )
 
