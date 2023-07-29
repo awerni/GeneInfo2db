@@ -2,7 +2,7 @@
 #'
 #' @return a list with a single list element called public.msigdb
 
-getMSigDB <- function() {
+getMSigDB <- function(version) {
 
   con <- getPostgresqlConnection()
 
@@ -18,7 +18,7 @@ getMSigDB <- function() {
   msig_df <- NULL
 
   for (n in 1:nrow(gmt.files)) {
-    g <- gmt.files[[n, "file"]]
+    g <- gsub("\\$", version, gmt.files[[n, "file"]])
     print(g)
     msig <- scan(paste0(getOption("msigdb_path"), "/", g), what="", sep="\n")
     msig <- strsplit(msig, "\t")
