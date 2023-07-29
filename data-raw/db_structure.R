@@ -61,5 +61,5 @@ save(
   recreateAnnotationSchema, geneAnnotation, db_glue_anno,
   recreateCelllineSchema, celllineDB, db_glue_cl, refreshView_cl, alternative_celllinename,
   recreateTissueSchema, tissueDB, renewTissuePanels, db_glue_ti, refreshView_ti,
-  file = "data/db_schema.rdata"
+  file = "data/db_schema.rda"
 )
