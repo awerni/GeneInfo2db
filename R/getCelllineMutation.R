@@ -1,19 +1,19 @@
 getCelllineMutation <- function() {
   con <- getPostgresqlConnection()
-  
+
   transcript <- dplyr::tbl(con, "transcript") %>%
     dplyr::inner_join(dplyr::tbl(con, "gene"), by = "ensg") %>% 
     dplyr::filter(species == "human")  %>% 
     dplyr::select(enst) %>%
     dplyr::collect()
-  
+
   cellline <- dplyr::tbl(con, dbplyr::in_schema("cellline", "cellline"))  %>%
     dplyr::filter(species == "human")  %>% 
     dplyr::select(celllinename, depmap) %>%
     dplyr::collect()
-  
+
   RPostgres::dbDisconnect(con)
-  
+
   DepMap.mutations <- getFileData("OmicsSomaticMutations")
 
   DepMap.mutations2 <- DepMap.mutations %>%
@@ -31,6 +31,6 @@ getCelllineMutation <- function() {
     dplyr::inner_join(cellline, by = "depmap") %>%
     dplyr::filter(enst %in% transcript$enst) %>%
     dplyr::select(celllinename, enst, dnamutation, aamutation, dnazygosity, rnazygosity)
-  
+
   list(cellline.processedsequence = DepMap.mutations2)
 }
