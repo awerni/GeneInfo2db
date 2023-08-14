@@ -1,4 +1,4 @@
-getMissingLab <- function(lab) {
+getLaboratory <- function(lab) {
   con <- getPostgresqlConnection()
 
   laboratory <- dplyr::tbl(con, "laboratory") |>
