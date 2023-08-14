@@ -179,7 +179,7 @@ safeReadFile <- function(url, filename = NULL, read_fnc = readr::read_tsv, .retr
 guessingReadingFunction <- function(filepath) {
 
   if (dplyr::coalesce(readxl::format_from_signature(filepath) == "xlsx", FALSE)) {
-    log_trace("Using eadxl::read_xlsx to read {filepath}")
+    log_trace("Using readxl::read_xlsx to read {filepath}")
     readxl::read_xlsx(filepath,  guess_max = 10000)
   } else {
     l <- readLines(filepath, n = 1)
