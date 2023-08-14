@@ -37,8 +37,10 @@ getTissueProcessedRNASeq <- function(projects) {
     result$tissue.tissue <- NULL
     result$tissue.patient <- NULL
   }
-
-  result
+  c(
+    getLaboratory("recount3"),
+    result
+  )
 }
 
 
