@@ -1,8 +1,8 @@
-#' Get file size info from the url.
+#' Get file size info from the URL.
 #'
-#' @param url url to test. Can be a ftp url.
+#' @param URL URL to test. Can be a ftp URL.
 #'
-#' @return file size of the file from the url.
+#' @return file size of the file from the URL.
 #'
 #' @importFrom RCurl getURL
 #' @importFrom stringi stri_extract_all_regex
@@ -16,37 +16,37 @@
 #' download_filesize("https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz")
 #' }
 #'
-download_filesize <- function(url) {
+download_filesize <- function(URL) {
 
-  rcurlFileSize <- function(url) {
+  rcurlFileSize <- function(URL) {
 
-    if(!getOption("GeneInfo2db.ExperimentalCurlSizeRequest", default = FALSE)) {
-      size <- RCurl::getURL(url, nobody = 1L, header = 1L) # get header without body
-    } else {
+    if (getOption("GeneInfo2db.ExperimentalCurlSizeRequest", default = FALSE)) {
       # this is the most experimental implementation but it should work
       # in most places. Some servers does not support nobody request
-      size <- paste(system2("curl", paste("-s -I -X GET", url), TRUE), collapse = "\n")
+      # -L for following to a different location (e.g. figshare uses AWS). otherwise size = 0
+      size <- paste(system2("curl", paste("-s -I -L -X GET", URL), TRUE), collapse = "\n")
+    } else {
+      size <- RCurl::getURL(URL, nobody = 1L, header = 1L) # get header without body
     }
-    size <- (
-      stringi::stri_extract_all_regex(size, "Content-Length: [0-9]+")
-      %>% stringi::stri_extract_all_regex("[0-9]+") 
-      %>% unlist() 
-      %>% as.numeric()
-    )
-    return(size)
+    stringi::stri_extract_all_regex(size, "Content-Length: [0-9]+") |>
+      unlist() |>
+      stringi::stri_extract_all_regex("[0-9]+") |>
+      unlist() |>
+      as.numeric() |>
+      max()
   }
 
-  if(substr(url,1,3) == "ftp") {
-    return(rcurlFileSize(url))
+  if (substr(URL, 1, 3) == "ftp") {
+    return(rcurlFileSize(URL))
   }
 
-  size <- as.numeric(httr::HEAD(url)$headers$`content-length`)
-  if(length(size) == 0) size <- rcurlFileSize(url)
+  size <- as.numeric(httr::HEAD(URL)$headers$`content-length`)
+  if (length(size) == 0) size <- rcurlFileSize(URL)
   size
 }
 
 
-safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
+safeDownloadFile <- function(URL, filename, .retries = 20, .waitTime = 20) {
 
   if(.retries < 0) stop(".retries must be greater or equal to zero!")
 
@@ -56,7 +56,7 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
   # we assume that the file was only partially downloaded or a new version is available
   # in both cases - the downloading needs to start from scratch
   if (file.exists(filename)) {
-    size2download <- download_filesize(url)
+    size2download <- download_filesize(URL)
     currentSize <- file.info(filename)$size
 
     logger::log_trace("{filename}: Size to download: {size2download}, Current Size: {currentSize}, Match size: {size2download == currentSize}")
@@ -69,10 +69,10 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
     }
   }
 
-  logger::log_trace("File {filename} not available local cache. Downloading from {url} using safeDownloadFile().")
+  logger::log_trace("File {filename} not available local cache. Downloading from {URL} using safeDownloadFile().")
 
-  status <- tryCatch(download.file(url, filename), error = function(err) {
-    logger::log_error("Cannot download the {url}.")
+  status <- tryCatch(download.file(URL, filename), error = function(err) {
+    logger::log_error("Cannot download the {URL}.")
     if(file.exists(filename)) unlink(filename)
     err
   })
@@ -82,9 +82,9 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
     if(.retries == 0) {
       stop(status)
     } else {
-      logger::log_trace("Cannot download file - Retrying {url} - number of retries left {.retries - 1}")
+      logger::log_trace("Cannot download file - Retrying {URL} - number of retries left {.retries - 1}")
       Sys.sleep(.waitTime)
-      res <- safeDownloadFile(url, filename, .retries - 1, .waitTime)
+      res <- safeDownloadFile(URL, filename, .retries - 1, .waitTime)
       return(res)
     }
   }
@@ -92,9 +92,9 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
   return(list(status = status, .retries = .retries))
 }
 
-#' Safe read file from url.
+#' Safe read file from URL.
 #'
-#' @param url url to file.
+#' @param URL URL to file.
 #' @param read_fnc function used to read file from disk. Default \code{\link{read_tsv}} from \code{readr} package.
 #' @param ... other parameres passed to \code{read_fnc}.
 #'
@@ -104,8 +104,8 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
 #'
 #' @details 
 #'
-#' This function is a safer alternative to \code{read_tsv(url)}. When there will be any problem with the connection, \code{safe_read_file}
-#' will fail, but the \code{read_tsv(url)} can return partial result (meaning - all rows downloaded up to the loss connection point).
+#' This function is a safer alternative to \code{read_tsv(URL)}. When there will be any problem with the connection, \code{safe_read_file}
+#' will fail, but the \code{read_tsv(URL)} can return partial result (meaning - all rows downloaded up to the loss connection point).
 #'
 #' @export
 #'
@@ -117,17 +117,17 @@ safeDownloadFile <- function(url, filename, .retries = 20, .waitTime = 20) {
 #' safeReadFile("https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz")
 #' }
 #' 
-safeReadFile <- function(url, filename = NULL, read_fnc = readr::read_tsv, .retries = 20, .waitTime = 20, ...) {
+safeReadFile <- function(URL, filename = NULL, read_fnc = readr::read_tsv, .retries = 20, .waitTime = 20, ...) {
 
   if(is.null(filename)) {
-    logger::log_trace("filename in safeReadFile is NULL using basename(url): {basename(url)}")
-    filename <- basename(url)
+    logger::log_trace("filename in safeReadFile is NULL using basename(URL): {basename(URL)}")
+    filename <- basename(URL)
     filename <- useLocalFileRepo(filename)
   }
 
   # If file is not in a local cache, the function below tries to download it.
   # Note that it uses safeDownloadFile which tries \code{.retries} times if it is not able to succeed in a given attempt.
-  status <- safeDownloadFile(url, filename, .retries, .waitTime)
+  status <- safeDownloadFile(URL, filename, .retries, .waitTime)
   .retries <- status$.retries # update retries to include retires used in recurrent safeDownloadFile calls.
 
   # Safely reading the file:
@@ -153,9 +153,9 @@ safeReadFile <- function(url, filename = NULL, read_fnc = readr::read_tsv, .retr
     if(.retries == 0) {
       stop(res)
     } else {
-      logger::log_trace("Problem with downloaded file - Retrying {url} - number of retries left {.retries - 1}")
+      logger::log_trace("Problem with downloaded file - Retrying {URL} - number of retries left {.retries - 1}")
       Sys.sleep(.waitTime)
-      res <- safeReadFile(url, read_fnc = read_fnc, .retries = .retries - 1, .waitTime = .waitTime, ...)
+      res <- safeReadFile(URL, read_fnc = read_fnc, .retries = .retries - 1, .waitTime = .waitTime, ...)
     }
   }
   res
