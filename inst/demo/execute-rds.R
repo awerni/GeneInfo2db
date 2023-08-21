@@ -102,7 +102,7 @@ getCelllineMetMap() %>% save_data("getCelllineMetMap")
 read_rds("getCelllineMetMap") %>% writeDatabase()
 
 # ---------- MSigDB ----------------
-getMSigDB() %>% save_data("getMSigDB")
+getMSigDB("v2023.1.Hs") %>% save_data("getMSigDB")
 read_rds("getMSigDB") %>% writeDatabase()
 
 
