@@ -1,4 +1,7 @@
-getTissueCopyNumber <- function(projects) {
+getTissueCopyNumber <- function() {
+  projects <- TCGAbiolinks::getGDCprojects() |>
+    filter(grepl("TCGA", id)) |>
+    pull(project_id)
   list(
     tissue.processedCopyNumber = purrr::map_dfr(projects, getTissueProjectCopyNumber)
   )
