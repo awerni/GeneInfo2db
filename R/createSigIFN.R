@@ -28,7 +28,7 @@ getSigIFNexpr <- function(sample_type) {
                     "WHERE rnaseqrunid IN ('", paste(sample_anno$rnaseqrunid, collapse = "','"), "')",
                     "AND ensg IN ('", paste( gene$ensg, collapse = "','"), "')")
   } else if (sample_type == "tissue") {
-    sql1b <- paste0("SELECT rnaseqrunid, rr.tissuename, tumortype, morphology FROM tissue.rnaseqrun rr ",
+    sql1b <- paste0("SELECT rnaseqrunid, rr.tissuename, tumortype FROM tissue.rnaseqrun rr ",
                     "JOIN tissue.tissue c on c.tissuename = rr.tissuename ",
                     "WHERE rnaseqgroupid IN (1, 2) and canonical")
     sample_anno <- DBI::dbGetQuery(con, sql1b)
@@ -61,10 +61,14 @@ calculateSigIFN <- function(sample_data) {
     data.frame(rnaseqrunid = rownames(expr4calc), NIBR_IFN = apply(dataz, 1, mean))
   }
 
-  rsid_cl <- sample_data$sample_anno %>%
-    dplyr::filter(!grepl("fibroblast", morphology)) %>%
-    pull("rnaseqrunid")
-
+  if (("celllinename" %in% colnames(sample_data$sample_anno))) {
+    rsid_cl <- sample_data$sample_anno %>%
+      dplyr::filter(!grepl("fibroblast", morphology)) %>%
+      pull("rnaseqrunid")
+  } else {
+    rsid_cl <- sample_data$sample_anno$rnaseqrunid
+  }
+  
   res_NIBR_IFN <- calcNIBR_IFN(expr, expr[rsid_cl, ]) %>%
     dplyr::inner_join(sample_data$sample_anno, by = "rnaseqrunid")
 
