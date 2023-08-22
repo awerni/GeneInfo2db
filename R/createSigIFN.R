@@ -1,37 +1,56 @@
 # https://www.nature.com/articles/s41591-018-0302-5
-createCelllineSigIFN <- function() {
 
+getSigIFNexpr <- function(sample_type) {
+  
   con <- getPostgresqlConnection()
-
-  sig_NIBR_IFN <- c("ADAR","DDX60","HERC6","IRF7","OASL","PSME2","STAT2","TRIM25","BST2","DHX58",
-                    "IFI35","ISG15","OGFR","RSAD2","TDRD7","UBE2L6","CASP1","EIF2AK2","IFIH1","ISG20",
-                    "PARP12","RTP4","TRAFD1","USP18","CMPK2","EPSTI1","IFIT2","MX1","PARP14","SAMD9L",
-                    "TRIM14","CXCL10","GBP4","IFIT3","NMI","PNPT1","SP110","TRIM21") %>% unique()
-
+  
+  sig_NIBR_IFN <- c("ADAR", "DDX60", "HERC6", "IRF7", "OASL", "PSME2", "STAT2", "TRIM25", "BST2", "DHX58",
+                    "IFI35", "ISG15", "OGFR", "RSAD2", "TDRD7", "UBE2L6", "CASP1", "EIF2AK2", "IFIH1", "ISG20",
+                    "PARP12", "RTP4", "TRAFD1", "USP18", "CMPK2", "EPSTI1", "IFIT2", "MX1", "PARP14", "SAMD9L",
+                    "TRIM14", "CXCL10", "GBP4", "IFIT3", "NMI", "PNPT1", "SP110", "TRIM21") %>% unique()
+  
   sql <- paste0("SELECT ensg, symbol FROM gene WHERE symbol IN ('",
                 paste(sig_NIBR_IFN, collapse = "','"), "') AND species = 'human'",
                 "AND length(chromosome) <= 2")
-
+  
   gene <- DBI::dbGetQuery(con, sql)
   missing <- setdiff(sig_NIBR_IFN, gene$symbol)
   if (length(missing) > 0) stop("symbols ", paste(missing, collapse = ", "), " are missing")
-
-  # ------------ load data for celllines -----
-
-  sql1b <- paste0("SELECT rnaseqrunid, rr.celllinename, tumortype, morphology FROM cellline.rnaseqrun rr ",
-                 "JOIN cellline.cellline c on c.celllinename = rr.celllinename ",
-                 "WHERE rnaseqgroupid IN (0,1) and canonical")
-  cellline_anno <- DBI::dbGetQuery(con, sql1b)
-
-  sql2b <- paste0("SELECT ensg, rnaseqrunid, log2tpm FROM cellline.processedrnaseq ",
-                 "WHERE rnaseqrunid IN ('", paste(cellline_anno$rnaseqrunid, collapse = "','"), "')",
-                 "AND ensg IN ('", paste( gene$ensg, collapse = "','"), "')")
-  expr_long_cl <- DBI::dbGetQuery(con, sql2b)
-
+  
+  
+  if (sample_type == "cellline") {
+    # load data for celllines
+    sql1b <- paste0("SELECT rnaseqrunid, rr.celllinename, tumortype, morphology FROM cellline.rnaseqrun rr ",
+                    "JOIN cellline.cellline c on c.celllinename = rr.celllinename ",
+                    "WHERE rnaseqgroupid = 1 and canonical")
+    sample_anno <- DBI::dbGetQuery(con, sql1b)
+    sql2b <- paste0("SELECT ensg, rnaseqrunid, log2tpm FROM cellline.processedrnaseq ",
+                    "WHERE rnaseqrunid IN ('", paste(sample_anno$rnaseqrunid, collapse = "','"), "')",
+                    "AND ensg IN ('", paste( gene$ensg, collapse = "','"), "')")
+  } else if (sample_type == "tissue") {
+    sql1b <- paste0("SELECT rnaseqrunid, rr.tissuename, tumortype, morphology FROM tissue.rnaseqrun rr ",
+                    "JOIN tissue.tissue c on c.tissuename = rr.tissuename ",
+                    "WHERE rnaseqgroupid IN (1, 2) and canonical")
+    sample_anno <- DBI::dbGetQuery(con, sql1b)
+    sql2b <- paste0("SELECT ensg, rnaseqrunid, log2tpm FROM tissue.processedrnaseq ",
+                    "WHERE rnaseqrunid IN ('", paste(sample_anno$rnaseqrunid, collapse = "','"), "')",
+                    "AND ensg IN ('", paste( gene$ensg, collapse = "','"), "')")
+  } else {
+    logger::log_error("invalid sample type")
+  }
+  
+  expr_long <- DBI::dbGetQuery(con, sql2b)
   RPostgres::dbDisconnect(con)
+  
+  return(list(sample_anno = sample_anno, 
+              expr_long = expr_long,
+              gene = gene))
+}
 
-  expr_cl <- expr_long_cl %>%
-    tidyr::pivot_wider(rnaseqrunid, names_from = "ensg", values_from = "log2tpm") %>%
+calculateSigIFN <- function(sample_data) {
+
+  expr <- sample_data$expr_long %>%
+    tidyr::pivot_wider(id_cols = rnaseqrunid, names_from = "ensg", values_from = "log2tpm") %>%
     tibble::column_to_rownames("rnaseqrunid")
 
   # ----------- calc NIBR_IFN ------------
@@ -42,20 +61,18 @@ createCelllineSigIFN <- function() {
     data.frame(rnaseqrunid = rownames(expr4calc), NIBR_IFN = apply(dataz, 1, mean))
   }
 
-  rsid_cl <- cellline_anno %>%
+  rsid_cl <- sample_data$sample_anno %>%
     dplyr::filter(!grepl("fibroblast", morphology)) %>%
-    .$rnaseqrunid
+    pull("rnaseqrunid")
 
-  res_NIBR_IFN_cl <- calcNIBR_IFN(expr_cl, expr_cl[rsid_cl, ]) %>%
-    dplyr::inner_join(cellline_anno, by = "rnaseqrunid")
+  res_NIBR_IFN <- calcNIBR_IFN(expr, expr[rsid_cl, ]) %>%
+    dplyr::inner_join(sample_data$sample_anno, by = "rnaseqrunid")
 
   # ---------- check distribution --------------
-  #ggplot(res_NIBR_IFN_cl, aes(x = forcats::fct_reorder(tumortype, NIBR_IFN), y = NIBR_IFN)) + geom_boxplot() + coord_flip()
+  #ggplot(res_NIBR_IFN, aes(x = forcats::fct_reorder(tumortype, NIBR_IFN), y = NIBR_IFN)) + geom_boxplot() + coord_flip()
 
-  # ---------------- prepare return values -------
-
-  res_import_cl <- res_NIBR_IFN_cl %>%
-    dplyr::select(celllinename, score = NIBR_IFN) %>%
+  res_import <- res_NIBR_IFN %>%
+    dplyr::select(dplyr::ends_with("name"), score = NIBR_IFN) %>%
     dplyr::mutate(signature = "NIBR_IFN")
 
   signature_db <- data.frame(
@@ -64,8 +81,19 @@ createCelllineSigIFN <- function() {
     unit = "arbitrary units",
     hyperlink = "https://www.nature.com/articles/s41591-018-0302-5"
   )
+  
+  c(checkGeneSignature(signature_db),
+    list(dbtable = res_import))
+}
 
-  list(public.genesignature = signature_db,
-       cellline.cellline2genesignature = res_import_cl)
+createCelllineSigIFN <- function() {
+  sig <- getSigIFNexpr("cellline") |> calculateSigIFN()
+  names(sig)[names(sig) == "dbtable"] <- "cellline.cellline2genesignature"
+  return(sig)
+}
 
+createTissueSigIFN <- function() {
+  sig <- getSigIFNexpr("tissue") |> calculateSigIFN()
+  names(sig)[names(sig) == "dbtable"] <- "tissue.tissue2genesignature"
+  return(sig)
 }
