@@ -45,9 +45,9 @@ getSigTP53expr <- function(sample_type) {
 calcNIBR_TP53 <- function(sample_data) {
   # ----------- calc NIBR_TP53 ------------
   expr_mean <- sample_data$expr_long |>
-    group_by(ensg) |>
-    summarise(log2tpm_mean = mean(log2tpm),
-              log2tpm_sd = sd(log2tpm))
+    dplyr::group_by(ensg) |>
+    dplyr::summarise(log2tpm_mean = mean(log2tpm),
+                     log2tpm_sd = sd(log2tpm))
     
   res_TP53 <- sample_data$expr_long |>
     dplyr::inner_join(expr_mean, by = "ensg") |>
