@@ -17,7 +17,7 @@ getSigTP53expr <- function(sample_type) {
     sql1b <- paste0("SELECT rnaseqrunid, rr.celllinename, tumortype FROM cellline.rnaseqrun rr ",
                     "JOIN cellline.cellline c on c.celllinename = rr.celllinename ",
                     "WHERE rnaseqgroupid IN (0,1) and canonical")
-  
+    sample_anno <- DBI::dbGetQuery(con, sql1b)
     sql2b <- paste0("SELECT ensg, rnaseqrunid, log2tpm FROM cellline.processedrnaseq ",
                     "WHERE rnaseqrunid IN ('", paste(sample_anno$rnaseqrunid, collapse = "','"), "')",
                     "AND ensg IN ('", paste( gene$ensg, collapse = "','"), "')")
@@ -26,7 +26,7 @@ getSigTP53expr <- function(sample_type) {
     sql1b <- paste0("SELECT rnaseqrunid, rr.tissuename, tumortype FROM tissue.rnaseqrun rr ",
                     "JOIN tissue.tissue c on c.tissuename = rr.tissuename ",
                     "WHERE rnaseqgroupid IN (0,1) and canonical")
-    
+    sample_anno <- DBI::dbGetQuery(con, sql1b)
     sql2b <- paste0("SELECT ensg, rnaseqrunid, log2tpm FROM tissue.processedrnaseq ",
                     "WHERE rnaseqrunid IN ('", paste(sample_anno$rnaseqrunid, collapse = "','"), "')",
                     "AND ensg IN ('", paste( gene$ensg, collapse = "','"), "')")
@@ -34,7 +34,6 @@ getSigTP53expr <- function(sample_type) {
     logger::log_error("invalid sample type")
   }
   
-  sample_anno <- DBI::dbGetQuery(con, sql1b)
   expr_long <- DBI::dbGetQuery(con, sql2b)
   RPostgres::dbDisconnect(con)
   
