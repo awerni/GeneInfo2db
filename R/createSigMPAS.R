@@ -25,15 +25,14 @@ getSigMPASexpr <- function(sample_type) {
   
   if (sample_type == "cellline") {
   # load data for celllines
-  sql1b <- paste0("SELECT rnaseqrunid, rr.celllinename, tumortype FROM cellline.rnaseqrun rr ",
-                  "JOIN cellline.cellline c on c.celllinename = rr.celllinename ",
-                  "WHERE tumortype NOT LIKE 'normal' AND canonical")
-  sample_anno <- DBI::dbGetQuery(con, sql1b)
-  
-  sql2b <- paste0("SELECT ensg, rnaseqrunid, log2tpm FROM cellline.processedrnaseq ",
-                  "WHERE rnaseqrunid IN ('", paste(sample_anno$rnaseqrunid, collapse = "','"), "')",
-                  "AND ensg IN ('", paste( gene$ensg, collapse = "','"), "')")
-  expr_long <- DBI::dbGetQuery(con, sql2b)
+    sql1b <- paste0("SELECT rnaseqrunid, rr.celllinename, tumortype FROM cellline.rnaseqrun rr ",
+                    "JOIN cellline.cellline c on c.celllinename = rr.celllinename ",
+                    "WHERE tumortype NOT LIKE 'normal' AND canonical")
+    sample_anno <- DBI::dbGetQuery(con, sql1b)
+    
+    sql2b <- paste0("SELECT ensg, rnaseqrunid, log2tpm FROM cellline.processedrnaseq ",
+                    "WHERE rnaseqrunid IN ('", paste(sample_anno$rnaseqrunid, collapse = "','"), "')",
+                    "AND ensg IN ('", paste( gene$ensg, collapse = "','"), "')")
   } else if (sample_type == "tissue") {
     # load data for tissues
     sql1b <- paste0("SELECT rnaseqrunid, rr.tissuename, tumortype FROM tissue.rnaseqrun rr ",
@@ -44,10 +43,10 @@ getSigMPASexpr <- function(sample_type) {
     sql2b <- paste0("SELECT ensg, rnaseqrunid, log2tpm FROM tissue.processedrnaseq ",
                     "WHERE rnaseqrunid IN ('", paste(tissue_anno$rnaseqrunid, collapse = "','"), "')",
                     "AND ensg IN ('", paste( gene$ensg, collapse = "','"), "')")
-    expr_long <- DBI::dbGetQuery(con, sql2b)
   } else {
     logger::log_error("invalid sample type")
   }
+  expr_long <- DBI::dbGetQuery(con, sql2b)
   RPostgres::dbDisconnect(con)
   return(list(sample_anno = sample_anno, 
               expr_long = expr_long,
