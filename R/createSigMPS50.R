@@ -21,7 +21,7 @@ getSigMPS50expr <- function(sample_type) {
   if (sample_type == "cellline") {
     sql1b <- paste0("SELECT rnaseqrunid, rr.celllinename, tumortype FROM cellline.rnaseqrun rr ",
                     "JOIN cellline.cellline c on c.celllinename = rr.celllinename ",
-                    "WHERE rnaseqgroupid IN (0,1) and canonical")
+                    "WHERE rnaseqgroupid IN (1) and canonical")
     sample_anno <- DBI::dbGetQuery(con, sql1b)
     sql2b <- paste0("SELECT ensg, rnaseqrunid, log2tpm FROM cellline.processedrnaseq ",
                     "WHERE rnaseqrunid IN ('", paste(sample_anno$rnaseqrunid, collapse = "','"), "')",
@@ -30,7 +30,7 @@ getSigMPS50expr <- function(sample_type) {
   } else if (sample_type == "tissue") {
     sql1b <- paste0("SELECT rnaseqrunid, rr.tissuename, tumortype FROM tissue.rnaseqrun rr ",
                     "JOIN tissue.tissue c on c.tissuename = rr.tissuename ",
-                    "WHERE rnaseqgroupid IN (0,1) and canonical")
+                    "WHERE rnaseqgroupid IN (1, 2) and canonical AND organ like 'Prostate%';")
     sample_anno <- DBI::dbGetQuery(con, sql1b)
     sql2b <- paste0("SELECT ensg, rnaseqrunid, log2tpm FROM tissue.processedrnaseq ",
                     "WHERE rnaseqrunid IN ('", paste(sample_anno$rnaseqrunid, collapse = "','"), "')",
