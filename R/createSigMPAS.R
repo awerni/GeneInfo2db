@@ -53,7 +53,7 @@ getSigMPASexpr <- function(sample_type) {
               gene = gene))
 }
 
-createSigMPAS <- function(sample_data) {
+createSigMPAS <- function(sample_data, tablename) {
   # calculate MPAS score
   res_MPAS <- sample_data$expr_long |>
     dplyr::group_by(ensg) |>
@@ -77,19 +77,18 @@ createSigMPAS <- function(sample_data) {
     hyperlink   = "https://doi.org/10.1038/s41698-018-0051-4"
   )
   
-  c(checkGeneSignature(signature_db),
+  ret <- c(checkGeneSignature(signature_db),
     list(dbtable = res_MPAS))
+  
+  names(ret)[names(ret) == "dbtable"] <- tablename
+  ret
 }
 
 createCelllineSigMPAS <- function() {
-  sig <- getSigMPASexpr("cellline") |> createSigMPAS()
-  names(sig)[names(sig) == "dbtable"] <- "cellline.cellline2genesignature"
-  return(sig)
+  getSigMPASexpr("cellline") |> createSigMPAS("cellline.cellline2genesignature")
 }
 
 createTissueSigMPAS <- function() {
-  sig <- getSigMPASexpr("tissue") |> createSigMPAS()
-  names(sig)[names(sig) == "dbtable"] <- "tissue.tissue2genesignature"
-  return(sig)
+  getSigMPASexpr("tissue") |> createSigMPAS("tissue.tissue2genesignature")
 }
 

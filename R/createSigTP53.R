@@ -42,7 +42,7 @@ getSigTP53expr <- function(sample_type) {
               gene = gene))
 }
   
-calcNIBR_TP53 <- function(sample_data) {
+calcNIBR_TP53 <- function(sample_data, tablename) {
   # ----------- calc NIBR_TP53 ------------
   expr_mean <- sample_data$expr_long |>
     dplyr::group_by(ensg) |>
@@ -65,18 +65,17 @@ calcNIBR_TP53 <- function(sample_data) {
     hyperlink = "https://elifesciences.org/articles/06498"
   )
   
-  c(checkGeneSignature(signature_db),
+  ret <- c(checkGeneSignature(signature_db),
     list(dbtable = res_TP53))
+  
+  names(ret)[names(ret) == "dbtable"] <- tablename
+  ret
 }
 
 createCelllineSigTP53 <- function() {
-  sig <- getSigTP53expr("cellline") |> calcNIBR_TP53()
-  names(sig)[names(sig) == "dbtable"] <- "cellline.cellline2genesignature"
-  return(sig)
+  getSigTP53expr("cellline") |> calcNIBR_TP53("cellline.cellline2genesignature")
 }
 
 createTissueSigTP53 <- function() {
-  sig <- getSigTP53expr("tissue") |> calcNIBR_TP53()
-  names(sig)[names(sig) == "dbtable"] <- "tissue.tissue2genesignature"
-  return(sig)
+  getSigTP53expr("tissue") |> calcNIBR_TP53("tissue.tissue2genesignature")
 }
