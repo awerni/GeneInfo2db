@@ -41,7 +41,7 @@ getSigMPASexpr <- function(sample_type) {
     sample_anno <- DBI::dbGetQuery(con, sql1b)
     
     sql2b <- paste0("SELECT ensg, rnaseqrunid, log2tpm FROM tissue.processedrnaseq ",
-                    "WHERE rnaseqrunid IN ('", paste(tissue_anno$rnaseqrunid, collapse = "','"), "')",
+                    "WHERE rnaseqrunid IN ('", paste(sample_anno$rnaseqrunid, collapse = "','"), "')",
                     "AND ensg IN ('", paste( gene$ensg, collapse = "','"), "')")
   } else {
     logger::log_error("invalid sample type")
