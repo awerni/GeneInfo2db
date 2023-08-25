@@ -1,10 +1,24 @@
 getTissueCopyNumber <- function() {
+  
+  con <- getPostgresqlConnection()
+  
+  gene <- dplyr::tbl(con, "gene") %>%
+    dplyr::filter(species == "human") %>%
+    dplyr::collect()
+  
+  RPostgres::dbDisconnect(con)
+  
   projects <- TCGAbiolinks::getGDCprojects() |>
     filter(grepl("TCGA", id)) |>
     pull(project_id)
+  
+  result <- purrr::map_dfr(projects, getTissueProjectCopyNumber)
+  result <- result |>
+    dplyr::filter(ENSG %in% gene$ensg)
+  
   list(
-    tissue.processedCopyNumber = purrr::map_dfr(projects, getTissueProjectCopyNumber)
-  )
+    tissue.processedcopynumber = result
+  ) 
 }
 
 getTissueProjectCopyNumber <- function(project) {
@@ -94,15 +108,17 @@ getTissueProjectCopyNumber <- function(project) {
   data_gene <- data_gene[,substr(rownames(anno_data), 14, 14) == "0"]
 
   copy_raw <- SummarizedExperiment::assay(data_gene, "copy_number")
-  rownames(copy_raw) <- substr(rownames(copy_raw),1,15)
+  rownames(copy_raw) <- substr(rownames(copy_raw), 1, 15)
   copy_raw <- copy_raw[!duplicated(rownames(copy_raw)), ]
 
   abs_copy_number <- as.data.frame.table(copy_raw, responseName = "totalAbsCopyNumber") |>
     dplyr::rename(ENSG = Var1, tissuename = Var2) |>
     mutate(ENSG =  substr(ENSG, 1, 15),
            tissuename = substr(tissuename, 1, 15)) |>
-    filter(!is.na(ENSG))
+    filter(!is.na(ENSG) & !is.na(totalAbsCopyNumber))
 
-  result <- dplyr::full_join(relative_copy_number, abs_copy_number, by = c("tissuename", "ENSG"))
+  result <- relative_copy_number |> 
+    dplyr::full_join(abs_copy_number, by = c("tissuename", "ENSG"))
+  
   result
 }
