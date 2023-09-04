@@ -21,7 +21,7 @@ getSigMPS50expr <- function(sample_type) {
   if (sample_type == "cellline") {
     sql1b <- paste0("SELECT rnaseqrunid, rr.celllinename, tumortype FROM cellline.rnaseqrun rr ",
                     "JOIN cellline.cellline c on c.celllinename = rr.celllinename ",
-                    "WHERE rnaseqgroupid IN (1) and canonical")
+                    "WHERE rnaseqgroupid IN (1) and canonical AND tumortype = 'prostate cancer'")
     sample_anno <- DBI::dbGetQuery(con, sql1b)
     sql2b <- paste0("SELECT ensg, rnaseqrunid, log2tpm FROM cellline.processedrnaseq ",
                     "WHERE rnaseqrunid IN ('", paste(sample_anno$rnaseqrunid, collapse = "','"), "')",
