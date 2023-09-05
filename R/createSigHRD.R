@@ -14,6 +14,7 @@ getSigHRD <- function(){
   res_HRD <- Knijnenburg2018 %>%
     dplyr::select(tissuename = "TCGA sample barcode",
                   score = "HRD_Score") |>
+    dplyr::filter(!is.na(score)) |>                  
     dplyr::mutate(signature = "HRD")
   
   signature_db <- data.frame(
@@ -25,7 +26,6 @@ getSigHRD <- function(){
   
   sig <- c(checkGeneSignature(signature_db),
            list(dbtable = res_HRD))
-  names(sig)[names(sig) == "dbtable"] <- "tissue.tissue2genesignature"
   sig
   
 }
