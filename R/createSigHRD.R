@@ -25,7 +25,7 @@ getSigHRD <- function(){
   )
   
   sig <- c(checkGeneSignature(signature_db),
-           list(dbtable = res_HRD))
+           list(tissue.tissue2genesignature = res_HRD))
   sig
   
 }
