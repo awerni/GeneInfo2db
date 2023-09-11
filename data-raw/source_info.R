@@ -99,7 +99,8 @@ other_info <- tibble::tribble(
   "uniprot", "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping_selected.tab.gz", "HUMAN_9606_idmapping_selected.tab.gz",
   "metmap", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-020-2969-2/MediaObjects/41586_2020_2969_MOESM7_ESM.xlsx", 'metmap.xlsx',
   "msi", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", "msi",
-  "TCSA", "http://fcgportal.org/TCSA/Download/Table%20S2.xlsx", "TCSA_ensg.xlsx"
+  "TCSA", "http://fcgportal.org/TCSA/Download/Table%20S2.xlsx", "TCSA_ensg.xlsx",
+  "TF", "https://cdn.netbiol.org/tflink/download_files/TFLink_Homo_sapiens_interactions_All_simpleFormat_v1.0.tsv.gz", "TFLink_Homo_sapiens.tsv.gz"
 )
 
 drugcomb_info <- tibble::tribble(
