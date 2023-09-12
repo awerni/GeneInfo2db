@@ -13,7 +13,7 @@ getGeneSet_TF <- function() {
   
   geneset <- tibble::tribble(
     ~genesetname, ~species,
-    "TF", "human"
+    "transcription factors", "human"
   )
   
   geneassignment <-
@@ -27,7 +27,7 @@ getGeneSet_TF <- function() {
     dplyr::left_join(gene_id, by = c("NCBI.GeneID.TF" = "geneid")) |>
     dplyr::select(ensg) |>
     dplyr::distinct() |>
-    dplyr::mutate(genesetname = "Transcription Factors")
+    dplyr::mutate(genesetname = "transcription factors")
   
   list(
     public.geneset = geneset,
