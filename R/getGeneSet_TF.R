@@ -19,12 +19,15 @@ getGeneSet_TF <- function() {
   geneassignment <-
     dplyr::as_tibble(TF) |>
     dplyr::select(NCBI.GeneID.TF) |>
-    base::unique() |>
+    dplyr::distinct() |>
+    dplyr::mutate(NCBI.GeneID.TF = str_split(NCBI.GeneID.TF, ";")) |>
+    tidyr::unnest(NCBI.GeneID.TF) |>
+    dplyr::filter(NCBI.GeneID.TF != "-") |>
     dplyr::mutate(NCBI.GeneID.TF = as.integer(NCBI.GeneID.TF)) |>
-    dplyr::left_join(gene_id, by = c("NCBI.GeneID.TF"="geneid")) |>
+    dplyr::left_join(gene_id, by = c("NCBI.GeneID.TF" = "geneid")) |>
     dplyr::select(ensg) |>
-    stats::na.omit() |>
-    dplyr::mutate(genesetname = "TF")
+    dplyr::distinct() |>
+    dplyr::mutate(genesetname = "Transcription Factors")
   
   list(
     public.geneset = geneset,
