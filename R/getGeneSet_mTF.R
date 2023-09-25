@@ -1,4 +1,4 @@
-getGeneSet_TF <- function() {
+getGeneSet_mTF <- function() {
   
   con <- getPostgresqlConnection()
   
