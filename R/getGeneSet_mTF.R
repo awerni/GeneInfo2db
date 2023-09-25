@@ -2,9 +2,9 @@ getGeneSet_TF <- function() {
   
   con <- getPostgresqlConnection()
   
-  gene_name_id <- tbl(con, "entrezgene") %>%
+  gene_name_id <- tbl(con, "entrezgene") |>
     dplyr::collect()
-  gene_id_ensg <- tbl(con, "entrezgene2ensemblgene") %>%
+  gene_id_ensg <- tbl(con, "entrezgene2ensemblgene") |>
     dplyr::collect()
   
   RPostgres::dbDisconnect(con)
