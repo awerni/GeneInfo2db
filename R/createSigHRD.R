@@ -20,7 +20,7 @@ getSigHRD <- function(sample_type){
     dplyr::mutate(signature = "HRD")
   
   signature_db <- data.frame(
-    signature = "HRD",
+    signature = "HRD_cellline",
     description = "HRD scores processed by Takamatsu et al. 2023 from depMap data",
     unit = "arbitrary units",
     hyperlink = "https://www.biorxiv.org/content/biorxiv/early/2023/07/07/2023.07.06.547853.full.pdf"
@@ -50,7 +50,7 @@ else if (sample_type == 'tissue'){
     dplyr::mutate(signature = "HRD")
   
   signature_db <- data.frame(
-    signature = "HRD",
+    signature = "HRD_tissue",
     description = "HRD scores derived from Knijnenburg et al. 2018",
     unit = "arbitrary units",
     hyperlink = "https://gdc.cancer.gov/about-data/publications/PanCan-DDR-2018"
