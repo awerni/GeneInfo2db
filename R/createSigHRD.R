@@ -17,7 +17,7 @@ getSigHRD <- function(sample_type){
     dplyr::select(celllinename = "CCLE_Name",
                   score = "HRD_score") |>
     dplyr::filter(!is.na(score)) |>
-    dplyr::mutate(signature = "HRD")
+    dplyr::mutate(signature = "HRD_cellline")
   
   signature_db <- data.frame(
     signature = "HRD_cellline",
@@ -47,7 +47,7 @@ else if (sample_type == 'tissue'){
     dplyr::select(tissuename = "TCGA sample barcode",
                   score = "HRD_Score") |>
     dplyr::filter(!is.na(score)) |>                  
-    dplyr::mutate(signature = "HRD")
+    dplyr::mutate(signature = "HRD_tissue")
   
   signature_db <- data.frame(
     signature = "HRD_tissue",
