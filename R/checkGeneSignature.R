@@ -10,7 +10,7 @@ checkGeneSignature <- function(check_signature) {
   # -------------------------
   if (nrow(db_signature) == 0) return(list(public.genesignature = check_signature))
   
-  if (all.equal(tibble::as_tibble(check_signature), tibble::as_tibble(db_signature))) {
+  if (all.equal(tibble::as_tibble(check_signature), tibble::as_tibble(db_signature)) == TRUE) {
     list()
   } else {
     logger::log_error("{check_signature$signature} signature description is different to database")
