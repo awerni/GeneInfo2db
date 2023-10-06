@@ -4,6 +4,15 @@ getSigHRD <- function(sample_type){
 
   if (sample_type == 'cellline') {
 
+    con <- getPostgresqlConnection()
+
+    cellline <- dplyr::tbl(con, dbplyr::in_schema("cellline", "cellline"))  %>%
+      dplyr::filter(species == "human") %>%
+      dplyr::select(celllinename, depmap) %>%
+      dplyr::collect()
+
+    RPostgres::dbDisconnect(con)
+
     # ------- download processed data
     url <- "https://raw.githubusercontent.com/shirotak/CellLine_HRD_DrugRes/main/processed_data/CCLE_broad.txt"
     file_Takamatsu2023 <- "CCLE_BroadInstitute.txt"
@@ -14,9 +23,11 @@ getSigHRD <- function(sample_type){
     
     # ----------- extract precomputed HRD data
     res_HRD <- Takamatsu2023 %>%
-      dplyr::select(celllinename = "CCLE_Name",
+      dplyr::select(depmap = "DepMap_ID",
                     score = "HRD_score") |>
+      dplyr::inner_join(cellline, by = "depmap") |>
       dplyr::filter(!is.na(score)) |>
+      dplyr::select(celllinename, score) |>
       dplyr::mutate(signature = "HRD_cellline")
     
     signature_db <- data.frame(
