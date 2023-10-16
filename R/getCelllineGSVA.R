@@ -1,3 +1,4 @@
+#' @export
 getCelllineGSVA <- function() {
   # ----------------------------
   con <- getPostgresqlConnection()

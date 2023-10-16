@@ -15,7 +15,7 @@
 #' \dontrun{
 #' download_filesize("https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/Homo_sapiens.gene_info.gz")
 #' }
-#'
+#' @export
 download_filesize <- function(URL) {
 
   rcurlFileSize <- function(URL) {
@@ -174,8 +174,6 @@ safeReadFile <- function(URL, filename = NULL, read_fnc = readr::read_tsv, .retr
 #' @importFrom readxl read_xlsx
 #'
 #' @export
-#'
-#' @examples
 guessingReadingFunction <- function(filepath) {
 
   if (dplyr::coalesce(readxl::format_from_signature(filepath) == "xlsx", FALSE)) {

@@ -1,3 +1,4 @@
+#' @export
 getUniprot <- function() {
 
   # ----------------------------

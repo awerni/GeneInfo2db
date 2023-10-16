@@ -93,10 +93,12 @@ calculateSigIFN <- function(sample_data, tablename) {
   sig
 }
 
+#' @export
 createCelllineSigIFN <- function() {
   getSigIFNexpr("cellline") |> calculateSigIFN("cellline.cellline2genesignature")
 }
 
+#' @export
 createTissueSigIFN <- function() {
   getSigIFNexpr("tissue") |> calculateSigIFN("tissue.tissue2genesignature")
 }

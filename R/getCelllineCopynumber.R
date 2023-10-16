@@ -1,3 +1,4 @@
+#' @export
 getCelllineCopynumber <- function() {
   con <- getPostgresqlConnection()
 

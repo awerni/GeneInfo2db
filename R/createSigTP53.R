@@ -72,10 +72,12 @@ calcNIBR_TP53 <- function(sample_data, tablename) {
   ret
 }
 
+#' @export
 createCelllineSigTP53 <- function() {
   getSigTP53expr("cellline") |> calcNIBR_TP53("cellline.cellline2genesignature")
 }
 
+#' @export
 createTissueSigTP53 <- function() {
   getSigTP53expr("tissue") |> calcNIBR_TP53("tissue.tissue2genesignature")
 }

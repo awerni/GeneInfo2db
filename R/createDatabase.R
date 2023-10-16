@@ -2,7 +2,7 @@
 #'
 #' @param db_part a part of the database structure stored in this package
 #' @return nothing
-
+#' @export
 createDatabase <- function(db_part) {
   if (db_part %in% c("recreateAnnotationSchema", "geneAnnotation", "db_glue_anno",
                      "recreateCelllineSchema", "celllineDB", "db_glue_cl", "refreshView_cl", "alternative_celllinename",

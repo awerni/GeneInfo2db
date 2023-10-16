@@ -1,3 +1,4 @@
+#' @export
 modifyTissueCanonicalRNAseqRun <- function() {
   con <- getPostgresqlConnection()
   

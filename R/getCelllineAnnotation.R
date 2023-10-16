@@ -1,13 +1,10 @@
-#' Title
-#'
-#' @return
-#' @export
+#' getCelllineAnnotation
 #'
 #' @importFrom dplyr na_if
 #' @importFrom logger log_trace
 #' @importFrom magrittr `%>%`
-#'
-#' @examples
+#' 
+#' @export
 getCelllineAnnotation <- function() {
 
   cell_model_passport <- safeReadFile(

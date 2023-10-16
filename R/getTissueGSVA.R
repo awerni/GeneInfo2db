@@ -1,3 +1,10 @@
+#' Get Tissue Gene Set Variation Analysis (GSVA) Data
+#' @return
+#' A list containing the data frame with GSVA scores for hallmark gene sets
+#' across different tissues.
+#'
+#' @export
+#' 
 getTissueGSVA <- function() {
   # ----------------------------
   con <- getPostgresqlConnection()

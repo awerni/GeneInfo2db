@@ -7,7 +7,7 @@
 setDBconfig(host, port, name, user, pass)
 }
 \arguments{
-\item{host}{database host or list with configuration (preferably the result 
+\item{host}{database host or list with configuration (preferably the result
 of pgpass2dbConfig)}
 
 \item{port}{database port}

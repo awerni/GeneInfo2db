@@ -1,3 +1,4 @@
+#' @export
 getLaboratory <- function(lab) {
   con <- getPostgresqlConnection()
 

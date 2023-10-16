@@ -1,3 +1,11 @@
+#' Get Tissue Signaling Pathway Data
+#'
+#' This function retrieves signaling pathway data for specific tissues.
+#'
+#' @return a list
+#'
+#' @export
+#' 
 getTissueSignalingPathway <- function() {
 
   con <- getPostgresqlConnection()

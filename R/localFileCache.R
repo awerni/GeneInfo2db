@@ -41,11 +41,7 @@ getLocalFileRepo <- function() {
 #'
 #' @param path path to local file cache.
 #'
-#' @return
 #' @export
-#'
-#' @examples
-#' 
 setLocalFileRepo <- function(path) {
   options("geneinfo2db_local_filecache" = path)
   invisible(getLocalFileRepo())
@@ -56,7 +52,7 @@ setLocalFileRepo <- function(path) {
 #' @param path path to file to download.
 #'
 #' @return a file path consisting the local file chace path.
-#' @examples
+
 #' 
 #' \dontrun{
 #' useLocalFileRepo("xd.rds")

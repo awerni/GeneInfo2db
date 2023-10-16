@@ -1,3 +1,13 @@
+#' Get Tissue Copy Number Variation Data
+#'
+#' @return
+#' A list containing the data frame with processed copy number variation data
+#' for specific genes.
+#
+#' @examples
+#' result <- getTissueCopyNumber()
+#' @export
+#' 
 getTissueCopyNumber <- function() {
   
   con <- getPostgresqlConnection()
@@ -30,6 +40,8 @@ getTissueCopyNumber <- function() {
 #' 
 #' @return A data frame containing relative and absolute copy number information 
 #' for genes in the specified tissue project.
+#' @export
+#' 
 #' @examples
 #' result <- getTissueProjectCopyNumber("TCGA-ACC")
 #' 

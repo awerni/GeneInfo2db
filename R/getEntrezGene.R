@@ -1,3 +1,4 @@
+#' @export
 getEntrezGene <- function(gene_info, species_name) {
 
   db <- gene_info %>%

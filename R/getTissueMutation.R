@@ -1,3 +1,13 @@
+#' Get Tissue Mutation Data
+#'
+#' This function connects to a PostgreSQL database and retrieves mutation data
+#' for specific tissues.
+#'
+#' @return
+#' A list containing the following element: a data frame with processed 
+#' mutation data for specific transcripts and tissues.
+#' @export
+#' 
 getTissueMutation <- function() {
 
   con <- getPostgresqlConnection()

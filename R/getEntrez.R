@@ -1,3 +1,4 @@
+#' @export
 getEntrez <- function(gene_info, refseq_info, species_name) {
   res <- getEntrezGene(gene_info, species_name)
   # The RefSeq is a legacy functionality to compare sequences.
