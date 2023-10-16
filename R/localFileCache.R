@@ -11,9 +11,9 @@
 #' }
 #' 
 checkLocalFileRepo <- function(subdir = getOption("geneinfo2db_local_filecache")) {
-  log_trace("Check for subdir '{subdir}' existence: {dir.exists(subdir)}")
+  logger::log_trace("Check for subdir '{subdir}' existence: {dir.exists(subdir)}")
   if(!dir.exists(subdir)) {
-    log_trace("'{subdir}' does not exists. Creating it.")
+    logger::log_trace("'{subdir}' does not exists. Creating it.")
     dir.create(subdir, showWarnings = FALSE, recursive = TRUE)
   }
   return(subdir)

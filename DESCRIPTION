@@ -1,12 +1,16 @@
 Package: GeneInfo2db
 Title: Imports gene and omics data into a PostgreSQL database
 Version: 0.2.0
-Authors@R: person("Andreas", "Wernitznig", email = "awernitz@broadinstitute.org",
-                  role = c("aut", "cre"))
+Authors@R: c(
+    person("Andreas", "Wernitznig", email = "andreas@wernitznig.com", role = c("aut", "rev"),
+           comment = c(ORCID = "0000-0003-1883-1470")),
+    person("Michal", "Jakubczak", email = "michal.jakubczak@ardigen.com", role = c("aut", "cre", "ctr")),
+    person("Zygmunt", "Zawadzki", email = "zygmunt.zawadzki@ardigen.com", role = c("aut", "ctr"))
+  )
 Description: Fills the bioinfo database with gene information and omics data from depmap.org
-Depends: R (>= 4.0.0), dplyr, RPostgres, DBI, purrr, tibble, tidyr, magrittr, dbplyr, stringr, GSVA, mskcc.oncotree, TCGAbiolinks, RMariaDB
+Depends: R (>= 4.0.0), dplyr, RPostgres, DBI, purrr, tibble, tidyr, magrittr, dbplyr, stringr, GSVA, mskcc.oncotree, TCGAbiolinks, RMariaDB, logger
 Suggests: recount3, recount
-License: What license is it under?
+License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/broadinstitute/GeneInfo2db
 RoxygenNote: 7.2.3

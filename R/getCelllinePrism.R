@@ -10,7 +10,7 @@ getCelllinePrism <- function() {
   RPostgres::dbDisconnect(con)
 
   # -----------------------------------
-
+  lab <- "Broad Institute"
   dfile <- "prism-repurposing-20q2-secondary-screen-dose-response-curve-parameters"
   prism_data <- getFileData(dfile)
 
@@ -29,7 +29,7 @@ getCelllinePrism <- function() {
     dplyr::slice(1) %>%
     dplyr::ungroup() %>%
     dplyr::inner_join(cellline, by = c("depmap_id" = "depmap")) %>%
-    dplyr::mutate(campaign = 'Prism', proliferationtest = "PRISM", laboratory = "Broad Institute") %>%
+    dplyr::mutate(campaign = 'Prism', proliferationtest = "PRISM", laboratory = lab) %>%
     dplyr::rename(actarea = auc, drugid = name, top = upper_limit, bottom = lower_limit) %>%
     dplyr::mutate(actarea = 1 - actarea) %>%
     dplyr::select(-broad_id, -depmap_id, -screen_id, -passed_str_profiling, -r2) %>%
@@ -37,7 +37,10 @@ getCelllinePrism <- function() {
 
   campaign <- data.frame(campaign = "Prism", campaigndesc = "profiling relative inhibition simultaneously in mixtures")
 
-  list(public.drug = prism_drugs,
-       cellline.campaign = campaign,
-       cellline.processedproliftest = prism_data2)
+  c(
+    getLaboratory(lab),
+    list(public.drug = prism_drugs,
+         cellline.campaign = campaign,
+         cellline.processedproliftest = prism_data2)
+  )
 }

@@ -3,8 +3,7 @@ getVersion <- function() {
 }
 
 getFileVersion <- function() {
-  
   env <- new.env()
-  data("source_info", package = "GeneInfo2db", envir = env)
+  data("file_version", package = "GeneInfo2db", envir = env)
   env$file_version
 }

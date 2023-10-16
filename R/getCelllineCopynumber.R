@@ -12,25 +12,25 @@ getCelllineCopynumber <- function() {
 
   RPostgres::dbDisconnect(con)
 
-  CCLE.gene.cn <- getFileData("OmicsCNGene")
+  DepMap_gene_cn <- getFileData("OmicsCNGene")
 
-  if ("matrix" %in% class(CCLE.gene.cn)) {
+  if ("matrix" %in% class(DepMap_gene_cn)) {
 
-    gene_name <- data.frame(gene = colnames(CCLE.gene.cn)) %>%
+    gene_name <- data.frame(gene = colnames(DepMap_gene_cn)) %>%
       tidyr::separate(gene, c("symbol", "geneid"), sep = " ") %>%
       dplyr::mutate(geneid = as.numeric(gsub("(\\(|\\))", "", geneid)))
 
-    CCLE.gene.cn <- data.frame(log2cn = c(CCLE.gene.cn),
-                               depmap = rownames(CCLE.gene.cn),
-                               symbol = c(sapply(gene_name$symbol, rep, times = nrow(CCLE.gene.cn))),
-                               geneid = c(sapply(gene_name$geneid, rep, times = nrow(CCLE.gene.cn)))) %>%
+    DepMap_gene_cn <- data.frame(log2cn = c(DepMap_gene_cn),
+                               depmap = rownames(DepMap_gene_cn),
+                               symbol = c(sapply(gene_name$symbol, rep, times = nrow(DepMap_gene_cn))),
+                               geneid = c(sapply(gene_name$geneid, rep, times = nrow(DepMap_gene_cn)))) %>%
       dplyr::inner_join(cellline, by = "depmap") %>%
       dplyr::select(-depmap) %>%
       dplyr::mutate(cn = 2*(2^log2cn - 1)) 
 
     gene2ensg <- getEntrezGene2ENSG(gene_name$geneid)
 
-    CCLE.gene.cn <- CCLE.gene.cn %>%
+    DepMap_gene_cn <- DepMap_gene_cn %>%
       dplyr::inner_join(gene2ensg, by = "geneid") %>%
       dplyr::mutate(log2relativecopynumber = log2(cn) - 1) %>%
       dplyr::select(celllinename, ensg, log2relativecopynumber) %>%
@@ -38,14 +38,14 @@ getCelllineCopynumber <- function() {
 
   } else {
 
-    gene_name <- data.frame(gene = colnames(CCLE.gene.cn)[-1]) %>%
+    gene_name <- data.frame(gene = colnames(DepMap_gene_cn)[-1]) %>%
       tidyr::separate(gene, c("symbol", "geneid"), sep = " ") %>%
       dplyr::mutate(geneid = as.numeric(gsub("(\\(|\\))", "", geneid)))
 
-    colnames(CCLE.gene.cn) <- c("depmap", as.character(gene_name$geneid))
+    colnames(DepMap_gene_cn) <- c("depmap", as.character(gene_name$geneid))
     gene2ensg <- getEntrezGene2ENSG(gene_name$geneid)
 
-    CCLE.gene.cn <- CCLE.gene.cn %>%
+    DepMap_gene_cn <- DepMap_gene_cn %>%
       tidyr::pivot_longer(!depmap, names_to = "geneid", values_to = "log2cn") %>%
       dplyr::inner_join(cellline, by = "depmap") %>%
       dplyr::mutate(geneid = as.numeric(geneid),
@@ -55,12 +55,12 @@ getCelllineCopynumber <- function() {
       dplyr::distinct(celllinename, ensg, .keep_all = TRUE)
   }
 
-  av_cn <- CCLE.gene.cn %>%
+  av_cn <- DepMap_gene_cn %>%
     dplyr::group_by(celllinename) %>%
     dplyr::summarize(avg_cn = mean(2*2^log2relativecopynumber))
   print(summary(av_cn$avg_cn))
 
   list(
-    cellline.processedcopynumber = CCLE.gene.cn
+    cellline.processedcopynumber = DepMap_gene_cn
   )
 }

@@ -3,13 +3,6 @@
 library(dplyr)
 
 # ---  Ensembl Gene File ---
-# db_info <- tibble::tribble(
-#   ~species, ~database, ~symbol_source, ~transcriptname_source,
-#   "human", "homo_sapiens_core_86_38", c("HGNC"), "HGNC_trans_name",
-#   "mouse", "mus_musculus_core_86_38", c("MGI", "EntrezGene"), "MGI_trans_name",
-#   "rat",   "rattus_norvegicus_core_86_6", c("RGD", "MGI", "EntrezGene"), "RFAM_trans_name",
-# )
-
 db_info <- tibble::tribble(
   ~species, ~database, ~symbol_source, ~transcriptname_source,
   "human", "homo_sapiens_core_95_38", c("HGNC"), "HGNC_trans_name",
@@ -55,7 +48,10 @@ depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/
       "AchillesNonessentialControls",
       "OmicsCNGene",
       "OmicsFusionFiltered",
-      "OmicsSomaticMutations"
+      "OmicsSomaticMutations",
+      "OmicsDefaultModelConditionProfiles",
+      "ModelCondition",
+      "OmicsProfiles"
     )
   )
 
@@ -89,15 +85,6 @@ sanger_info_chronos <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles
   mutate(data_name = "sanger-crispr-project-score", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) %>%
   select(data_name,  url = download_url, data_file)
 
-# sanger_info_ceres <- tibble::tribble(
-#   ~"data_name", ~"url", ~"data_file",
-#   "sanger-ceres", "https://ndownloader.figshare.com/files/16623887", "essential_genes",
-#   "sanger-ceres", "https://ndownloader.figshare.com/files/16623890", "nonessential_genes",
-#   "sanger-ceres", "https://ndownloader.figshare.com/files/16623881", "gene_effect",
-#   "sanger-ceres", "https://ndownloader.figshare.com/files/16623851", "gene_effect_unscaled",
-#   "sanger-ceres", "https://ndownloader.figshare.com/files/16623884", "gene_dependency"
-# )
-
 #sanger_info <- bind_rows(sanger_info_chronos, sanger_info_ceres)
 sanger_info <- sanger_info_chronos
 
@@ -112,7 +99,8 @@ other_info <- tibble::tribble(
   "uniprot", "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/HUMAN_9606_idmapping_selected.tab.gz", "HUMAN_9606_idmapping_selected.tab.gz",
   "metmap", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-020-2969-2/MediaObjects/41586_2020_2969_MOESM7_ESM.xlsx", 'metmap.xlsx',
   "msi", "https://static-content.springer.com/esm/art%3A10.1038%2Fs41586-019-1102-x/MediaObjects/41586_2019_1102_MOESM1_ESM.xlsx", "msi",
-  "TCSA", "http://fcgportal.org/TCSA/Download/Table%20S2.xlsx", "TCSA_ensg.xlsx"
+  "TCSA", "http://fcgportal.org/TCSA/Download/Table%20S2.xlsx", "TCSA_ensg.xlsx",
+  "TF", "https://cdn.netbiol.org/tflink/download_files/TFLink_Homo_sapiens_interactions_All_simpleFormat_v1.0.tsv.gz", "TFLink_Homo_sapiens.tsv.gz"
 )
 
 drugcomb_info <- tibble::tribble(
@@ -131,7 +119,8 @@ download_file_info <- depmap_info %>%
 file_version <- tibble::tribble(
   ~description, ~information,
   "Depmap Version", paste("public", DEPMAP_VERSION),
-  "Depmap Version Omics", paste("public", DEPMAP_VERSION_OLD),
+  "Depmap Version DNAseq", paste("public", DEPMAP_VERSION),
+  "CCLE Version Omics", paste("public", DEPMAP_VERSION_OLD),
   "metabolomics", "CCLE_metabolomics_20190502",
   "Proteomics", "CCLE_RPPA_20181003"
 )
@@ -191,29 +180,29 @@ additional_TCGA_antibodies <- tibble::tribble(
 
 gmt.files <- tibble::tribble(
   ~file, ~collection, ~collection_name, ~gene_set_group,
-  "c1.all.v7.4.entrez.gmt", "c1", "positional", "positional",
-  "c2.cgp.v7.4.entrez.gmt", "c2", "curated", "chemical and genetic perturbations",
-  "c2.cp.biocarta.v7.4.entrez.gmt", "c2", "curated", "biocarta",
-  "c2.cp.kegg.v7.4.entrez.gmt", "c2", "curated", "KEGG",
-  "c2.cp.pid.v7.4.entrez.gmt", "c2", "curated", "PID",
-  "c2.cp.reactome.v7.4.entrez.gmt", "c2", "curated", "Reactome",
-  "c2.cp.wikipathways.v7.4.entrez.gmt", "c2", "curated", "wiki pathways",
-  "c2.cp.v7.4.entrez.gmt", "c2", "curated", "canonical pathways",
-  "c3.mir.mirdb.v7.4.entrez.gmt", "c3", "regulatory target", "MIRDB targets",
-  "c3.mir.mir_legacy.v7.4.entrez.gmt", "c3", "regulatory target", "Legacy microRNA targets",
-  #"c3.mir.v7.4.entrez.gmt", "c3", "regulatory target", "all microRNA targets",
-  "c3.tft.gtrd.v7.4.entrez.gmt", "c3", "regulatory target", "GTRD targets",
-  "c3.tft.tft_legacy.v7.4.entrez.gmt", "c3", "regulatory target", "Legacy transcription factor targets",
-  #"c3.tft.v7.4.entrez.gmt", "c3", "regulatory target", "all transcription factor targets",
-  "c4.cgn.v7.4.entrez.gmt", "c4", "computational", "cancer gene neighborhoods",
-  "c4.cm.v7.4.entrez.gmt", "c4", "computational", "cancer modules",
-  "c5.go.bp.v7.4.entrez.gmt", "c5", "gene ontology", "biological processes",
-  "c5.go.cc.v7.4.entrez.gmt", "c5", "gene ontology", "cellular components",
-  "c5.go.mf.v7.4.entrez.gmt", "c5", "gene ontology", "molecular functions",
-  "c6.all.v7.4.entrez.gmt", "c6", "oncogenic signatures", "all oncogenic signatures",
-  "c7.all.v7.4.entrez.gmt", "c7", "immunologic signatures", "all immunologic signatures ",
-  "c8.all.v7.4.entrez.gmt", "c8", "cell type signatures", "all cell type signatures",
-  "h.all.v7.4.entrez.gmt", "h", "hallmark", "hallmark"
+  "c1.all.$.entrez.gmt", "c1", "positional", "positional",
+  "c2.cgp.$.entrez.gmt", "c2", "curated", "chemical and genetic perturbations",
+  "c2.cp.biocarta.$.entrez.gmt", "c2", "curated", "biocarta",
+  "c2.cp.kegg.$.entrez.gmt", "c2", "curated", "KEGG",
+  "c2.cp.pid.$.entrez.gmt", "c2", "curated", "PID",
+  "c2.cp.reactome.$.entrez.gmt", "c2", "curated", "Reactome",
+  "c2.cp.wikipathways.$.entrez.gmt", "c2", "curated", "wiki pathways",
+  "c2.cp.$.entrez.gmt", "c2", "curated", "canonical pathways",
+  "c3.mir.mirdb.$.entrez.gmt", "c3", "regulatory target", "MIRDB targets",
+  #"c3.mir.mir_legacy.$.entrez.gmt", "c3", "regulatory target", "Legacy microRNA targets",
+  #"c3.mir.$.entrez.gmt", "c3", "regulatory target", "all microRNA targets",
+  "c3.tft.gtrd.$.entrez.gmt", "c3", "regulatory target", "GTRD targets",
+  "c3.tft.tft_legacy.$.entrez.gmt", "c3", "regulatory target", "Legacy transcription factor targets",
+  #"c3.tft.$.entrez.gmt", "c3", "regulatory target", "all transcription factor targets",
+  "c4.cgn.$.entrez.gmt", "c4", "computational", "cancer gene neighborhoods",
+  "c4.cm.$.entrez.gmt", "c4", "computational", "cancer modules",
+  "c5.go.bp.$.entrez.gmt", "c5", "gene ontology", "biological processes",
+  "c5.go.cc.$.entrez.gmt", "c5", "gene ontology", "cellular components",
+  "c5.go.mf.$.entrez.gmt", "c5", "gene ontology", "molecular functions",
+  "c6.all.$.entrez.gmt", "c6", "oncogenic signatures", "all oncogenic signatures",
+  "c7.all.$.entrez.gmt", "c7", "immunologic signatures", "all immunologic signatures ",
+  "c8.all.$.entrez.gmt", "c8", "cell type signatures", "all cell type signatures",
+  "h.all.$.entrez.gmt", "h", "hallmark", "hallmark"
 )
 
 TCGA_study <- tibble::tribble(
@@ -284,5 +273,13 @@ TCGA_sample_type <- tibble::tribble(
 )
 
 # -----------------
-save(db_info, gene_info, refseq_info, db_compara, download_file_info,
-     gmt.files, TCGA_study, TCGA_sample_type, file_version, file = "data/source_info.rdata")
+
+usethis::use_data(db_info, overwrite = TRUE)
+usethis::use_data(gene_info, overwrite = TRUE)
+usethis::use_data(refseq_info, overwrite = TRUE)
+usethis::use_data(db_compara, overwrite = TRUE)
+usethis::use_data(download_file_info, overwrite = TRUE)
+usethis::use_data(gmt.files,  overwrite = TRUE)
+usethis::use_data(TCGA_study, overwrite = TRUE)
+usethis::use_data(TCGA_sample_type, overwrite = TRUE)
+usethis::use_data(file_version, overwrite = TRUE)
