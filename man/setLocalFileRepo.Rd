@@ -9,6 +9,9 @@ setLocalFileRepo(path)
 \arguments{
 \item{path}{path to local file cache.}
 }
+\value{
+Invisible, returns the result of `getLocalFileRepo()`.
+}
 \description{
 Set path to local file cache.
 }

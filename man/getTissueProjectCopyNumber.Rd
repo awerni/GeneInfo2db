@@ -9,7 +9,8 @@ getTissueProjectCopyNumber(project, workflow = "ASCAT3")
 \arguments{
 \item{project}{A string. Name of the GDC project, e.g. "TCGA-ACC"}
 
-\item{workflow}{A string. Name of GDC workflow to load data (default = "ASCAT3")}
+\item{workflow}{A string. Name of GDC workflow to load data (default = "ASCAT3").
+[Workflows Documentation](https://docs.gdc.cancer.gov/Data/Bioinformatics_Pipelines/CNV_Pipeline/)}
 }
 \value{
 A data frame containing relative and absolute copy number information 

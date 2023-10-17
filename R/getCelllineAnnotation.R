@@ -4,6 +4,9 @@
 #' @importFrom logger log_trace
 #' @importFrom magrittr `%>%`
 #' 
+#' @return a list containing two data frames: 
+#' one with cell line annotations and another with alternative cell line names
+#'
 #' @export
 getCelllineAnnotation <- function() {
 

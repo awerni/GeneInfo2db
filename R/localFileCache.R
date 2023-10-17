@@ -41,6 +41,8 @@ getLocalFileRepo <- function() {
 #'
 #' @param path path to local file cache.
 #'
+#' @return Invisible, returns the result of `getLocalFileRepo()`.
+#' 
 #' @export
 setLocalFileRepo <- function(path) {
   options("geneinfo2db_local_filecache" = path)

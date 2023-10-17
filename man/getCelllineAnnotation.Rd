@@ -6,6 +6,10 @@
 \usage{
 getCelllineAnnotation()
 }
+\value{
+a list containing two data frames: 
+one with cell line annotations and another with alternative cell line names
+}
 \description{
 getCelllineAnnotation
 }

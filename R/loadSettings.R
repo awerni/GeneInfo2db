@@ -79,7 +79,7 @@ print.GeneInfo2DatabaseConfig <- function(x, ...) {
 #' Set database config.
 #'
 #' @param host database host or list with configuration (preferably the result
-#' of pgpass2dbConfig)
+#' of getDBConfig)
 #' @param port database port
 #' @param name database name
 #' @param user database user
