@@ -1,3 +1,7 @@
+#' Get Tissue Metabolics Data
+#' 
+#' @export
+#' 
 getTissueMetabolics <- function(directory) {
 
   # (taken from shiny app described in https://doi.org/10.1186/s12943-018-0895-9)

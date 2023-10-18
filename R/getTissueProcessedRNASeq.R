@@ -1,8 +1,29 @@
+#' Get Processed RNA-Seq Projects for TCGA and GTEx
+#'
+#' This function retrieves a list of processed RNA-Seq projects for TCGA (The Cancer Genome Atlas)
+#' and GTEx (Genotype-Tissue Expression) from the recount3 package's available projects data.
+#'
+#' @return
+#' A data frame with information on processed RNA-Seq projects for TCGA and GTEx.
+#' @examples
+#' result <- getTissueProcessedRNASeqProjects()
+#'
+#' @export
+#' 
 getTissueProcessedRNASeqProjects <- function() {
   human_projects <- recount3::available_projects()
   human_projects %>% dplyr::filter(file_source %in% c("gtex", "tcga"))
 }
 
+
+#' Get Tissue RNA-Seq Group Data
+#'
+#' This function generates a data frame representing RNA-Seq groups, including their IDs,
+#' names, data file paths, and processing pipelines.
+#'
+#' @return a data frame
+#'
+#' @export
 getTissueRNAseqGroup <- function() {
   RNAseqGroup <- data.frame(
     rnaseqgroupid = 1:2,
@@ -15,6 +36,9 @@ getTissueRNAseqGroup <- function() {
     tissue.rnaseqgroup = RNAseqGroup
   )
 }
+
+#' Get Processed RNA-Seq Data for TCGA and GTEx Tissues
+#' @export
 
 getTissueProcessedRNASeq <- function(projects) {
 

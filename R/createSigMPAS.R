@@ -84,10 +84,12 @@ createSigMPAS <- function(sample_data, tablename) {
   ret
 }
 
+#' @export
 createCelllineSigMPAS <- function() {
   getSigMPASexpr("cellline") |> createSigMPAS("cellline.cellline2genesignature")
 }
 
+#' @export
 createTissueSigMPAS <- function() {
   getSigMPASexpr("tissue") |> createSigMPAS("tissue.tissue2genesignature")
 }

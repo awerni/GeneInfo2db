@@ -1,3 +1,4 @@
+#' @export
 getFileData <- function(dfile) {
   getFileDownloadFunction <- getOption("GeneInfo2db.getFileDownload")
   getFileDownloadFunction(dfile)

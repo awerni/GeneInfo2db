@@ -1,3 +1,4 @@
+#' @export
 writeEntrezGene2EnsemblGene <- function(species_data) {
 
   species_data <- species_data %>%

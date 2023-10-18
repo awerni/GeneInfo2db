@@ -1,3 +1,4 @@
+#' @export
 getGeneSet_TF <- function() {
   
   con <- getPostgresqlConnection()

@@ -1,3 +1,4 @@
+#' @export
 filterForRNAseqImport <- function(db_tables) {
 
   con <- getPostgresqlConnection()

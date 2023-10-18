@@ -1,3 +1,4 @@
+#' @export
 getGeneSet_network_of_cancer_genes <- function() {
   con <- getPostgresqlConnection()
 

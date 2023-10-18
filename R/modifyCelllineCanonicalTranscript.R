@@ -1,3 +1,4 @@
+#' @export
 modifyCelllineCanonicalTranscript <- function() {
   con <- getPostgresqlConnection()
 

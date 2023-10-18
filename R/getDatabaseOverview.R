@@ -1,3 +1,4 @@
+#' @export
 getDatabaseOverview <- function() {
   sql <- "SELECT *, pg_size_pretty(total_bytes) AS total
     , pg_size_pretty(index_bytes) AS index

@@ -1,3 +1,4 @@
+#' @export
 getCelllineMutation <- function() {
   con <- getPostgresqlConnection()
 

@@ -1,3 +1,4 @@
+#' @export
 getCelllineAvana <- function() {
   # ceres <- getCellline_CRISPR_screen(
   #   screen_name = 'Avana', 
