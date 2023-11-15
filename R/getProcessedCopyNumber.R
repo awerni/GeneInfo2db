@@ -16,6 +16,11 @@ getTissueCopyNumber <- function() {
     dplyr::filter(species == "human") |>
     dplyr::collect()
   
+  tissue <- dplyr::tbl(con, dbplyr::in_schema("tissue", "tissue")) |>
+    dplyr::filter(vendorname == "TCGA") |>
+    dplyr::select(tissuename) |>
+    dplyr::collect()
+  
   RPostgres::dbDisconnect(con)
   
   projects <- TCGAbiolinks::getGDCprojects() |>
@@ -24,11 +29,13 @@ getTissueCopyNumber <- function() {
   
   result <- purrr::map_dfr(projects, getTissueProjectCopyNumber)
   result <- result |>
-    dplyr::filter(ENSG %in% gene$ensg)
+    dplyr::filter(ensg %in% gene$ensg) |>
+    dplyr::filter(tissuename %in% tissue$tissuename)
   
-  list(
+  processedcopynumber <- list(
     tissue.processedcopynumber = result
   ) 
+  
 }
 
 #' Get Tissue Project Copy Number Data
@@ -167,13 +174,13 @@ getTissueProjectCopyNumber <- function(project, workflow = "ASCAT3") {
       
       chunk_dt <- segment_dt[segments_hits,]
       
-      chunk_dt$ENSG <- genes$gene_id[genes_hits]
+      chunk_dt$ensg <- genes$gene_id[genes_hits]
       chunk_dt$overlap_width <- width
       
       chunk_dt <- chunk_dt |>
-        dplyr::group_by(Sample, ENSG) |>
+        dplyr::group_by(Sample, ensg) |>
         dplyr::summarise(
-          log2relativeCopyNumber = weighted.mean(
+          log2relativecopynumber = weighted.mean(
             x = log2relativeCopyNumber,
             w = overlap_width
           ),
@@ -186,7 +193,8 @@ getTissueProjectCopyNumber <- function(project, workflow = "ASCAT3") {
   
   relative_copy_number <- relative_copy_number |>
     dplyr::rename(tissuename = Sample) |>
-    dplyr::mutate(tissuename = getTissueName(tissue_name = tissuename))
+    dplyr::mutate(tissuename = getTissueName(tissue_name = tissuename)) |>
+    dplyr::distinct(tissuename, ensg, .keep_all = TRUE)
   
   anno_data <- SummarizedExperiment::colData(data_gene)
   data_gene <- data_gene[,substr(rownames(anno_data), 14, 14) == "0"]
@@ -197,24 +205,24 @@ getTissueProjectCopyNumber <- function(project, workflow = "ASCAT3") {
   
   abs_copy_number <- as.data.frame.table(
     copy_raw, 
-    responseName = "totalAbsCopyNumber"
+    responseName = "totalabscopynumber"
   )|>
     dplyr::rename(
-      ENSG = Var1, 
+      ensg = Var1, 
       tissuename = Var2
     )|>
     dplyr::mutate(
-      ENSG = getGeneId(ENSG),
+      ensg = getGeneId(ensg),
       tissuename = getTissueName(tissuename)
     )|>
     dplyr::filter(
-      !is.na(ENSG) & !is.na(totalAbsCopyNumber)
+      !is.na(ensg) & !is.na(totalabscopynumber)
     )
   
   result <- relative_copy_number |> 
     dplyr::full_join(
       abs_copy_number, 
-      by = c("tissuename", "ENSG")
+      by = c("tissuename", "ensg")
     )
   
   result
