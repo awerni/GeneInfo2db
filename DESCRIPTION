@@ -8,7 +8,23 @@ Authors@R: c(
     person("Zygmunt", "Zawadzki", email = "zygmunt.zawadzki@ardigen.com", role = c("aut", "ctr"))
   )
 Description: Fills the bioinfo database with gene information and omics data from depmap.org
-Depends: R (>= 4.0.0), dplyr, RPostgres, DBI, purrr, tibble, tidyr, magrittr, dbplyr, stringr, GSVA, mskcc.oncotree, TCGAbiolinks, RMariaDB, logger
+Depends: 
+      R (>= 4.0.0), 
+      dplyr, 
+      RPostgres, 
+      DBI, 
+      purrr, 
+      tibble, 
+      tidyr, 
+      magrittr, 
+      dbplyr, 
+      stringr, 
+      GSVA, 
+      mskcc.oncotree, 
+      TCGAbiolinks, 
+      RMariaDB, 
+      logger, 
+      httr
 Suggests: recount3, recount
 License: MIT + file LICENSE
 LazyData: true
