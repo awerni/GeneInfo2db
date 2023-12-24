@@ -18,6 +18,7 @@ getCelllineRNAseq <- function(.splits = 20) {
   lab <- "Broad Institute"
 
   #expr_TPM <- getFileData("OmicsExpressionProteinCodingGenesTPMLogp1")
+  expr_TPM <- getFileData("OmicsExpressionAllGenesTPMLogp1Profile")
   expr_TPM <- getFileData("CCLE_expression_full")
   colnames(expr_TPM) <- gsub("(^.*\\(|\\))", "", colnames(expr_TPM))
 
@@ -40,6 +41,7 @@ getCelllineRNAseq <- function(.splits = 20) {
   rm(expr_TPM)
   invisible(replicate(5, gc()))
 
+  expr_counts <- getFileData("OmicsExpressionGenesExpectedCountProfile")
   expr_counts <- getFileData("CCLE_RNAseq_reads")
   colnames(expr_counts) <- gsub("(^.*\\(|\\))", "", colnames(expr_counts))
 
