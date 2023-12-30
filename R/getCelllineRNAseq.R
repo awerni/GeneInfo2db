@@ -17,19 +17,24 @@ getCelllineRNAseq <- function(.splits = 20) {
   # ------------------
   lab <- "Broad Institute"
 
-  #expr_TPM <- getFileData("OmicsExpressionProteinCodingGenesTPMLogp1")
+  model_condition <- getFileData("OmicsDefaultModelConditionProfiles") |>
+    dplyr::filter(ProfileType == "rna") |>
+    left_join(getFileData("ModelCondition"), by = join_by(ModelConditionID)) |>
+    dplyr::select(-ProfileType, -ParentModelConditionID, -PassageNumber, -PlateCoating) 
+
+  #expr_TPM <- getFileData("CCLE_expression_full")
   expr_TPM <- getFileData("OmicsExpressionAllGenesTPMLogp1Profile")
-  expr_TPM <- getFileData("CCLE_expression_full")
   colnames(expr_TPM) <- gsub("(^.*\\(|\\))", "", colnames(expr_TPM))
 
   if ("matrix" %in% class(expr_TPM)) {
+    rownames(expr_TPM) <- model_profile[rownames(expr_TPM), "ModelID"]
     depmap_ID <- rownames(expr_TPM)
     expr_TPM_long <- expr_TPM %>%
       as.data.frame(stringsAsFactors = FALSE) %>%
       tibble::rownames_to_column("rnaseqrunid") %>%
       tidyr::pivot_longer(!rnaseqrunid, names_to = "ensg", values_to = "log2tpm")
   } else {
-    depmap_ID <- expr_TPM[[1]]
+    depmap_ID <- model_profile[expr_TPM[[1]], "ModelID"]
     #expr_TPM_long <- expr_TPM %>%
     #  dplyr::rename(rnaseqrunid = 1) %>%
     #  tidyr::gather(key = "ensg", value = "log2tpm", -rnaseqrunid)
@@ -42,7 +47,7 @@ getCelllineRNAseq <- function(.splits = 20) {
   invisible(replicate(5, gc()))
 
   expr_counts <- getFileData("OmicsExpressionGenesExpectedCountProfile")
-  expr_counts <- getFileData("CCLE_RNAseq_reads")
+  #expr_counts <- getFileData("CCLE_RNAseq_reads")
   colnames(expr_counts) <- gsub("(^.*\\(|\\))", "", colnames(expr_counts))
 
   if ("matrix" %in% class(expr_counts)) {
