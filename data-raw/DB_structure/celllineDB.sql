@@ -433,6 +433,7 @@ create table RNASEQRUN (
    COMMENT              TEXT                 null,
    CANONICAL            BOOL                 null,
    SOURCEID             TEXT                 null,
+   GROWTHMEDIA          TEXT                 null,
    constraint PK_RNASEQRUN primary key (RNASEQRUNID)
 );
 
