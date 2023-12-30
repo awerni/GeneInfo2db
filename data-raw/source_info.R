@@ -39,6 +39,9 @@ depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/
   filter(
     data_file %in% c(
       "Model",
+      "ModelCondition",
+      "OmicsDefaultModelProfiles",
+      "OmicsDefaultModelConditionProfiles",
       "OmicsExpressionProteinCodingGenesTPMLogp1",
       "OmicsExpressionTranscriptsExpectedCountProfile",
       "OmicsExpressionGenesExpectedCountProfile",
@@ -54,8 +57,6 @@ depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/
       "OmicsCNGene",
       "OmicsFusionFiltered",
       "OmicsSomaticMutations",
-      "OmicsDefaultModelConditionProfiles",
-      "ModelCondition",
       "OmicsProfiles"
     )
   )
