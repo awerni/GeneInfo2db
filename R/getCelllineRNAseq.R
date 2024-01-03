@@ -10,9 +10,6 @@ getCelllineRNAseq <- function(.splits = 20) {
     dplyr::select(celllinename, depmap) |>
     dplyr::collect()
 
-  laboratory <- dplyr::tbl(con, "laboratory") |>
-    dplyr::collect()
-
   RPostgres::dbDisconnect(con)
 
   # ------------------
@@ -116,14 +113,10 @@ getCelllineRNAseq <- function(.splits = 20) {
     processingpipeline = 'RNA-seq CCLE'
   )
 
-  if (lab %in% laboratory$laboratory) {
+  c(
+    getLaboratory(lab),
     list(cellline.rnaseqgroup = rnaseqgroup,
          cellline.rnaseqrun = rnaseqrun,
          cellline.processedrnaseq = depmap_RNAseq)
-  } else {
-    list(public.laboratory = data.frame(laboratory = lab),
-         cellline.rnaseqgroup = rnaseqgroup,
-         cellline.rnaseqrun = rnaseqrun,
-         cellline.processedrnaseq = depmap_RNAseq)
-  }
+  )
 }
