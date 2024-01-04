@@ -7,7 +7,7 @@ CREATE INDEX idx_processedcopynumberensg ON cellline.processedcopynumber(ensg);
 --CREATE INDEX idx_processedcopynumbercell ON cellline.processedcopynumber(celllinename);
 
 CREATE INDEX idx_processedsequenceenst ON cellline.processedsequence(enst);
-CREATE INDEX idx_processedrnaseq ON cellline.processedrnaseq(ensg, rnaseqrunid);
+CREATE INDEX idx_processedrnaseq ON cellline.processedrnaseq using hash (ensg);
 CREATE INDEX idx_processedrnaseqtrans ON cellline.processedrnaseqtranscript(enst, rnaseqrunid);
 CREATE INDEX idx_processedfusiongene1 ON cellline.processedfusiongene(ensg1, celllinename);  
 CREATE INDEX idx_processedfusiongene2 ON cellline.processedfusiongene(ensg2, celllinename);  
