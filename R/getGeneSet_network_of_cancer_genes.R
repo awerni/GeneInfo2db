@@ -13,8 +13,22 @@ getGeneSet_network_of_cancer_genes <- function() {
     "network_of_cancer_genes", "human"
   )
 
+  res <- httr::POST(
+    url = "http://www.network-cancer-genes.org/download.php", 
+    body = list(downloadcancergenes = "Download"), 
+    encode = "form",
+    httr::timeout(30)
+  )
+  if (res$status_code != 200){
+    stop("Could not download file from network-cancer-genes.org")
+  }
+  raw_df <- httr::content(
+    x = res, 
+    type = "text/tab-separated-values" # uses readr::read_tsv function to parse the content
+  )
+  
   geneassignment <-
-    readr::read_tsv(paste0(getLocalFileRepo(), "/NCG_cancerdrivers_annotation_supporting_evidence.tsv")) |>
+    raw_df |>
     dplyr::select(geneid = entrez) |>
     dplyr::distinct() |>
     dplyr::inner_join(gene_map, by = "geneid") |>
