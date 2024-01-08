@@ -295,7 +295,8 @@ create table PROCESSEDGENEDEPENDENCY (
 create table PROCESSEDMETABOLITE (
    METABOLITE           TEXT                 null,
    CELLLINENAME         TEXT                 null,
-   SCORE                FLOAT4               null
+   SCORE                FLOAT4               null,
+   constraint PK_PROCESSEDMETABOLITE primary key (METABOLITE, CELLLINENAME)
 );
 
 /*==============================================================*/
