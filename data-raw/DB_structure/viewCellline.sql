@@ -174,7 +174,8 @@ CREATE MATERIALIZED VIEW cellline.sequenced_cellline AS
 
 CREATE VIEW cellline.processedsequenceExtended AS
   SELECT tr.ensg, e.enst, symbol, c.celllinename,
-    coalesce(dnamutation, 'wt') AS dnamutation, coalesce(aamutation, 'wt') AS aamutation, dnazygosity, exonscomplete
+    coalesce(dnamutation, 'wt') AS dnamutation, coalesce(aamutation, 'wt') AS aamutation, dnazygosity, exonscomplete,
+    varianttype, variantinfo, oncogenehighimpact, tumorsuppressorhighimpact, likelylof
     FROM (SELECT celllinename FROM cellline.sequenced_cellline) AS c
     LEFT OUTER JOIN cellline.sequenced_transcript e ON (TRUE)
     LEFT OUTER JOIN cellline.processedsequence ps ON (c.celllinename = ps.celllinename AND e.enst = ps.enst)
