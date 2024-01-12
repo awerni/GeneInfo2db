@@ -295,7 +295,8 @@ create table PROCESSEDGENEDEPENDENCY (
 create table PROCESSEDMETABOLITE (
    METABOLITE           TEXT                 null,
    CELLLINENAME         TEXT                 null,
-   SCORE                FLOAT4               null
+   SCORE                FLOAT4               null,
+   constraint PK_PROCESSEDMETABOLITE primary key (METABOLITE, CELLLINENAME)
 );
 
 /*==============================================================*/
@@ -403,6 +404,11 @@ create table PROCESSEDSEQUENCE (
    EXONSCOMPLETE        FLOAT4               null,
    CONFIRMEDDETAIL      BOOL                 null,
    NUMSOURCES           INT2                 null,
+   VARIANTTYPE          TEXT                 null,
+   VARIANTINFO          TEXT                 null,
+   ONCOGENEHIGHIMPACT   BOOL                 null,
+   TUMORTSUPPRESSORHIGHIMPACT BOOL           null,
+   LIKELYLOF            BOOL                 null,
    constraint PK_PROCESSEDSEQUENCE primary key (CELLLINENAME, ENST)
 );
 
@@ -433,6 +439,7 @@ create table RNASEQRUN (
    COMMENT              TEXT                 null,
    CANONICAL            BOOL                 null,
    SOURCEID             TEXT                 null,
+   GROWTHMEDIA          TEXT                 null,
    constraint PK_RNASEQRUN primary key (RNASEQRUNID)
 );
 
