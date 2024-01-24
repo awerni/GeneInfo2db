@@ -1,3 +1,6 @@
+#' Get TCGA Proteomics RPPA Data
+#' @export
+#' 
 getTCGAProteomicsRPPA <- function() {
   
   con <- getPostgresqlConnection()

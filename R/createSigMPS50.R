@@ -77,10 +77,12 @@ calcMPS50 <- function(sample_data, tablename) {
   ret
 }
 
+#' @export
 createCelllineSigMPS50 <- function() {
   getSigMPS50expr("cellline") |> calcMPS50("cellline.cellline2genesignature")
 }
 
+#' @export
 createTissueSigMPS50 <- function() {
   getSigMPS50expr("tissue") |> calcMPS50("tissue.tissue2genesignature")
 }

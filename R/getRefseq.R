@@ -1,3 +1,4 @@
+#' @export
 getRefseq <- function(refseq_info, species_name) {
 
   rs <- refseq_info %>%

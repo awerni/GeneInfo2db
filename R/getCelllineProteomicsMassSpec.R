@@ -1,3 +1,4 @@
+#' @export
 getCelllineProteomicsMassSpec <- function() {
 
   con <- getPostgresqlConnection()

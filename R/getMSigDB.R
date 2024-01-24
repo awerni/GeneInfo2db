@@ -1,7 +1,7 @@
 #' writes a list of data frames into a Postgresql database
 #'
 #' @return a list with a single list element called public.msigdb
-
+#' @export
 getMSigDB <- function(version) {
 
   con <- getPostgresqlConnection()

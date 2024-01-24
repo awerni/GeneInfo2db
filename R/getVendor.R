@@ -1,3 +1,4 @@
+#' @export
 getVendor <- function(vn) {
   vendor <- data.frame(
     vendorname = vn,

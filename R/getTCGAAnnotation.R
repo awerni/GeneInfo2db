@@ -1,13 +1,10 @@
-#' Title
-#'
-#' @return
-#' @export
+#' getTCGAAnnotation
 #'
 #' @importFrom dplyr na_if
 #' @importFrom logger log_trace
 #' @importFrom magrittr `%>%`
 #'
-#' @examples
+#' @export
 getTCGAAnnotation <- function() {
 
   project <- TCGAbiolinks::getGDCprojects()$project_id

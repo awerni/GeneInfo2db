@@ -1,3 +1,4 @@
+#' @export
 getCelllineDrugComb <- function() {
 
   con <- getPostgresqlConnection()

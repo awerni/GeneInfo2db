@@ -73,10 +73,12 @@ getSigHRD <- function(sample_type){
   return(sig)
 }
 
+#' @export
 createCelllineSigHRD <- function(){
   getSigHRD("cellline")
 }
 
+#' @export
 createTissueSigHRD <- function(){
   getSigHRD("tissue")
 }

@@ -1,3 +1,6 @@
+#' Get Tissue Cell Type Data
+#' @export
+#' 
 getTissueCellType <- function() {
   
   con <- getPostgresqlConnection()

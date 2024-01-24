@@ -1,3 +1,4 @@
+#' @export
 getCelllinePrism <- function() {
 
   con <- getPostgresqlConnection()

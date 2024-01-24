@@ -1,3 +1,4 @@
+#' @export
 getCelllineRNAseq <- function(.splits = 20) {
   con <- getPostgresqlConnection()
 

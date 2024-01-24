@@ -11,7 +11,7 @@ addCelllineLossOfY <- function() {
                  "(SELECT ensg FROM gene WHERE chromosome = 'Y' AND species = 'human') ",
                  "GROUP BY celllinename")
 
-  con <- GeneInfo2db::getPostgresqlConnection()
+  con <- getPostgresqlConnection()
   cl_anno <- RPostgres::dbGetQuery(con, "SELECT * FROM cellline.cellline")
   data.cn <- RPostgres::dbGetQuery(con, sql1)
   data.expr <- RPostgres::dbGetQuery(con, sql2)

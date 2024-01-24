@@ -1,3 +1,4 @@
+#' @export
 getEnsemblTranscript <- function(con, transcriptname_source) {
   # ---transcript
   sql1 = paste0(

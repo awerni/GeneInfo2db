@@ -1,3 +1,4 @@
+#' @export
 getCelllineProteomicsRPPA <- function() {
 
   con <- getPostgresqlConnection()

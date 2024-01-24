@@ -1,3 +1,4 @@
+#' @export
 getFileDownload <- function(dfile) {
   
   if (grepl("@", dfile)) {

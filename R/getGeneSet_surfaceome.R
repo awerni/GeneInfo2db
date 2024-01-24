@@ -1,3 +1,4 @@
+#' @export
 getGeneSet_surfaceome <- function() {
 
   con <- getPostgresqlConnection()

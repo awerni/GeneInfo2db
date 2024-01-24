@@ -1,3 +1,4 @@
+#' @export
 getCelllineMetMap <- function() {
   con <- getPostgresqlConnection()
 

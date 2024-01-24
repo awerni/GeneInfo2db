@@ -1,3 +1,4 @@
+#' @export
 getCelllineMicrosatelliteStability <- function() {
 
   con <- getPostgresqlConnection()

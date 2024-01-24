@@ -1,3 +1,5 @@
+#' Get TCGA Pan-Cancer Data
+#' @export
 getTCGApancancerData <- function(ti) {
 
   tissuename_to_patientname <-

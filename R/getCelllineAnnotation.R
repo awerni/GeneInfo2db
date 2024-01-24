@@ -1,13 +1,13 @@
-#' Title
-#'
-#' @return
-#' @export
+#' getCelllineAnnotation
 #'
 #' @importFrom dplyr na_if
 #' @importFrom logger log_trace
 #' @importFrom magrittr `%>%`
+#' 
+#' @return a list containing two data frames: 
+#' one with cell line annotations and another with alternative cell line names
 #'
-#' @examples
+#' @export
 getCelllineAnnotation <- function() {
 
   cell_model_passport <- safeReadFile(

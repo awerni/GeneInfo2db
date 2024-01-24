@@ -1,3 +1,4 @@
+#' @export
 getCelllineDrive <- function() {
   con <- getPostgresqlConnection()
 
