@@ -1,5 +1,5 @@
 ### CAUTION !
-### This scirpt is not run during the building process.
+### This script is not run during the building process.
 library(dplyr)
 
 # ---  Ensembl Gene File ---
@@ -31,26 +31,32 @@ refseq_info <- tibble::tribble(
 
 # ------figshare (depmap) and direct links -----------
 
-FIGSHARE_ID <- 22765112 # 22Q4 = 21637199; 22Q2 = 19700056; 22Q1 = 19139906; 21Q4 = 16924132; 21Q3 = 15160110
-DEPMAP_VERSION  <- "23q2"
+FIGSHARE_ID <- 24667905 # 23Q2 = 22765112; 22Q4 = 21637199; 22Q2 = 19700056; 22Q1 = 19139906; 21Q4 = 16924132; 21Q3 = 15160110
+DEPMAP_VERSION  <- "23q4"
 depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", FIGSHARE_ID)) %>%
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
   filter(
     data_file %in% c(
       "Model",
+      "ModelCondition",
+      "OmicsDefaultModelProfiles",
+      "OmicsDefaultModelConditionProfiles",
       "OmicsExpressionProteinCodingGenesTPMLogp1",
       "OmicsExpressionTranscriptsExpectedCountProfile",
       "OmicsExpressionGenesExpectedCountProfile",
+      "OmicsExpressionAllGenesTPMLogp1Profile",
+      "CRISPRScreenMap",
       "CRISPRGeneDependency",
       "CRISPRGeneEffect",
       "AchillesCommonEssentialControls",
       "AchillesNonessentialControls",
+      "HumagneRawReadcounts",
+      "HumagneLogfoldChange",
+      "HumagneRawReadcounts",
       "OmicsCNGene",
       "OmicsFusionFiltered",
       "OmicsSomaticMutations",
-      "OmicsDefaultModelConditionProfiles",
-      "ModelCondition",
       "OmicsProfiles"
     )
   )
@@ -118,9 +124,8 @@ download_file_info <- depmap_info %>%
 
 file_version <- tibble::tribble(
   ~description, ~information,
-  "Depmap Version", paste("public", DEPMAP_VERSION),
-  "Depmap Version DNAseq", paste("public", DEPMAP_VERSION),
-  "CCLE Version Omics", paste("public", DEPMAP_VERSION_OLD),
+  "Depmap Version CRISPR", paste("public", DEPMAP_VERSION),
+  "Depmap Version Omics", paste("public", DEPMAP_VERSION),
   "metabolomics", "CCLE_metabolomics_20190502",
   "Proteomics", "CCLE_RPPA_20181003"
 )
@@ -183,7 +188,7 @@ gmt.files <- tibble::tribble(
   "c1.all.$.entrez.gmt", "c1", "positional", "positional",
   "c2.cgp.$.entrez.gmt", "c2", "curated", "chemical and genetic perturbations",
   "c2.cp.biocarta.$.entrez.gmt", "c2", "curated", "biocarta",
-  "c2.cp.kegg.$.entrez.gmt", "c2", "curated", "KEGG",
+  "c2.cp.kegg_medicus.$.entrez.gmt", "c2", "curated", "KEGG",
   "c2.cp.pid.$.entrez.gmt", "c2", "curated", "PID",
   "c2.cp.reactome.$.entrez.gmt", "c2", "curated", "Reactome",
   "c2.cp.wikipathways.$.entrez.gmt", "c2", "curated", "wiki pathways",

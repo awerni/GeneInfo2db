@@ -190,9 +190,9 @@ SELECT p.ensg, species
   HAVING min(log2relativecopynumber) < log(2, 0.75) OR max(log2relativecopynumber) > log(2, 1.5) ORDER BY species, p.ensg;
 
 CREATE MATERIALIZED VIEW tissue.processedcopynumber_array AS
-WITH cntissue AS (SELECT DISTINCT tissuename FROM tissue.processedcopynumber)
+WITH cntissue AS (SELECT DISTINCT tissuename FROM tissue.processedcopynumber WHERE ensg IN (SELECT ensg FROM tissue.cnaltered_ensg LIMIT 20))
 SELECT tissuename,
-  array(SELECT log2relativecopynumber FROM tissue.processedcopynumber p WHERE p.tissuename = cnt.tissuename AND ensg IN (SELECT ensg FROM tissue.cnaltered_ensg) ORDER BY ensg) AS log2relativecopynumber
+  array(SELECT log2relativecopynumber FROM tissue.cnaltered_ensg e LEFT JOIN tissue.processedcopynumber p ON (p.ensg = e.ensg AND p.tissuename = cnt.tissuename) ORDER BY e.ensg) AS log2relativecopynumber
   FROM cntissue cnt;
 
 -------------

@@ -55,6 +55,7 @@ getCelllineAnnotation <- function() {
                   tissue_subtype = tolower(gsub("_", " ", na_if(OncotreePrimaryDisease, ""))),
                   histology_type = tolower(gsub("_", " ", na_if(OncotreeSubtype, ""))),
                   histology_subtype = tolower(gsub("_", " ", gsub("_cell", "-cell", na_if(LegacyMolecularSubtype, "")))),
+                  tumortype = ifelse(histology_type == "small cell lung cancer", "small cell lung cancer", tumortype),
                   cell_model_passport = dplyr::coalesce(cell_model_passport2, na_if(SangerModelID, "")),
                   cellosaurus = na_if(RRID, ""),
                   growth_type = gsub("[32]d: ", "", tolower(na_if(GrowthPattern, ""))),
