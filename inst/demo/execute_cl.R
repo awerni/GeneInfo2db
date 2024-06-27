@@ -7,7 +7,7 @@ logger::log_threshold(TRACE)
 # Be careful! Running the code below might mess up with the selected database.
 # Make sure that you've selected the proper one (preferably empty one).
 #dbconfig <- getDBConfig(list(dbname = "bioinfo.hg38", dbhost = "charlotte", dbuser = "andreas"))
-dbconfig <- getDBConfig(list(dbname = "bioinfo_23Q4.hg38", dbhost = "charlotte", dbuser = "andreas"))
+dbconfig <- getDBConfig(list(dbname = "bioinfo_24Q2.hg38", dbhost = "charlotte", dbuser = "andreas"))
 
 setDBconfig(dbconfig)
 # YOU'VE BEEN WARNDED!
