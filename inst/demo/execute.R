@@ -16,13 +16,13 @@ options("GeneInfo2db.ExperimentalCurlSizeRequest" = TRUE)
 
 createDatabase("recreateAnnotationSchema")
 createDatabase("geneAnnotation")
-createDatabase("db_glue_anno")
 
 createDatabase("recreateCelllineSchema")
+createDatabase("recreateTissueSchema")
+
+createDatabase("db_glue_anno")
 createDatabase("celllineDB")
 createDatabase("db_glue_cl")
-
-createDatabase("recreateTissueSchema")
 createDatabase("tissueDB")
 createDatabase("db_glue_ti")
 
