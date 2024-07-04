@@ -71,7 +71,7 @@ safeDownloadFile <- function(URL, filename, .retries = 20, .waitTime = 20) {
 
   logger::log_trace("File {filename} not available local cache. Downloading from {URL} using safeDownloadFile().")
 
-  status <- tryCatch(download.file(URL, filename), error = function(err) {
+  status <- tryCatch(download_filesize(URL, filename), error = function(err) {
     logger::log_error("Cannot download the {URL}.")
     if(file.exists(filename)) unlink(filename)
     err
