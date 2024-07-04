@@ -82,7 +82,7 @@ drive_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/6025238/f
   filter(grepl("(D2_DRIVE_gene_dep_scores)", data_file)) %>%
   mutate(data_file = "gene_effect")
 
-prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/20564034/files") %>%
+prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/25917643/files") %>%  #   20564034
   mutate(data_name = "prism", data_file = gsub("\\.csv$", "", name)) %>%
   select(data_name,  url = download_url, data_file) %>%
   filter(data_file %in% c("prism-repurposing-20q2-secondary-screen-dose-response-curve-parameters"))
