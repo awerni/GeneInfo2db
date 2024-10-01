@@ -23,7 +23,7 @@ dbNew <- getPostgresqlConnection()
 dbNewSummary <- dbGetQuery(dbNew, statement = sql)
 
 oldUser <- "reader"
-oldName <- "bioinfo_22Q4.hg38"
+oldName <- "bioinfo_23Q4.hg38"
 oldPassword <- ""
 oldDb <-
   getPostgresqlConnection(user = oldUser,
