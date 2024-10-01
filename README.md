@@ -2,7 +2,7 @@
 
 GeneInfo2db is an R package for the creation of a PostgreSQL relational database for CLIFF and TIFF.
 
-Ready to create data from DepMap 24Q2, now.
+The current version loads data from [DepMap 24Q2](https://figshare.com/articles/dataset/DepMap_24Q2_Public/25880521).
 
 This package fills the database with tissue and cell line data as well as annotation data 
 from genes and proteins.
