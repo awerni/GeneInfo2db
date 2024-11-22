@@ -25,29 +25,25 @@ getTCGAAnnotation <- function() {
     query1 <- TCGAbiolinks::GDCquery(
       project = p,
       data.category = "Transcriptome Profiling",
-      data.type = "miRNA Expression Quantification",
-      legacy = FALSE
+      data.type = "miRNA Expression Quantification"
     )
 
     query2 <- TCGAbiolinks::GDCquery(
       project = p,
       data.category = "Transcriptome Profiling",
-      data.type = "Gene Expression Quantification",
-      legacy = FALSE
+      data.type = "Gene Expression Quantification"
     )
 
     query3 <- TCGAbiolinks::GDCquery(
       project = p,
       data.category = "Copy Number Variation",
-      data.type = "Gene Level Copy Number",
-      legacy = FALSE
+      data.type = "Gene Level Copy Number"
     )
 
     query4 <- TCGAbiolinks::GDCquery(
       project = p,
       data.category = "Simple Nucleotide Variation",
-      data.type = "Raw Simple Somatic Mutation",
-      legacy = FALSE
+      data.type = "Raw Simple Somatic Mutation"
     )
 
     getTissuename <-

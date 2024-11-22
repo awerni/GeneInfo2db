@@ -33,7 +33,6 @@ getTissueMutation <- function() {
       project = p,
       data.category = "Simple Nucleotide Variation",
       access = "open",
-      legacy = FALSE,
       data.type = "Masked Somatic Mutation",
       workflow.type = "Aliquot Ensemble Somatic Variant Merging and Masking"
     )
