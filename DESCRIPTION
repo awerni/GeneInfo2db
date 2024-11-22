@@ -24,7 +24,8 @@ Depends:
       TCGAbiolinks, 
       RMariaDB, 
       logger, 
-      httr
+      httr,
+      RCurl
 Suggests: recount3, recount
 License: MIT + file LICENSE
 LazyData: true
