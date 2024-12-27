@@ -91,12 +91,12 @@ CREATE MATERIALIZED VIEW tissue.mutationalburden AS
 SELECT pse.tissuename, species, tumortype, sum((aamutation <> 'wt')::INT4)/count(*)::REAL AS mutational_fraction
   FROM tissue.processedsequenceExtended pse JOIN tissue.tissue t ON t.tissuename = pse.tissuename JOIN transcript tr on tr.enst = pse.enst
   WHERE iscanonical 
-  GROUP BY pse.tissuename, species, tumortype having count(*) > 10000;
+  GROUP BY pse.tissuename, species, tumortype HAVING count(*) > 10000;
 
 ----------------------
 
 CREATE OR REPLACE VIEW tissue.hla_a_type AS
-SELECT t.tissuename, n.rnaseqrunid, allele1 AS HLA_A_allele1, allele2 as HLA_A_allele2 FROM tissue.tissue t
+SELECT t.tissuename, n.rnaseqrunid, allele1 AS HLA_A_allele1, allele2 AS HLA_A_allele2 FROM tissue.tissue t
 JOIN tissue.rnaseqrun n ON (t.tissuename = n.tissuename AND canonical)
 JOIN tissue.hlatype h ON (n.rnaseqrunid = h.rnaseqrunid AND hla_class = 'A');
 
