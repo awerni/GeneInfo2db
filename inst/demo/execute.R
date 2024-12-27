@@ -174,6 +174,7 @@ createTissueSigMPS50() %>% writeDatabase()
 # weight, height, bmi
 # loss of Y
 # gene signatures
+# dnasequenced
 
 createDatabase("refreshView_ti")
 
