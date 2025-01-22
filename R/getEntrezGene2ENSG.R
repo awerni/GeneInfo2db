@@ -20,12 +20,12 @@ getEntrezGene2ENSG <- function(geneid) {
   ensg <- RPostgres::dbGetQuery(con, sql)
   RPostgres::dbDisconnect(con)
 
-  ensg_summary <- ensg %>%
-    dplyr::group_by(geneid) %>%
-    dplyr::summarize(n = n()) %>%
+  ensg_summary <- ensg |>
+    dplyr::group_by(geneid) |>
+    dplyr::summarize(n = n()) |>
     dplyr::filter(n > 1) # assign all ambiguous geneid <=> ensg associations
 
-  ensg %>%
-    dplyr::filter(!geneid %in% ensg_summary$geneid) %>% # filter ambiguous gene annotations
+  ensg |>
+    dplyr::filter(!geneid %in% ensg_summary$geneid) |> # filter ambiguous gene annotations
     dplyr::select(ensg, geneid)
 }

@@ -1,13 +1,13 @@
 getGeneSet <- function() {
-  essential_genes <- getFileData("AchillesCommonEssentialControls") %>%
-    dplyr::rename(gene = Gene) %>%
+  essential_genes <- getFileData("AchillesCommonEssentialControls") |>
+    dplyr::rename(gene = Gene) |>
     dplyr::mutate(genesetname = "essential genes")
 
-  nonessential_genes <- getFileData("AchillesNonessentialControls") %>%
-    dplyr::rename(gene = Gene) %>%
+  nonessential_genes <- getFileData("AchillesNonessentialControls") |>
+    dplyr::rename(gene = Gene) |>
     dplyr::mutate(genesetname = "non-essential genes")
 
-  gene_df <- separate_gene(dplyr::bind_rows(essential_genes, nonessential_genes)) %>%
+  gene_df <- separate_gene(dplyr::bind_rows(essential_genes, nonessential_genes)) |>
     dplyr::select(-symbol)
 
   geneset <- tibble::tribble(
@@ -16,8 +16,8 @@ getGeneSet <- function() {
     "non-essential genes", "human"
   )
 
-  geneassignment <- getEntrezGene2ENSG(gene_df$geneid) %>%
-    dplyr::left_join(gene_df, by = "geneid") %>%
+  geneassignment <- getEntrezGene2ENSG(gene_df$geneid) |>
+    dplyr::left_join(gene_df, by = "geneid") |>
     dplyr::select(-geneid)
 
   list(

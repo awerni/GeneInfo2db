@@ -2,7 +2,7 @@
 getGeneSet_network_of_cancer_genes <- function() {
   con <- getPostgresqlConnection()
 
-  gene_map <- tbl(con, "normchromentrezgene2ensemblgene") %>%
+  gene_map <- tbl(con, "normchromentrezgene2ensemblgene") |>
     dplyr::collect()
 
   RPostgres::dbDisconnect(con)

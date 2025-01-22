@@ -26,7 +26,7 @@ getEnsemblTranscript <- function(con, transcriptname_source) {
   DBI::dbClearResult(res)
 
   # -- put things together
-  transcript2 <- transcript %>%
-    dplyr::left_join(transcript_name, by = "enst") %>%
+  transcript2 <- transcript |>
+    dplyr::left_join(transcript_name, by = "enst") |>
     dplyr::mutate(iscanonical = ifelse(iscanonical == 1, TRUE, FALSE))
 }

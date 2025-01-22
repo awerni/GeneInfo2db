@@ -6,9 +6,9 @@ getSigHRD <- function(sample_type){
 
     con <- getPostgresqlConnection()
 
-    cellline <- dplyr::tbl(con, dbplyr::in_schema("cellline", "cellline"))  %>%
-      dplyr::filter(species == "human") %>%
-      dplyr::select(celllinename, depmap) %>%
+    cellline <- dplyr::tbl(con, dbplyr::in_schema("cellline", "cellline"))  |>
+      dplyr::filter(species == "human") |>
+      dplyr::select(celllinename, depmap) |>
       dplyr::collect()
 
     RPostgres::dbDisconnect(con)
@@ -22,7 +22,7 @@ getSigHRD <- function(sample_type){
     Takamatsu2023 <- read.csv(file_Takamatsu2023, sep = "\t", na = "NaN", dec = ".")
     
     # ----------- extract precomputed HRD data
-    res_HRD <- Takamatsu2023 %>%
+    res_HRD <- Takamatsu2023 |>
       dplyr::select(depmap = "DepMap_ID",
                     score = "HRD_score") |>
       dplyr::inner_join(cellline, by = "depmap") |>
@@ -51,7 +51,7 @@ getSigHRD <- function(sample_type){
     Knijnenburg2018 <- readxl::read_xlsx(file_Knijnenburg2018, sheet = "DDR footprints", skip = 3, na = "NaN")
     
     # ----------- extract precomputed HRD data
-    res_HRD <- Knijnenburg2018 %>%
+    res_HRD <- Knijnenburg2018 |>
       dplyr::select(tissuename = "TCGA sample barcode",
                     score = "HRD_Score") |>
       dplyr::filter(!is.na(score)) |>                  

@@ -29,7 +29,7 @@ getCelllineCopynumber <- function() {
       ) |>
       dplyr::inner_join(cellline, by = "depmap") |>
       dplyr::select(-depmap) |>
-      dplyr::mutate(cn = 2*(2^log2cn - 1)) 
+      dplyr::mutate(cn = 2*(2^log2cn - 1))
 
     gene2ensg <- getEntrezGene2ENSG(gene_name$geneid)
 

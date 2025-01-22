@@ -1,21 +1,21 @@
 #' @export
 getRefseq <- function(refseq_info, species_name) {
 
-  rs <- refseq_info %>%
-    dplyr::filter(species == species_name) %>%
+  rs <- refseq_info |>
+    dplyr::filter(species == species_name) |>
     as.list()
 
-  a <- safeReadFile(rs$file, col_names = c("size", "file")) %>%
-    dplyr::filter(grepl("rna.fna.gz", file)) %>%
+  a <- safeReadFile(rs$file, col_names = c("size", "file")) |>
+    dplyr::filter(grepl("rna.fna.gz", file)) |>
     dplyr::arrange(file)
 
   readFasta <- function(my_file) {
     curr_file  <- paste0(gsub("([^\\/]+$)", "", rs$file), my_file)
     print(curr_file)
 
-    safeReadFile(curr_file, col_names = c("content")) %>%
-      dplyr::filter(grepl(">", content)) %>%
-      tidyr::separate(content, c("refseqid", "refseqdesc"), sep = " ", extra = "merge") %>%
+    safeReadFile(curr_file, col_names = c("content")) |>
+      dplyr::filter(grepl(">", content)) |>
+      tidyr::separate(content, c("refseqid", "refseqdesc"), sep = " ", extra = "merge") |>
       dplyr::mutate(refseqid = gsub(">", "", refseqid))
   }
 
@@ -33,10 +33,10 @@ getRefseq <- function(refseq_info, species_name) {
       stop(status[grepl(status, pattern = "invalid compressed")])
     }
     
-    gene2refseq <- readr::read_tsv(new_file) %>%
-      dplyr::select(taxid = `#tax_id`, geneid = GeneID, refseqid = RNA_nucleotide_accession.version) %>%
-      dplyr::filter(taxid == rs$taxid) %>%
-      dplyr::filter(!refseqid == "-") %>%
+    gene2refseq <- readr::read_tsv(new_file) |>
+      dplyr::select(taxid = `#tax_id`, geneid = GeneID, refseqid = RNA_nucleotide_accession.version) |>
+      dplyr::filter(taxid == rs$taxid) |>
+      dplyr::filter(!refseqid == "-") |>
       unique()
     
     file.remove(new_file)
@@ -49,5 +49,5 @@ getRefseq <- function(refseq_info, species_name) {
   options("timeout" = timeout)  
   
   
-  gene2refseq %>% left_join(refseq_name, by = "refseqid")
+  gene2refseq |> left_join(refseq_name, by = "refseqid")
 }

@@ -2,7 +2,7 @@
 #'
 #' @importFrom dplyr na_if
 #' @importFrom logger log_trace
-#' @importFrom magrittr `%>%`
+#' @importFrom magrittr `|>`
 #' 
 #' @return a list containing two data frames: 
 #' one with cell line annotations and another with alternative cell line names
@@ -13,18 +13,18 @@ getCelllineAnnotation <- function() {
   cell_model_passport <- safeReadFile(
       "https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz",
       read_fnc = readr::read_csv
-    ) %>%
+    ) |>
     dplyr::filter(model_type == "Cell Line")
 
-  cell_model_passport1 <- cell_model_passport %>%
-    dplyr::select(CCLEName = CCLE_ID, cell_model_passport2 = model_id) %>%
+  cell_model_passport1 <- cell_model_passport |>
+    dplyr::select(CCLEName = CCLE_ID, cell_model_passport2 = model_id) |>
     dplyr::filter(!is.na(CCLEName))
 
-  cell_model_passport2 <- cell_model_passport %>%
+  cell_model_passport2 <- cell_model_passport |>
     dplyr::select(cell_model_passport = model_id, tumortype = cancer_type)
 
-  sample_info <- getFileData("Model") %>%
-    dplyr::mutate(CCLEName = ifelse(is.na(CCLEName) | CCLEName == "", CellLineName, CCLEName)) %>%
+  sample_info <- getFileData("Model") |>
+    dplyr::mutate(CCLEName = ifelse(is.na(CCLEName) | CCLEName == "", CellLineName, CCLEName)) |>
     dplyr::mutate(CCLEName = dplyr::coalesce(CCLEName, StrippedCellLineName))
 
   if(anyNA(sample_info$CCLEName)) {
@@ -33,21 +33,21 @@ getCelllineAnnotation <- function() {
   }
 
   if ("Alias" %in% colnames(sample_info)) {
-    sample_info <- sample_info %>% dplyr::rename(alias = Alias)
+    sample_info <- sample_info |> dplyr::rename(alias = Alias)
   }
 
   no <- table(sample_info$CCLEName)
   no <- names(no[no>1])
 
-  tumor_types <- mskcc.oncotree::get_tumor_types() %>%
-    select(oncotree_name, oncotree_main_type) %>%
+  tumor_types <- mskcc.oncotree::get_tumor_types() |>
+    select(oncotree_name, oncotree_main_type) |>
     distinct()
 
-  sample_info <- sample_info %>% dplyr::filter(!CCLEName %in% no)
+  sample_info <- sample_info |> dplyr::filter(!CCLEName %in% no)
 
-  cl_anno <- sample_info %>%
-    dplyr::left_join(cell_model_passport1, by = "CCLEName") %>%
-    dplyr::left_join(tumor_types, by = c("OncotreePrimaryDisease" = "oncotree_name")) %>%
+  cl_anno <- sample_info |>
+    dplyr::left_join(cell_model_passport1, by = "CCLEName") |>
+    dplyr::left_join(tumor_types, by = c("OncotreePrimaryDisease" = "oncotree_name")) |>
     dplyr::mutate(species = "human",
                   gender = tolower(Sex),
                   organ = tolower(gsub("_", " ", na_if(OncotreeLineage, ""))),
@@ -64,64 +64,64 @@ getCelllineAnnotation <- function() {
                   organ = ifelse(grepl("fibroblast", organ), gsub("fibroblast, ", "", histology_type), organ),
                   tumortype = ifelse(grepl("(matched normal|immortalized)", histology_type), "normal", tumortype),
                   comment = dplyr::na_if(PublicComments, ""),
-                  public = TRUE) %>%
+                  public = TRUE) |>
     dplyr::rename(celllinename = CCLEName,
                   age_at_surgery = Age,
                   cosmicid = COSMICID,
-                  depmap = ModelID) %>%
+                  depmap = ModelID) |>
     dplyr::select(celllinename, species, organ, tumortype, histology_type, histology_subtype,
                   growth_type, morphology, metastatic_site, cosmicid, gender, age_at_surgery, depmap,
                   cellosaurus, cell_model_passport, comment, public)
 
   ccle_anno <- getFileData("Cell_lines_annotations_20181226")
 
-  ccle1 <- ccle_anno %>%
-    dplyr::select(celllinename = CCLE_ID, alternative_celllinename = Name) %>%
-    dplyr::filter(!is.na(alternative_celllinename) & alternative_celllinename != "") %>%
-    dplyr::mutate(source = "CCLE") %>%
+  ccle1 <- ccle_anno |>
+    dplyr::select(celllinename = CCLE_ID, alternative_celllinename = Name) |>
+    dplyr::filter(!is.na(alternative_celllinename) & alternative_celllinename != "") |>
+    dplyr::mutate(source = "CCLE") |>
     dplyr::filter(celllinename %in% cl_anno$celllinename)
 
-  depmap1 <- sample_info %>%
-    dplyr::select(celllinename = `CCLEName`, alternative_celllinename = CellLineName) %>%
-    dplyr::filter(!is.na(alternative_celllinename) & alternative_celllinename != "") %>%
-    dplyr::mutate(alternative_celllinename = stringr::str_split(alternative_celllinename, ", ")) %>%
-    tidyr::unnest(alternative_celllinename) %>%
+  depmap1 <- sample_info |>
+    dplyr::select(celllinename = `CCLEName`, alternative_celllinename = CellLineName) |>
+    dplyr::filter(!is.na(alternative_celllinename) & alternative_celllinename != "") |>
+    dplyr::mutate(alternative_celllinename = stringr::str_split(alternative_celllinename, ", ")) |>
+    tidyr::unnest(alternative_celllinename) |>
     dplyr::mutate(source = "depmap_alias")
 
-  depmap2 <- sample_info %>%
-    dplyr::select(celllinename = CCLEName, alternative_celllinename = StrippedCellLineName) %>%
-    dplyr::mutate(source = "depmap_stripped_name") %>%
+  depmap2 <- sample_info |>
+    dplyr::select(celllinename = CCLEName, alternative_celllinename = StrippedCellLineName) |>
+    dplyr::mutate(source = "depmap_stripped_name") |>
     dplyr::filter(celllinename %in% cl_anno$celllinename)
 
-  sanger1 <- cell_model_passport %>%
-    dplyr::select(celllinename = CCLE_ID, alternative_celllinename = model_name) %>%
-    dplyr::filter(!is.na(alternative_celllinename) & alternative_celllinename != "") %>%
-    dplyr::filter(!is.na(celllinename) & celllinename != "") %>%
-    dplyr::mutate(source = "Sanger") %>%
+  sanger1 <- cell_model_passport |>
+    dplyr::select(celllinename = CCLE_ID, alternative_celllinename = model_name) |>
+    dplyr::filter(!is.na(alternative_celllinename) & alternative_celllinename != "") |>
+    dplyr::filter(!is.na(celllinename) & celllinename != "") |>
+    dplyr::mutate(source = "Sanger") |>
     dplyr::filter(celllinename %in% cl_anno$celllinename)
 
-  sanger2 <- cell_model_passport %>%
-    dplyr::select(celllinename = CCLE_ID, alternative_celllinename = synonyms)  %>%
-    dplyr::filter(!is.na(alternative_celllinename) & alternative_celllinename != "") %>%
-    dplyr::mutate(alternative_celllinename = stringr::str_split(alternative_celllinename, ";")) %>%
-    tidyr::unnest(alternative_celllinename) %>%
-    dplyr::filter(!is.na(celllinename) & celllinename != "") %>%
-    dplyr::mutate(source = "Sanger") %>%
+  sanger2 <- cell_model_passport |>
+    dplyr::select(celllinename = CCLE_ID, alternative_celllinename = synonyms)  |>
+    dplyr::filter(!is.na(alternative_celllinename) & alternative_celllinename != "") |>
+    dplyr::mutate(alternative_celllinename = stringr::str_split(alternative_celllinename, ";")) |>
+    tidyr::unnest(alternative_celllinename) |>
+    dplyr::filter(!is.na(celllinename) & celllinename != "") |>
+    dplyr::mutate(source = "Sanger") |>
     dplyr::filter(celllinename %in% cl_anno$celllinename)
 
-  cl_alternative <- dplyr::bind_rows(ccle1, depmap1, depmap2, sanger1, sanger2) %>%
-    dplyr::group_by(celllinename, alternative_celllinename) %>%
-    dplyr::slice(1) %>%
-    dplyr::ungroup() %>%
+  cl_alternative <- dplyr::bind_rows(ccle1, depmap1, depmap2, sanger1, sanger2) |>
+    dplyr::group_by(celllinename, alternative_celllinename) |>
+    dplyr::slice(1) |>
+    dplyr::ungroup() |>
     dplyr::arrange(celllinename, alternative_celllinename)
 
-  cl_dupl <- cl_alternative %>%
-    dplyr::group_by(alternative_celllinename) %>%
-    dplyr::summarise(n = n(), .groups = "drop") %>%
+  cl_dupl <- cl_alternative |>
+    dplyr::group_by(alternative_celllinename) |>
+    dplyr::summarise(n = n(), .groups = "drop") |>
     dplyr::filter(n > 1)
 
-  cl_alternative2 <- cl_alternative %>%
-    dplyr::filter(!is.na(alternative_celllinename)) %>%
+  cl_alternative2 <- cl_alternative |>
+    dplyr::filter(!is.na(alternative_celllinename)) |>
     dplyr::filter(!alternative_celllinename %in% cl_dupl$alternative_celllinename)
 
   if(anyNA(cl_anno$celllinename)) {

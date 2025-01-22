@@ -3,9 +3,9 @@ getGeneSet_surfaceome <- function() {
 
   con <- getPostgresqlConnection()
 
-  gene <- tbl(con, "gene") %>%
-    dplyr::filter(species == "human") %>%
-    dplyr::select(ensg) %>%
+  gene <- tbl(con, "gene") |>
+    dplyr::filter(species == "human") |>
+    dplyr::select(ensg) |>
     dplyr::collect()
 
   RPostgres::dbDisconnect(con)
@@ -20,9 +20,9 @@ getGeneSet_surfaceome <- function() {
   )
 
   geneassignment <-
-    TCSA_data[, 1] %>%
-    dplyr::select(ensg = 1) %>%
-    dplyr::filter(ensg %in% gene$ensg) %>%
+    TCSA_data[, 1] |>
+    dplyr::select(ensg = 1) |>
+    dplyr::filter(ensg %in% gene$ensg) |>
     dplyr::mutate(genesetname = "surfaceome")
 
   list(

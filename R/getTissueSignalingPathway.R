@@ -10,8 +10,8 @@ getTissueSignalingPathway <- function() {
 
   con <- getPostgresqlConnection()
 
-  tissue <- dplyr::tbl(con, dbplyr::in_schema("tissue", "tissue"))  %>%
-    dplyr::select(tissuename) %>%
+  tissue <- dplyr::tbl(con, dbplyr::in_schema("tissue", "tissue"))  |>
+    dplyr::select(tissuename) |>
     dplyr::collect()
 
   RPostgres::dbDisconnect(con)
@@ -24,11 +24,11 @@ getTissueSignalingPathway <- function() {
     download.file(url, destfile = file_sanches_vega2018, method = "wget", quiet = TRUE)
   }
 
-  sanches_vega2018 <- readxl::read_xlsx(file_sanches_vega2018, sheet = 3, na = "NA") %>%
-    dplyr::rename(tissuename = SAMPLE_BARCODE) %>%
-    dplyr::rename(cell_cycle = `Cell Cycle`, rtk_ras = `RTK RAS`, tgf_beta = `TGF-Beta`) %>%
-    dplyr::rename_all(tolower) %>%
-    dplyr::mutate_if(is.numeric, as.logical) %>%
+  sanches_vega2018 <- readxl::read_xlsx(file_sanches_vega2018, sheet = 3, na = "NA") |>
+    dplyr::rename(tissuename = SAMPLE_BARCODE) |>
+    dplyr::rename(cell_cycle = `Cell Cycle`, rtk_ras = `RTK RAS`, tgf_beta = `TGF-Beta`) |>
+    dplyr::rename_all(tolower) |>
+    dplyr::mutate_if(is.numeric, as.logical) |>
     dplyr::filter(tissuename %in% tissue$tissuename)
 
   list(

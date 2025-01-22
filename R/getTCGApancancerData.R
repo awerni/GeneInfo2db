@@ -3,7 +3,7 @@
 getTCGApancancerData <- function(ti) {
 
   tissuename_to_patientname <-
-    data.frame(tissuename = ti) %>%
+    data.frame(tissuename = ti) |>
     dplyr::mutate(patientname = stringr::str_sub(tissuename, 1, 12))
 
   # ------------------------------------------------------------------------------
@@ -25,16 +25,16 @@ getTCGApancancerData <- function(ti) {
   ### process
   thorsson2018 <- readxl::read_excel(file_thorsson2018, na = "NA")
 
-  immune_environment <- thorsson2018 %>%
-    dplyr::left_join(mapper, by = "Immune Subtype") %>%
-    dplyr::select(patientname = `TCGA Participant Barcode`, immune_environment) %>%
+  immune_environment <- thorsson2018 |>
+    dplyr::left_join(mapper, by = "Immune Subtype") |>
+    dplyr::select(patientname = `TCGA Participant Barcode`, immune_environment) |>
     dplyr::inner_join(tissuename_to_patientname, by = "patientname")
 
   # SANITY CHECK:
   # 292 patients have a 1-to-n mapping between patientname and tissuename
-  immune_environment %>%
-    dplyr::count(patientname) %>%
-    dplyr::rename(mapping = n) %>%
+  immune_environment |>
+    dplyr::count(patientname) |>
+    dplyr::rename(mapping = n) |>
     dplyr::count(mapping)
 
   # ------------------------------------------------------------------------------
@@ -50,18 +50,18 @@ getTCGApancancerData <- function(ti) {
   ### process
   ding2018 <- readxl::read_excel(file_ding2018, skip = 2, col_types = c("text", "numeric", "skip"))
 
-  microsatellite_stability <- ding2018 %>%
-    dplyr::select(patientname = `Participant Barcode`, microsatellite_stability_score = `MSIsensor score`) %>%
+  microsatellite_stability <- ding2018 |>
+    dplyr::select(patientname = `Participant Barcode`, microsatellite_stability_score = `MSIsensor score`) |>
     # classify into MSS and MSI based on Ding 2018
-    dplyr::mutate(microsatellite_stability_class = if_else(microsatellite_stability_score < 4, "MSS", "MSI")) %>%
-    dplyr::inner_join(tissuename_to_patientname, by = "patientname") %>%
+    dplyr::mutate(microsatellite_stability_class = if_else(microsatellite_stability_score < 4, "MSS", "MSI")) |>
+    dplyr::inner_join(tissuename_to_patientname, by = "patientname") |>
     dplyr::select(tissuename, patientname, microsatellite_stability_class, microsatellite_stability_score)
 
   # SANITY CHECK:
   # 286 patients have a 1-to-n mapping between patientname and tissuename
-  microsatellite_stability %>%
-    count(patientname) %>%
-    dplyr::rename(mapping = n) %>%
+  microsatellite_stability |>
+    count(patientname) |>
+    dplyr::rename(mapping = n) |>
     count(mapping)
 
   # ------------------------------------------------------------------------------
@@ -78,16 +78,16 @@ getTCGApancancerData <- function(ti) {
   ### process
   liu2018 <- readxl::read_excel(file_liu2018, skip = 1)
 
-  gi_mol_subtype <- liu2018 %>%
-    dplyr::select(patientname = `TCGA Participant Barcode`, gi_mol_subgroup = Molecular_Subtype) %>%
-    dplyr::inner_join(tissuename_to_patientname, by = "patientname") %>%
+  gi_mol_subtype <- liu2018 |>
+    dplyr::select(patientname = `TCGA Participant Barcode`, gi_mol_subgroup = Molecular_Subtype) |>
+    dplyr::inner_join(tissuename_to_patientname, by = "patientname") |>
     dplyr::select(tissuename, patientname, gi_mol_subgroup)
 
   # SANITY CHECK:
   # 3 patients have a 1-to-2 mapping between patientname and tissuename
-  gi_mol_subtype %>%
-    dplyr::count(patientname) %>%
-    dplyr::rename(mapping = n) %>%
+  gi_mol_subtype |>
+    dplyr::count(patientname) |>
+    dplyr::rename(mapping = n) |>
     dplyr::count(mapping)
 
   # ------------------------------------------------------------------------------
@@ -110,18 +110,18 @@ getTCGApancancerData <- function(ti) {
 
   ### process
   hoadley2018 <- readxl::read_xlsx(file_hoadley2018, na = "NA", skip = 1)
-  iCluster <- hoadley2018 %>%
-    dplyr::rename(patientname = `Sample ID`) %>%
-    dplyr::left_join(iClusterNames, by = "iCluster") %>%
-    dplyr::select(-iCluster) %>%
-    dplyr::rename(icluster = iClusterName) %>%
+  iCluster <- hoadley2018 |>
+    dplyr::rename(patientname = `Sample ID`) |>
+    dplyr::left_join(iClusterNames, by = "iCluster") |>
+    dplyr::select(-iCluster) |>
+    dplyr::rename(icluster = iClusterName) |>
     dplyr::inner_join(tissuename_to_patientname, by = "patientname")
 
   # SANITY CHECK:
   # 275 patients have a 1-to-n mapping between patientname and tissuename
-  iCluster %>%
-    dplyr::count(patientname) %>%
-    dplyr::rename(mapping = n) %>%
+  iCluster |>
+    dplyr::count(patientname) |>
+    dplyr::rename(mapping = n) |>
     dplyr::count(mapping)
 
   # ------------------------------------------------------------------------------
@@ -138,20 +138,20 @@ getTCGApancancerData <- function(ti) {
   ### process
   saltz2018 <- readxl::read_excel(file_saltz2018)
 
-  digital_pathology <- saltz2018 %>%
-    dplyr::select(patientname = ParticipantBarcode, til_pattern = Global_Pattern) %>%
-    dplyr::inner_join(tissuename_to_patientname, by = "patientname") %>%
+  digital_pathology <- saltz2018 |>
+    dplyr::select(patientname = ParticipantBarcode, til_pattern = Global_Pattern) |>
+    dplyr::inner_join(tissuename_to_patientname, by = "patientname") |>
     dplyr::select(tissuename, patientname, til_pattern)
 
   # SANITY CHECK:
   # 196 patients have a 1-to-n mapping between patientname and tissuename
-  digital_pathology %>%
-    dplyr::count(patientname) %>%
-    dplyr::rename(mapping = n) %>%
+  digital_pathology |>
+    dplyr::count(patientname) |>
+    dplyr::rename(mapping = n) |>
     dplyr::count(mapping)
 
   ## distribution of categories
-  # digital_pathology %>%
+  # digital_pathology |>
   #   count(til_pattern)
 
 
@@ -166,10 +166,10 @@ getTCGApancancerData <- function(ti) {
   }
   raynaud2018 <- readxl::read_xlsx(file_raynaud2018)
 
-  clones_and_phylo_tree <- raynaud2018 %>%
-    dplyr::select(sample_name, `number of clones`, `Tree score`) %>%
-    dplyr::rename(tissuename = sample_name, number_of_clones = `number of clones`, clone_tree_score = `Tree score`) %>%
-    dplyr::mutate_if(is.numeric, function(x) round(x, 3)) %>%
+  clones_and_phylo_tree <- raynaud2018 |>
+    dplyr::select(sample_name, `number of clones`, `Tree score`) |>
+    dplyr::rename(tissuename = sample_name, number_of_clones = `number of clones`, clone_tree_score = `Tree score`) |>
+    dplyr::mutate_if(is.numeric, function(x) round(x, 3)) |>
     dplyr::inner_join(tissuename_to_patientname, by = "tissuename")
 
   # ------------------------------------------------------------------------------
@@ -183,12 +183,12 @@ getTCGApancancerData <- function(ti) {
   }
   aran2015 <- readxl::read_xlsx(file_aran2015, skip = 3, na = "NaN")
 
-  tumor_purity <- aran2015 %>%
-    dplyr::mutate(tissuename = stringr::str_sub(`Sample ID`, 1, 15)) %>%
-    dplyr::filter(!is.na(CPE)) %>%
-    dplyr::select(tissuename, CPE) %>%
-    dplyr::group_by(tissuename) %>%
-    dplyr::summarise(tumorpurity = mean(CPE)) %>%
+  tumor_purity <- aran2015 |>
+    dplyr::mutate(tissuename = stringr::str_sub(`Sample ID`, 1, 15)) |>
+    dplyr::filter(!is.na(CPE)) |>
+    dplyr::select(tissuename, CPE) |>
+    dplyr::group_by(tissuename) |>
+    dplyr::summarise(tumorpurity = mean(CPE)) |>
     dplyr::inner_join(tissuename_to_patientname, by = "tissuename")
 
   # ------------------------------------------------------------------------------
@@ -203,9 +203,9 @@ getTCGApancancerData <- function(ti) {
 
   thennavan2021 <- readxl::read_xlsx(file_thennavan2021, na = "NA")
 
-  breast_hist_subtype <- thennavan2021 %>%
-    dplyr::mutate(tissuename = stringr::str_sub(CLID, 1, 15)) %>%
-    dplyr::rename(histology_subtype = `PAM50 and Claudin-low (CLOW) Molecular Subtype`) %>%
+  breast_hist_subtype <- thennavan2021 |>
+    dplyr::mutate(tissuename = stringr::str_sub(CLID, 1, 15)) |>
+    dplyr::rename(histology_subtype = `PAM50 and Claudin-low (CLOW) Molecular Subtype`) |>
     dplyr::select(tissuename, histology_subtype)
 
   # ------------------------------------------------------------------------------
@@ -217,8 +217,8 @@ getTCGApancancerData <- function(ti) {
 
   pancancer <- list(gi_mol_subtype, microsatellite_stability, immune_environment,
                     iCluster, digital_pathology, clones_and_phylo_tree, tumor_purity,
-                    breast_hist_subtype) %>%
-    reduce(full_join) %>%
+                    breast_hist_subtype) |>
+    reduce(full_join) |>
     filter(tissuename %in% ti)
 
 }
