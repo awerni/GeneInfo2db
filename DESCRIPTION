@@ -22,6 +22,8 @@ Depends:
       GSVA, 
       mskcc.oncotree, 
       TCGAbiolinks, 
+      recount,
+      recount3,
       RMariaDB, 
       logger, 
       httr,

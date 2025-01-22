@@ -12,7 +12,7 @@
 #' 
 getTissueProcessedRNASeqProjects <- function() {
   human_projects <- recount3::available_projects()
-  human_projects %>% dplyr::filter(file_source %in% c("gtex", "tcga"))
+  human_projects |> dplyr::filter(file_source %in% c("gtex", "tcga"))
 }
 
 
@@ -51,16 +51,19 @@ getTissueProcessedRNASeq <- function(projects) {
   )
 
   result <- list(
-    tissue.patient = result %>% lapply("[[", "tissue.patient") %>% bind_rows() %>% distinct(),
-    tissue.tissue = result %>% lapply("[[", "tissue.tissue") %>% bind_rows() %>% distinct(),
-    tissue.rnaseqrun = result %>% lapply("[[", "tissue.rnaseqrun") %>% bind_rows(),
-    tissue.processedrnaseq = result %>% lapply("[[", "tissue.processedrnaseq") %>% bind_rows()
+    tissue.patient = result |> lapply("[[", "tissue.patient") |> bind_rows() |> distinct(),
+    tissue.tissue = result |> lapply("[[", "tissue.tissue") |> bind_rows() |> distinct(),
+    tissue.rnaseqrun = result |> lapply("[[", "tissue.rnaseqrun") |> bind_rows(),
+    tissue.processedrnaseq = result |> lapply("[[", "tissue.processedrnaseq") |> bind_rows()
   )
 
   if(NROW(result$tissue.tissue) == 0) {
     result$tissue.tissue <- NULL
     result$tissue.patient <- NULL
   }
+
+  result <- filterForRNAseqImport(result)
+
   c(
     getLaboratory("recount3"),
     result
@@ -86,13 +89,13 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
     get_tissue_id <- function(x) substr(x, 1, nchar(x) - 9)
     get_tissue_run <- function(x) as.numeric(gsub(rownames(x), pattern = ".*\\.", replacement = ""))
     get_rnaset_run <- function(x) gsub(".*-", "", x) #gsub("\\.[0-9]$", "", gsub(".*-", "", x))
-    filter_bad_qc <- function(x) x %>% dplyr::filter(gtex.smafrze != "EXCLUDE")
+    filter_bad_qc <- function(x) x |> dplyr::filter(gtex.smafrze != "EXCLUDE")
 
   } else {
     stop("other file source is not supported")
   }
 
-  message("Processing: ", id, " ", proj$project, " ", proj$file_source)
+  logger::log_info(paste("Processing: ", id, " ", proj$project, " ", proj$file_source))
 
   withr::with_package("S4Vectors", {
     rse_gene <- recount3::create_rse(proj)
@@ -100,28 +103,28 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
 
   # Remove bad GTEX samples
 
-  col_data <- SummarizedExperiment::colData(rse_gene) %>%
-    as.data.frame() %>%
+  col_data <- SummarizedExperiment::colData(rse_gene) |>
+    as.data.frame() |>
     filter_bad_qc()
 
   if (nrow(col_data) == 0) {
-    message("no good quality runs available")
+    logger::log_info("no good quality runs available")
     return()
   }
-  
+
   #col_data <- SummarizedExperiment::colData(rse_gene)
   col_ids <- col_data[[id_column]]
 
   run_id <- get_tissue_run(col_data)
 
-  unique_ids <- tibble(col_id = col_ids) %>%
+  unique_ids <- tibble(col_id = col_ids) |>
     dplyr::mutate(
       id = row_number(),
       sample = run_id,
       clean_id = get_tissue_id(col_id)
-    ) %>%
-    group_by(clean_id) %>%
-    dplyr::filter(max(sample) == sample) %>%
+    ) |>
+    group_by(clean_id) |>
+    dplyr::filter(max(sample) == sample) |>
     dplyr::pull(id)
 
   rse_gene <- rse_gene[, unique_ids]
@@ -144,8 +147,8 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
   # SummarizedExperiment::assay(rse_gene_clean, "raw_counts")[idxes,] <- SummarizedExperiment::assay(rse_gene_clean, "raw_counts")[idxes,] + duplicated_counts
 
   to_data_frame <- function(dt, name = "counts") {
-    as.data.frame.table(dt, responseName = name) %>%
-      dplyr::rename(ensg = Var1, rnaseqrunid = Var2) %>%
+    as.data.frame.table(dt, responseName = name) |>
+      dplyr::rename(ensg = Var1, rnaseqrunid = Var2) |>
       dplyr::mutate(ensg =  substr(ensg, 1, 15))
   }
 
@@ -153,26 +156,26 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
 
   counts <- to_data_frame(SummarizedExperiment::assay(rse_gene, "counts"))
 
-  log2tpm <- to_data_frame(recount::getTPM(rse_gene), name = "tpm") %>%
-    dplyr::mutate(log2tpm = log2(tpm + 1)) %>% select(-tpm)
+  log2tpm <- to_data_frame(recount::getTPM(rse_gene), name = "tpm") |>
+    dplyr::mutate(log2tpm = log2(tpm + 1)) |> select(-tpm)
 
-  col_data <- SummarizedExperiment::colData(rse_gene) %>%
-    as.data.frame() %>%
+  col_data <- SummarizedExperiment::colData(rse_gene) |>
+    as.data.frame() |>
     filter_bad_qc()
 
-  processedRNASeq <- counts %>%
-    dplyr::mutate(log2tpm = log2tpm$log2tpm, rnaseqrunid = as.character(rnaseqrunid)) %>%
+  processedRNASeq <- counts |>
+    dplyr::mutate(log2tpm = log2tpm$log2tpm, rnaseqrunid = as.character(rnaseqrunid)) |>
     dplyr::filter(rnaseqrunid %in% rownames(col_data))
 
-  processedRNASeq_clean <- processedRNASeq %>%
+  processedRNASeq_clean <- processedRNASeq |>
     dplyr::filter(!ensg %in% dupl_ensg)
 
-  processedRNASeq_dupl <- processedRNASeq %>%
-    dplyr::filter(ensg %in% dupl_ensg) %>%
-    group_by(ensg, rnaseqrunid) %>%
+  processedRNASeq_dupl <- processedRNASeq |>
+    dplyr::filter(ensg %in% dupl_ensg) |>
+    group_by(ensg, rnaseqrunid) |>
     summarise(log2tpm = sum(log2tpm), counts = sum(counts), .groups = "drop")
 
-  processedRNASeq <- processedRNASeq_clean %>%
+  processedRNASeq <- processedRNASeq_clean |>
     bind_rows(processedRNASeq_dupl)
 
   RNAseqGroupID <- case_when(
@@ -216,7 +219,7 @@ processProcessedRNASeqExperiment <- function(id, human_projects) {
 getTissueGTEXAnno <- function(rse_gene) {
   anno <- SummarizedExperiment::colData(rse_gene)
 
-  anno <- anno[, grep(colnames(anno), value = TRUE, pattern = "^gtex")] %>%
+  anno <- anno[, grep(colnames(anno), value = TRUE, pattern = "^gtex")] |>
     as.data.frame()
 
   autolysis_score <-
@@ -238,18 +241,18 @@ getTissueGTEXAnno <- function(rse_gene) {
 
   # GTEX codes:
   # https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/GetListOfAllObjects.cgi?study_id=phs000424.v8.p2&object_type=variable
-  anno_all <- anno %>%
-    dplyr::left_join(autolysis_score, by = "gtex.smatsscr") %>%
-    dplyr::left_join(hardy_scale, by = "gtex.dthhrdy") %>%
+  anno_all <- anno |>
+    dplyr::left_join(autolysis_score, by = "gtex.smatsscr") |>
+    dplyr::left_join(hardy_scale, by = "gtex.dthhrdy") |>
     dplyr::mutate(
       gender = ifelse(gtex.sex == 1, "male", "female"),
-      days_to_birth = stringr::str_split(gtex.age, "-") %>% purrr::map(function(x)
+      days_to_birth = stringr::str_split(gtex.age, "-") |> purrr::map(function(x)
         - round(mean(as.numeric(
           x
-        )) * 365.25)) %>% unlist(),
+        )) * 365.25)) |> unlist(),
       tissuename = substr(gtex.sampid, 1, nchar(gtex.sampid) - 9)
-    ) %>%
-    dplyr::filter(gtex.smafrze != "EXCLUDE") %>%
+    ) |>
+    dplyr::filter(gtex.smafrze != "EXCLUDE") |>
     dplyr::select(
       tissuename,
       organ = gtex.smts,
@@ -313,7 +316,7 @@ getTissueGTEXAnno <- function(rse_gene) {
     person_neoplasm_cancer_status = NA,
     death_classification     = death_classification,
     treatment                = NA,
-  )) %>% distinct()
+  )) |> distinct()
 
   stopifnot("found duplicated patient name" =
               (anyDuplicated(patient_anno$patientname) == 0))
@@ -328,10 +331,10 @@ getTissueGTEXAnno <- function(rse_gene) {
 getTissueTCGAAnno <- function(rse_gene) {
   anno <- SummarizedExperiment::colData(rse_gene)
 
-  anno <- anno[, grep(colnames(anno), value = TRUE, pattern = "^tcga")] %>%
+  anno <- anno[, grep(colnames(anno), value = TRUE, pattern = "^tcga")] |>
     as.data.frame()
 
-  anno_all <- anno %>%
+  anno_all <- anno |>
     dplyr::mutate(
       tissuename = substr(tcga.tcga_barcode, 1, 15),
       patientname = substr(tissuename, 1, 12),
@@ -344,7 +347,7 @@ getTissueTCGAAnno <- function(rse_gene) {
       weight                   = NA,
       tissue_subtype = NA,
       comment = NA,
-    ) %>%
+    ) |>
     dplyr::select(
       tissuename,
       organ = tcga.gdc_cases.project.primary_site,
@@ -416,7 +419,7 @@ getTissueTCGAAnno <- function(rse_gene) {
     person_neoplasm_cancer_status = NA,
     death_classification     = NA,
     treatment                = NA,
-  )) %>% distinct()
+  )) |> distinct()
 
   stopifnot("found duplicated patient name" =
               (anyDuplicated(patient_anno$patientname) == 0))

@@ -142,14 +142,20 @@ getTCGAProteomicsRPPA() |> writeDatabase()
 
 getTissueRNAseqGroup() |> writeDatabase()
 
-tissue_project <- getTissueProcessedRNASeqProjects()
-tissue_project_sub <- tissue_project[49:50, ]
-#tissue_project_sub <- tissue_project[c(8), ]
-#tissue_project_sub <- tissue_project |> filter(project == "HNSC")
-d <- getTissueProcessedRNASeq(tissue_project_sub)
-d2 <- filterForRNAseqImport(d)
-writeDatabase(d2)
+tissue_project <- getTissueProcessedRNASeqProjects() |> arrange(n_samples)
+createDatabase("dropTissueRNASeqImportBlocker")
 
+for (n in 1:nrow(tissue_project)) {
+  tissue_project_sub <- tissue_project[n, ]
+  d <- getTissueProcessedRNASeq(tissue_project_sub)
+  writeDatabase(d)
+  rm(d)
+  gc()
+}
+
+createDatabase("restoreTissueRNASeqImportBlocker")
+
+modifyTissueCanonicalRNAseqRun()
 
 getTissueCellType() |> writeDatabase()
 getTissueCopyNumber() |> writeDatabase()

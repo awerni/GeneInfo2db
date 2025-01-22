@@ -44,6 +44,8 @@ setSearchPath_ti <- "set search_path = tissue,public;"
 tissueDB <-  paste(setSearchPath_ti, read_file("tissueDB.sql"), collapse = ";") 
 recreateTissueSchema <- read_file("recreateTissueSchema.sql")
 renewTissuePanels <- read_file("renewTissuePanels.sql")
+dropTissueRNASeqImportBlocker <- read_file("dropTissueRNASeqImportBlocker.sql")
+restoreTissueRNASeqImportBlocker <- read_file("restoreTissueRNASeqImportBlocker.sql")
 
 # ------------ tissue glue ---------
 db_glue_file <- c("viewTissue.sql",
@@ -61,5 +63,6 @@ save(
   recreateAnnotationSchema, geneAnnotation, db_glue_anno,
   recreateCelllineSchema, celllineDB, db_glue_cl, refreshView_cl, alternative_celllinename,
   recreateTissueSchema, tissueDB, renewTissuePanels, db_glue_ti, refreshView_ti,
+  dropTissueRNASeqImportBlocker, restoreTissueRNASeqImportBlocker,
   file = "data/db_schema.rda"
 )
