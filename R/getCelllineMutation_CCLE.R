@@ -1,30 +1,30 @@
 #' @export
 getCelllineMutation_CCLE <- function() {
   con <- getPostgresqlConnection()
-  
+
   transcript <- dplyr::tbl(con, "transcript") |>
     dplyr::inner_join(dplyr::tbl(con, "gene"), by = "ensg") |> 
     dplyr::filter(species == "human")  |> 
     dplyr::select(enst) |>
     dplyr::collect()
-  
+
   cellline <- dplyr::tbl(con, dbplyr::in_schema("cellline", "cellline"))  |>
     dplyr::filter(species == "human")  |> 
     dplyr::select(celllinename, depmap) |>
     dplyr::collect()
-  
+
   RPostgres::dbDisconnect(con)
-  
+
   CCLE.mutations <- getFileData("CCLE_mutations")
-  
+
   calcZygosity <- function(dna_zyg) {
     data.frame(x = dna_zyg) |> 
       dplyr::mutate(x = ifelse(is.na(x) | x == "", "NA:NA", x)) |>
       tidyr::separate(x, c("alt", "ref"), convert = TRUE) |>
       dplyr::mutate(rnazygosity = alt/(alt+ref)) |>
-      .$rnazygosity
+      pull("rnazygosity")
   }
-  
+
   CCLE.mutations2 <- CCLE.mutations |>
     dplyr::rename(depmap = DepMap_ID, enst = Annotation_Transcript) |>
     dplyr::filter(cDNA_Change != "" & Protein_Change != "") |>
@@ -43,6 +43,6 @@ getCelllineMutation_CCLE <- function() {
     dplyr::inner_join(cellline, by = "depmap") |>
     dplyr::filter(enst %in% transcript$enst) |>
     dplyr::select(celllinename, enst, dnamutation, aamutation, dnazygosity, rnazygosity)
-  
+
   list(cellline.processedsequence = CCLE.mutations2)
 }
