@@ -4,7 +4,7 @@ p <- "data-raw/DB_structure/"
 
 read_file <- function(f, keep_crlf = FALSE) {
   r <- readr::read_file(paste0(p, f))
-  if (!keep_crlf) r <- r %>% gsub(pattern = "(\n|\r)", replacement = "")
+  if (!keep_crlf) r <- r |> gsub(pattern = "(\n|\r)", replacement = "")
   return(r)
 }
 

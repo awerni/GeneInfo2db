@@ -9,8 +9,8 @@ createDatabase <- function(db_part) {
                      "recreateTissueSchema", "tissueDB", "renewTissuePanels", "db_glue_ti", "refreshView_ti")) {
 
     split_SQL <- function(my_SQL) {
-      s <- stringr::str_split(my_SQL, ";", simplify = FALSE) %>% unlist()
-      from_to <- stringr::str_detect(s, "\\$\\$") %>% which()
+      s <- stringr::str_split(my_SQL, ";", simplify = FALSE) |> unlist()
+      from_to <- stringr::str_detect(s, "\\$\\$") |> which()
       l <- length(from_to)
       if (l == 0) return(stringr::str_split(my_SQL, ";")[[1]])
       if (l %% 2 != 0) stop("SQL parsing error")
@@ -26,7 +26,7 @@ createDatabase <- function(db_part) {
     }
 
     con <- getPostgresqlConnection()
-    
+
     sapply(split_SQL(get(db_part)), function(s) {
       #res <- RPostgres::dbSendQuery(con, s)
       #RPostgres::dbClearResult(res)
@@ -35,7 +35,7 @@ createDatabase <- function(db_part) {
         DBI::dbExecute(con, dplyr::sql(s))
       }
     })
-    
+
     RPostgres::dbDisconnect(con)
   } else {
     stop("unknown database part")

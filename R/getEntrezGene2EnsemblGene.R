@@ -1,8 +1,8 @@
 #' @export
 getEntrezGene2EnsemblGene <- function(db_info, species_name) {
 
-  db <- db_info %>%
-    dplyr::filter(species == species_name) %>%
+  db <- db_info |>
+    dplyr::filter(species == species_name) |>
     as.list()
 
   conM <- getEnsemblDBConnection(db$database)

@@ -5,6 +5,6 @@ getEntrez <- function(gene_info, refseq_info, species_name) {
   # Currently we are not using RefSeq in CLIFF.
   # It's nice to have but if it causes problems we simply skip it.
   # res$public.refseq <- getRefseq(refseq_info, species_name)
-  
+
   return(res)
 }

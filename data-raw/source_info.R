@@ -33,9 +33,9 @@ refseq_info <- tibble::tribble(
 
 FIGSHARE_ID <- 25880521 # 23Q4 = 24667905; 23Q2 = 22765112; 22Q4 = 21637199; 22Q2 = 19700056; 22Q1 = 19139906; 21Q4 = 16924132; 21Q3 = 15160110
 DEPMAP_VERSION  <- "24q2"
-depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", FIGSHARE_ID)) %>%
-  mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
-  select(data_name,  url = download_url, data_file) %>%
+depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", FIGSHARE_ID)) |>
+  mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) |>
+  select(data_name,  url = download_url, data_file) |>
   filter(
     data_file %in% c(
       "Model",
@@ -63,9 +63,9 @@ depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/
 
 FIGSHARE_ID_OLD <- 19700056 #
 DEPMAP_VERSION_OLD  <- "22q2"
-depmap_info_old <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", FIGSHARE_ID_OLD)) %>%
-  mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) %>%
-  select(data_name,  url = download_url, data_file) %>%
+depmap_info_old <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", FIGSHARE_ID_OLD)) |>
+  mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) |>
+  select(data_name,  url = download_url, data_file) |>
   filter(
     data_file %in% c(
       "CCLE_expression_full",
@@ -76,19 +76,19 @@ depmap_info_old <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/artic
     )
   )
 
-drive_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/6025238/files") %>%
-  mutate(data_name = "demeter2-drive", data_file = gsub("\\.csv$", "", name)) %>%
-  select(data_name,  url = download_url, data_file) %>%
-  filter(grepl("(D2_DRIVE_gene_dep_scores)", data_file)) %>%
+drive_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/6025238/files") |>
+  mutate(data_name = "demeter2-drive", data_file = gsub("\\.csv$", "", name)) |>
+  select(data_name,  url = download_url, data_file) |>
+  filter(grepl("(D2_DRIVE_gene_dep_scores)", data_file)) |>
   mutate(data_file = "gene_effect")
 
-prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/25917643/files") %>%  #   20564034
-  mutate(data_name = "prism", data_file = gsub("\\.csv$", "", name)) %>%
-  select(data_name,  url = download_url, data_file) %>%
+prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/25917643/files") |>  #   20564034
+  mutate(data_name = "prism", data_file = gsub("\\.csv$", "", name)) |>
+  select(data_name,  url = download_url, data_file) |>
   filter(data_file %in% c("prism-repurposing-20q2-secondary-screen-dose-response-curve-parameters"))
 
-sanger_info_chronos <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732/files") %>%
-  mutate(data_name = "sanger-crispr-project-score", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) %>%
+sanger_info_chronos <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732/files") |>
+  mutate(data_name = "sanger-crispr-project-score", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) |>
   select(data_name,  url = download_url, data_file)
 
 #sanger_info <- bind_rows(sanger_info_chronos, sanger_info_ceres)
@@ -114,12 +114,12 @@ drugcomb_info <- tibble::tribble(
   "drugcomb", " ", "summary_v_1_5_update_with_drugIDs.csv"
 )
 
-download_file_info <- depmap_info %>%
-  bind_rows(depmap_info_old) %>%
-  bind_rows(drive_info) %>%
-  bind_rows(sanger_info) %>%
-  bind_rows(prism_info) %>%
-  bind_rows(other_info) %>%
+download_file_info <- depmap_info |>
+  bind_rows(depmap_info_old) |>
+  bind_rows(drive_info) |>
+  bind_rows(sanger_info) |>
+  bind_rows(prism_info) |>
+  bind_rows(other_info) |>
   bind_rows(drugcomb_info)
 
 file_version <- tibble::tribble(

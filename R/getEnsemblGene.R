@@ -29,24 +29,24 @@ getEnsemblGene <- function(con, symbol_source) {
     "')"
   )
   res <- DBI::dbSendQuery(con, sql3)
-  symbol <- DBI::dbFetch(res) %>%
-    unique() %>%
+  symbol <- DBI::dbFetch(res) |>
+    unique() |>
     dplyr::arrange(symbol)
 
   dbClearResult(res)
 
-  symbol %>%
-    dplyr::group_by(ensg) %>%
-    dplyr::summarise(n = n()) %>%
-    dplyr::filter(n > 1) %>%
+  symbol |>
+    dplyr::group_by(ensg) |>
+    dplyr::summarise(n = n()) |>
+    dplyr::filter(n > 1) |>
     print()
 
-  symbol2 <- symbol %>%
-    dplyr::group_by(ensg) %>%
+  symbol2 <- symbol |>
+    dplyr::group_by(ensg) |>
     dplyr::slice(1)
 
   # -- put things together
-  gene %>%
-    dplyr::left_join(gc_content, by = "ensg") %>%
+  gene |>
+    dplyr::left_join(gc_content, by = "ensg") |>
     dplyr::left_join(symbol2, by = "ensg")
 }

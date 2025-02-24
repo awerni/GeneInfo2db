@@ -114,12 +114,12 @@ getGeneSet() |> writeDatabase()
 getGeneSet_surfaceome() |> writeDatabase()
 
 # --------- gene expression signatures --------
-createCelllineSigMPAS() %>% writeDatabase()
-createCelllineSigRAS() %>% writeDatabase()
-createCelllineSigTP53() %>% writeDatabase()
-createCelllineSigIFN() %>% writeDatabase()
-createCelllineSigMPS50() %>% writeDatabase()
-getCelllineGSVA() %>% writeDatabase()
+createCelllineSigMPAS() |> writeDatabase()
+createCelllineSigRAS() |> writeDatabase()
+createCelllineSigTP53() |> writeDatabase()
+createCelllineSigIFN() |> writeDatabase()
+createCelllineSigMPS50() |> writeDatabase()
+getCelllineGSVA() |> writeDatabase()
 
 # ------- refresh Views -----------
 createDatabase("refreshView_cl")
@@ -169,10 +169,10 @@ getTissueSignalingPathway() |> writeDatabase()
 
 getTissueGSVA() |> writeDatabase()
 
-createTissueSigMPAS() %>% writeDatabase()
-createTissueSigTP53() %>% writeDatabase()
-createTissueSigIFN() %>% writeDatabase()
-createTissueSigMPS50() %>% writeDatabase()
+createTissueSigMPAS() |> writeDatabase()
+createTissueSigTP53() |> writeDatabase()
+createTissueSigIFN() |> writeDatabase()
+createTissueSigMPS50() |> writeDatabase()
 
 #---- missing -----
 # copy number

@@ -1,7 +1,7 @@
 #' @export
 writeEntrezGene2EnsemblGene <- function(species_data) {
 
-  species_data <- species_data %>%
+  species_data <- species_data |>
     dplyr::mutate(sql = paste0("SELECT setEntrezGene2EnsemblGene('", ensg, "',", geneid, ")"))
 
   con <- getPostgresqlConnection()

@@ -1,22 +1,22 @@
 #' @export
 getGeneSet_TF <- function() {
-  
+
   con <- getPostgresqlConnection()
-  
-  gene_id <- tbl(con, "entrezgene2ensemblgene") %>%
+
+  gene_id <- tbl(con, "entrezgene2ensemblgene") |>
     dplyr::collect()
-  
+
   RPostgres::dbDisconnect(con)
-  
+
   # ---------------------------
-  
+
   TF <- getFileDownload("TFLink_Homo_sapiens.tsv.gz")
-  
+
   geneset <- tibble::tribble(
     ~genesetname, ~species,
     "transcription factors", "human"
   )
-  
+
   geneassignment <-
     dplyr::as_tibble(TF) |>
     dplyr::select(NCBI.GeneID.TF) |>
@@ -29,7 +29,7 @@ getGeneSet_TF <- function() {
     dplyr::select(ensg) |>
     dplyr::distinct() |>
     dplyr::mutate(genesetname = "transcription factors")
-  
+
   list(
     public.geneset = geneset,
     public.geneassignment = geneassignment

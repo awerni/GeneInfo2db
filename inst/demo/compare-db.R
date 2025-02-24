@@ -35,8 +35,8 @@ dbDisconnect(dbNew)
 dbDisconnect(oldDb)
 
 result <- full_join(
-  dbNewSummary %>% select(table_schema, table_name, row_estimate, total, total_bytes),
-  dbOldSummary %>% select(
+  dbNewSummary |> select(table_schema, table_name, row_estimate, total, total_bytes),
+  dbOldSummary |> select(
     table_schema,
     table_name,
     old_row_estimate = row_estimate,
@@ -45,12 +45,12 @@ result <- full_join(
   )
 )
 
-res <- result %>% mutate(row_diff = round((row_estimate - old_row_estimate) / ((
+res <- result |> mutate(row_diff = round((row_estimate - old_row_estimate) / ((
   row_estimate + old_row_estimate
 ) / 2), 3),
 size_diff = round((total_bytes - old_total_bytes) / ((
   total_bytes + old_total_bytes
-) / 2), 3)) %>%
+) / 2), 3)) |>
   select(
     table_schema,
     table_name,

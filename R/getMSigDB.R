@@ -6,9 +6,9 @@ getMSigDB <- function(version) {
 
   con <- getPostgresqlConnection()
 
-  entrez_ensg <- tbl(con, "normchromentrezgene2ensemblgene") %>%
-    dplyr::inner_join(tbl(con, "gene", by = "ensg") %>% filter(species == "human"), by = "ensg") %>%
-    dplyr::select(ensg, geneid, chromosome) %>%
+  entrez_ensg <- tbl(con, "normchromentrezgene2ensemblgene") |>
+    dplyr::inner_join(tbl(con, "gene", by = "ensg") |> filter(species == "human"), by = "ensg") |>
+    dplyr::select(ensg, geneid, chromosome) |>
     dplyr::collect()
 
   DBI::dbDisconnect(con)
@@ -38,18 +38,18 @@ getMSigDB <- function(version) {
     human.msig_df <- tibble::tibble(gene_set = sapply(human.msig, function(x) x[[1]]),
                             ensg_array = paste0('{"', paste(sapply(human.msig, function(x) paste(x[c(-1, -2)], collapse = '","'))), '"}'),
                             species = "human",
-                            file = gmt.files[[n, "file"]]) %>%
-      left_join(gmt.files, by = "file") %>%
+                            file = gmt.files[[n, "file"]]) |>
+      left_join(gmt.files, by = "file") |>
       select(-file)
 
     r_before <- nrow(human.msig_df)
-    human.msig_df <- human.msig_df %>%
+    human.msig_df <- human.msig_df |>
       dplyr::filter(!gene_set %in% msig_df$gene_set)
     r_after <- nrow(human.msig_df)
 
     if (r_after != r_before) warning("removed ", r_before - r_after, " redundant gene sets", immediate. = TRUE)
 
-    msig_df <- msig_df %>%
+    msig_df <- msig_df |>
       bind_rows(human.msig_df)
 
   }
