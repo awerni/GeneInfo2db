@@ -71,7 +71,7 @@ safeDownloadFile <- function(URL, filename, .retries = 20, .waitTime = 20) {
 
   logger::log_trace("File {filename} not available local cache. Downloading from {URL} using safeDownloadFile().")
 
-  status <- tryCatch(download_filesize(URL, filename), error = function(err) {
+  status <- tryCatch(download.file(URL, filename), error = function(err) {
     logger::log_error("Cannot download the {URL}.")
     if(file.exists(filename)) unlink(filename)
     err
@@ -131,9 +131,9 @@ safeReadFile <- function(URL, filename = NULL, read_fnc = readr::read_tsv, .retr
   .retries <- status$.retries # update retries to include retires used in recurrent safeDownloadFile calls.
 
   # Safely reading the file:
-  # it needs to use tryCatch becaue sometimes even when the safeDownloadFile succeed, the archive still
+  # it needs to use tryCatch because sometimes even when the safeDownloadFile succeed, the archive still
   # can be corrupted leading to error on this stage. In such case (the reading below fails), safeReadFile
-  # calls itself once again to redownload hopefully uncorrupted verion of the file.
+  # calls itself once again to redownload hopefully uncorrupted version of the file.
   res <- tryCatch(
     read_fnc(filename, ...)
     , error = function(e) {
