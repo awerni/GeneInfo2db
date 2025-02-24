@@ -37,7 +37,7 @@ getCellline_CRISPR_screen_chronos <- function(
     tidyr::pivot_longer(cols = -depmap, names_to = "gene", values_to = "chronos") |>
     dplyr::inner_join(cellline, by = "depmap") |>
     dplyr::select(-depmap) |>
-    separate_gene
+    separate_gene()
 
   ensg <- getEntrezGene2ENSG(geneid = unique(gene_effect_long_new$geneid))
 
@@ -57,7 +57,7 @@ getCellline_CRISPR_screen_chronos <- function(
     tidyr::pivot_longer(!depmap, names_to = "gene", values_to = "chronos_prob") |>
     dplyr::inner_join(cellline, by = "depmap") |>
     dplyr::select(-depmap) |>
-    separate_gene |>
+    separate_gene() |>
     dplyr::mutate(chronos_prob = ifelse(chronos_prob < 1e-45, 0, chronos_prob))
 
   gene_effect_long <- gene_effect_long_new |>
