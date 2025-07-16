@@ -7,7 +7,7 @@ logger::log_threshold(TRACE)
 # Be careful! Running the code below might mess up with the selected database.
 # Make sure that you've selected the proper one (preferably empty one).
 #dbconfig <- getDBConfig(list(dbname = "bioinfo.hg38", dbhost = "charlotte", dbuser = "andreas"))
-dbconfig <- getDBConfig(list(dbname = "bioinfo_24Q2.hg38", dbhost = "charlotte", dbuser = "andreas"))
+dbconfig <- getDBConfig(list(dbname = "bioinfo_24Q4.hg38", dbhost = "charlotte", dbuser = "andreas"))
 
 setDBconfig(dbconfig)
 # YOU'VE BEEN WARNDED!
@@ -15,6 +15,21 @@ setDBconfig(dbconfig)
 options("msigdb_path" = "/data/shared_data/msigdb_v2023.2.Hs_files_to_download_locally/msigdb_v2023.2.Hs_GMTs")
 
 options("GeneInfo2db.ExperimentalCurlSizeRequest" = TRUE)
+
+# --------- Ensembl -------------
+getEnsembl(db_info, "human") |> writeDatabase()
+getEnsembl(db_info, "mouse") |> writeDatabase()
+getEnsembl(db_info, "rat") |> writeDatabase()
+
+# --------- Entrez Gene and RefSeq --------
+getEntrez(gene_info, refseq_info, "human") |> writeDatabase()
+getEntrez(gene_info, refseq_info, "mouse") |> writeDatabase()
+getEntrez(gene_info, refseq_info, "rat") |> writeDatabase()
+
+# ---------- Entrez Gene to Ensembl Gene -----
+getEntrezGene2EnsemblGene(db_info, "human") |> writeEntrezGene2EnsemblGene()
+getEntrezGene2EnsemblGene(db_info, "mouse") |> writeEntrezGene2EnsemblGene()
+getEntrezGene2EnsemblGene(db_info, "rat") |> writeEntrezGene2EnsemblGene()
 
 # ---------- Ensembl Orthologs ---------
 getEnsemblOrthologs(db_compara, "human", "mouse")

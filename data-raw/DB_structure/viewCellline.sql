@@ -155,7 +155,7 @@ DROP VIEW IF EXISTS cellline.allTranscriptMutation;
 
 ----------------------------------------------------
 
-DROP VIEW IF EXISTS cellline.sequenced_transcript CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS cellline.sequenced_transcript CASCADE;
 CREATE MATERIALIZED VIEW cellline.sequenced_transcript AS
   SELECT distinct enst FROM cellline.processedsequence;
 
