@@ -407,7 +407,7 @@ create table PROCESSEDSEQUENCE (
    VARIANTTYPE          TEXT                 null,
    VARIANTINFO          TEXT                 null,
    ONCOGENEHIGHIMPACT   BOOL                 null,
-   TUMORTSUPPRESSORHIGHIMPACT BOOL           null,
+   TUMORSUPPRESSORHIGHIMPACT BOOL            null,
    LIKELYLOF            BOOL                 null,
    constraint PK_PROCESSEDSEQUENCE primary key (CELLLINENAME, ENST)
 );
