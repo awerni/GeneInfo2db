@@ -31,9 +31,11 @@ refseq_info <- tibble::tribble(
 
 # ------figshare (depmap) and direct links -----------
 
-FIGSHARE_ID <- 25880521 # 23Q4 = 24667905; 23Q2 = 22765112; 22Q4 = 21637199; 22Q2 = 19700056; 22Q1 = 19139906; 21Q4 = 16924132; 21Q3 = 15160110
-DEPMAP_VERSION  <- "24q2"
-depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", FIGSHARE_ID)) |>
+FIGSHARE_ID <- 27993248 # 24Q2 = 25880521; 23Q4 = 24667905; 23Q2 = 22765112; 22Q4 = 21637199; 22Q2 = 19700056; 22Q1 = 19139906; 21Q4 = 16924132; 21Q3 = 15160110
+DEPMAP_VERSION  <- "24q4"
+# adding parameter page_size became ncessary: https://docs.figshare.com/#article_files
+# https://support.figshare.com/support/tickets/492056
+depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files?page_size=1000", FIGSHARE_ID)) |>
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) |>
   select(data_name,  url = download_url, data_file) |>
   filter(
@@ -53,7 +55,6 @@ depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/
       "AchillesNonessentialControls",
       "HumagneRawReadcounts",
       "HumagneLogfoldChange",
-      "HumagneRawReadcounts",
       "OmicsCNGene",
       "OmicsFusionFiltered",
       "OmicsSomaticMutations",
@@ -63,7 +64,7 @@ depmap_info <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/
 
 FIGSHARE_ID_OLD <- 19700056 #
 DEPMAP_VERSION_OLD  <- "22q2"
-depmap_info_old <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files", FIGSHARE_ID_OLD)) |>
+depmap_info_old <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/articles/%s/files?page_size=1000", FIGSHARE_ID_OLD)) |>
   mutate(data_name = "depmap", data_file = gsub("\\.csv$", "", name)) |>
   select(data_name,  url = download_url, data_file) |>
   filter(
@@ -76,18 +77,18 @@ depmap_info_old <- jsonlite::fromJSON(sprintf("https://api.figshare.com/v2/artic
     )
   )
 
-drive_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/6025238/files") |>
+drive_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/6025238/files?page_size=1000") |>
   mutate(data_name = "demeter2-drive", data_file = gsub("\\.csv$", "", name)) |>
   select(data_name,  url = download_url, data_file) |>
   filter(grepl("(D2_DRIVE_gene_dep_scores)", data_file)) |>
   mutate(data_file = "gene_effect")
 
-prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/25917643/files") |>  #   20564034
+prism_info <- jsonlite::fromJSON("https://api.figshare.com/v2/articles/20564034/files?page_size=1000") |>  # 24q2 = 25917643 (but has no secondary screen data)
   mutate(data_name = "prism", data_file = gsub("\\.csv$", "", name)) |>
-  select(data_name,  url = download_url, data_file) |>
+  select(data_name, url = download_url, data_file) |>
   filter(data_file %in% c("prism-repurposing-20q2-secondary-screen-dose-response-curve-parameters"))
 
-sanger_info_chronos <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732/files") |>
+sanger_info_chronos <-  jsonlite::fromJSON("https://api.figshare.com/v2/articles/9116732/files?page_size=1000") |>
   mutate(data_name = "sanger-crispr-project-score", data_file = gsub("(\\.csv$|\\.tsv$|\\.txt$)", "", name)) |>
   select(data_name,  url = download_url, data_file)
 
